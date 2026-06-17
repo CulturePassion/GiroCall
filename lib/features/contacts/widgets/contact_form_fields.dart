@@ -254,7 +254,7 @@ class _ContactFormFieldsState extends State<ContactFormFields> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _SectionHeader(title: 'Name', icon: Icons.person_outline),
+        const _SectionHeader(title: 'Name', icon: Icons.person_outline),
         TextField(
           controller: _controllers['firstName'],
           decoration: const InputDecoration(labelText: 'First name'),
@@ -269,7 +269,7 @@ class _ContactFormFieldsState extends State<ContactFormFields> {
           onChanged: (v) => _update('lastName', v),
         ),
         const SizedBox(height: 24),
-        _SectionHeader(title: 'Phone', icon: Icons.phone_outlined),
+        const _SectionHeader(title: 'Phone', icon: Icons.phone_outlined),
         TextField(
           controller: _controllers['phone'],
           decoration: const InputDecoration(labelText: 'Mobile'),
@@ -284,7 +284,7 @@ class _ContactFormFieldsState extends State<ContactFormFields> {
           onChanged: (v) => _update('secondaryPhone', v),
         ),
         const SizedBox(height: 24),
-        _SectionHeader(title: 'Email', icon: Icons.email_outlined),
+        const _SectionHeader(title: 'Email', icon: Icons.email_outlined),
         TextField(
           controller: _controllers['email'],
           decoration: const InputDecoration(labelText: 'Email'),
@@ -292,7 +292,7 @@ class _ContactFormFieldsState extends State<ContactFormFields> {
           onChanged: (v) => _update('email', v),
         ),
         const SizedBox(height: 24),
-        _SectionHeader(title: 'Work', icon: Icons.business_outlined),
+        const _SectionHeader(title: 'Work', icon: Icons.business_outlined),
         TextField(
           controller: _controllers['company'],
           decoration: const InputDecoration(labelText: 'Company'),
@@ -305,7 +305,7 @@ class _ContactFormFieldsState extends State<ContactFormFields> {
           onChanged: (v) => _update('jobTitle', v),
         ),
         const SizedBox(height: 24),
-        _SectionHeader(title: 'Birthday', icon: Icons.cake_outlined),
+        const _SectionHeader(title: 'Birthday', icon: Icons.cake_outlined),
         ListTile(
           contentPadding: EdgeInsets.zero,
           title: Text(
@@ -328,7 +328,7 @@ class _ContactFormFieldsState extends State<ContactFormFields> {
           },
         ),
         const SizedBox(height: 16),
-        _SectionHeader(title: 'Address', icon: Icons.location_on_outlined),
+        const _SectionHeader(title: 'Address', icon: Icons.location_on_outlined),
         TextField(
           controller: _controllers['addressLine1'],
           decoration: const InputDecoration(labelText: 'Street'),
@@ -381,7 +381,7 @@ class _ContactFormFieldsState extends State<ContactFormFields> {
           ],
         ),
         const SizedBox(height: 24),
-        _SectionHeader(title: 'More', icon: Icons.notes_outlined),
+        const _SectionHeader(title: 'More', icon: Icons.notes_outlined),
         TextField(
           controller: _controllers['website'],
           decoration: const InputDecoration(labelText: 'Website'),

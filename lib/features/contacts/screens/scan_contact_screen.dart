@@ -41,7 +41,7 @@ class _ScanContactScreenState extends ConsumerState<ScanContactScreen> {
     final userId = ref.read(contactsNotifierProvider.notifier).currentUserId;
     if (userId == null) return;
 
-    ContactDraft? draft = VCardParser.parse(raw, userId: userId);
+    final ContactDraft? draft = VCardParser.parse(raw, userId: userId);
 
     if (draft == null && raw.contains('/card/')) {
       setState(() {
@@ -210,11 +210,11 @@ class _ScanContactScreenState extends ConsumerState<ScanContactScreen> {
                 color: Colors.black.withValues(alpha: 0.65),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: Text(
+              child: const Text(
                 'Point at a contact QR code or vCard.\n'
                 'GiroCall digital cards also work.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white, height: 1.4),
+                style: TextStyle(color: Colors.white, height: 1.4),
               ),
             ),
           ),

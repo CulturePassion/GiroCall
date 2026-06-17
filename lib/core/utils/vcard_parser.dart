@@ -45,17 +45,19 @@ class VCardParser {
           fn = value;
         case 'N':
           final parts = value.split(';');
-          if (parts.length > 1)
+          if (parts.length > 1) {
             lastName = parts[0].trim().isEmpty ? null : parts[0];
-          if (parts.length > 2)
+          }
+          if (parts.length > 2) {
             firstName = parts[1].trim().isEmpty ? null : parts[1];
+          }
         case 'TEL':
           final normalized = PhoneFormatter.normalize(value);
           if (PhoneFormatter.looksValid(normalized)) {
             if (phone == null) {
               phone = normalized;
-            } else if (secondaryPhone == null) {
-              secondaryPhone = normalized;
+            } else {
+              secondaryPhone ??= normalized;
             }
           }
         case 'EMAIL':
@@ -75,13 +77,18 @@ class VCardParser {
           if (parts.length > 2 && parts[2].trim().isNotEmpty) {
             addressLine1 = parts[2];
           }
-          if (parts.length > 3 && parts[3].trim().isNotEmpty) city = parts[3];
-          if (parts.length > 4 && parts[4].trim().isNotEmpty) state = parts[4];
+          if (parts.length > 3 && parts[3].trim().isNotEmpty) {
+            city = parts[3];
+          }
+          if (parts.length > 4 && parts[4].trim().isNotEmpty) {
+            state = parts[4];
+          }
           if (parts.length > 5 && parts[5].trim().isNotEmpty) {
             postalCode = parts[5];
           }
-          if (parts.length > 6 && parts[6].trim().isNotEmpty)
+          if (parts.length > 6 && parts[6].trim().isNotEmpty) {
             country = parts[6];
+          }
       }
     }
 
