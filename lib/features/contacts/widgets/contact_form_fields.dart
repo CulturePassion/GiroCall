@@ -328,7 +328,8 @@ class _ContactFormFieldsState extends State<ContactFormFields> {
           },
         ),
         const SizedBox(height: 16),
-        const _SectionHeader(title: 'Address', icon: Icons.location_on_outlined),
+        const _SectionHeader(
+            title: 'Address', icon: Icons.location_on_outlined),
         TextField(
           controller: _controllers['addressLine1'],
           decoration: const InputDecoration(labelText: 'Street'),
