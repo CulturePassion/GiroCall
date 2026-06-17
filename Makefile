@@ -1,4 +1,4 @@
-.PHONY: install upgrade run run-ios run-android analyze test format format-check build-apk build-ios build-web clean deploy-edge deploy-edge-all supabase-link setup-db deploy-migrations site-install site-dev site-build clean-ios
+.PHONY: install upgrade run run-ios run-android analyze test format format-check build-apk build-ios build-web clean deploy-edge deploy-edge-all deploy-supabase verify-supabase supabase-link setup-db deploy-migrations site-install site-dev site-build clean-ios
 
 SUPABASE_PROJECT_REF ?= gtvpsukmmjhszpopulfe
 
@@ -79,6 +79,11 @@ setup-db:
 	@./scripts/setup_db.sh
 
 deploy-migrations: setup-db
+
+deploy-supabase: setup-db deploy-edge-all verify-supabase
+
+verify-supabase:
+	@./scripts/verify_supabase.mjs
 
 site-install:
 	cd site && npm install

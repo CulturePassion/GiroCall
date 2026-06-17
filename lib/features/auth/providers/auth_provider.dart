@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase_provider.dart';
+import '../../../core/utils/auth_redirect.dart';
 
 /// Encapsulates the current auth state and async operations.
 class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
@@ -43,7 +44,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
   }
 
   Future<void> resetPasswordForEmail(String email) async {
-    await _client.auth.resetPasswordForEmail(email.trim());
+    await _client.auth.resetPasswordForEmail(
+      email.trim(),
+      redirectTo: authRedirectUrl(),
+    );
   }
 
   Future<void> updatePassword(String newPassword) async {

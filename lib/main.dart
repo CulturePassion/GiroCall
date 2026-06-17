@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'core/app_bootstrap.dart';
 import 'core/app_theme.dart';
@@ -48,7 +49,13 @@ class _GiroCallAppState extends ConsumerState<GiroCallApp> {
   void initState() {
     super.initState();
     ref.listenManual(authUserProvider, (previous, next) {
-      if (next.value?.session != null && previous?.value?.session == null) {
+      final authState = next.value;
+      if (authState?.event == AuthChangeEvent.passwordRecovery) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ref.read(routerProvider).go('/settings/account/password');
+        });
+      }
+      if (authState?.session != null && previous?.value?.session == null) {
         onUserSignedIn(ref);
       }
     });

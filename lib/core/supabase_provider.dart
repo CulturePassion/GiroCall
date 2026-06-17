@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -31,5 +32,9 @@ Future<void> initializeSupabase({
   await Supabase.initialize(
     url: url,
     publishableKey: anonKey,
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce,
+      detectSessionInUri: kIsWeb,
+    ),
   );
 }

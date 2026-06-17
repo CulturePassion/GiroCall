@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Apply GiroCall SQL migrations (001–007) to a remote Supabase project.
+ * Apply GiroCall SQL migrations to a remote Supabase project.
  *
  * Option A (recommended): add DATABASE_URL to .env, then run `make setup-db`
  * Option B: add SUPABASE_ACCESS_TOKEN to .env, then run `node scripts/apply_migrations.mjs`
