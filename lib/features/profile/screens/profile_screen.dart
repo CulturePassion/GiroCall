@@ -3,14 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/app_colors.dart';
+import '../../../core/app_spacing.dart';
 import '../../../core/constants.dart';
 import '../../../core/supabase_provider.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../core/utils/supabase_error_message.dart';
+import '../../../shared/widgets/glass_surface.dart';
+import '../../../shared/widgets/gradient_background.dart';
 import '../../stats/providers/stats_provider.dart';
 import '../providers/profile_notifier.dart';
 
-/// Profile hub — account overview and navigation to card, settings, and account.
+/// Profile hub — glass cards, colorful stats, thumb-friendly navigation.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -22,106 +25,130 @@ class ProfileScreen extends ConsumerWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      body: SafeArea(
-        child: profileAsync.when(
-          data: (profile) {
-            final displayName = profile?.displayName ??
-                user?.email?.split('@').first ??
-                'GiroCall user';
-            final email = user?.email ?? '';
+      body: GradientBackground(
+        child: SafeArea(
+          child: profileAsync.when(
+            data: (profile) {
+              final displayName = profile?.displayName ??
+                  user?.email?.split('@').first ??
+                  'GiroCall user';
+              final email = user?.email ?? '';
 
-            return CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: ScreenPadding.all(context).copyWith(
-                      top: 16,
-                      bottom: 8,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Profile',
-                          style: theme.textTheme.displaySmall,
-                        ),
-                        const SizedBox(height: 20),
-                        _ProfileHeader(
-                          displayName: displayName,
-                          email: email,
-                          subtitle: profile?.title,
-                        ),
-                        const SizedBox(height: 20),
-                        _QuickStatsRow(
-                          streak: stats.currentStreak,
-                          totalCalls: stats.totalCalls,
-                          reconnected: stats.uniqueContactsCalled,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SliverPadding(
-                  padding: ScreenPadding.horizontal(context),
-                  sliver: SliverList(
-                    delegate: SliverChildListDelegate([
-                      const SizedBox(height: 8),
-                      _MenuCard(
+              return CustomScrollView(
+                slivers: [
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: ScreenPadding.all(context).copyWith(
+                        top: AppSpacing.xs,
+                        bottom: AppSpacing.xxs,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _ProfileMenuTile(
-                            icon: Icons.badge_outlined,
-                            title: 'My Digital Card',
-                            subtitle: profile?.isPublic == true
-                                ? 'Public · ${profile!.slug}'
-                                : 'Private — tap to share when ready',
-                            onTap: () => context.push('/profile/card'),
+                          Text(
+                            'Profile',
+                            style: theme.textTheme.displaySmall,
                           ),
-                          _ProfileMenuTile(
-                            icon: Icons.notifications_outlined,
-                            title: 'Reminders',
-                            subtitle: 'Daily spin nudges and call goals',
-                            onTap: () =>
-                                context.push('/settings/notifications'),
+                          const SizedBox(height: AppSpacing.sm),
+                          _ProfileHeader(
+                            displayName: displayName,
+                            email: email,
+                            subtitle: profile?.title,
                           ),
-                          _ProfileMenuTile(
-                            icon: Icons.settings_outlined,
-                            title: 'Settings',
-                            subtitle: 'Appearance, preferences, and more',
-                            onTap: () => context.push('/settings'),
-                          ),
-                          _ProfileMenuTile(
-                            icon: Icons.manage_accounts_outlined,
-                            title: 'Account',
-                            subtitle: 'Email, sign out, and data',
-                            onTap: () => context.push('/settings/account'),
+                          const SizedBox(height: AppSpacing.sm),
+                          _QuickStatsRow(
+                            streak: stats.currentStreak,
+                            totalCalls: stats.totalCalls,
+                            reconnected: stats.uniqueContactsCalled,
                           ),
                         ],
                       ),
-                      const SizedBox(height: 24),
-                      Text(
-                        Constants.tagline,
-                        style: theme.textTheme.bodySmall,
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(
-                        height: ScreenPadding.bottomNavClearance(context),
-                      ),
-                    ]),
+                    ),
                   ),
-                ),
-              ],
-            );
-          },
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(supabaseErrorMessage(error)),
+                  SliverPadding(
+                    padding: ScreenPadding.horizontal(context),
+                    sliver: SliverList(
+                      delegate: SliverChildListDelegate([
+                        GlassSurface(
+                          padding: EdgeInsets.zero,
+                          borderRadius: AppSpacing.radiusLg,
+                          child: Column(
+                            children: _withDividers(context, [
+                              _ProfileMenuTile(
+                                icon: Icons.badge_outlined,
+                                iconColor: AppColors.paletteTeal,
+                                title: 'My Digital Card',
+                                subtitle: profile?.isPublic == true
+                                    ? 'Public · ${profile!.slug}'
+                                    : 'Private — tap to share when ready',
+                                onTap: () => context.push('/profile/card'),
+                              ),
+                              _ProfileMenuTile(
+                                icon: Icons.notifications_outlined,
+                                iconColor: AppColors.paletteGold,
+                                title: 'Reminders',
+                                subtitle: 'Daily spin nudges and call goals',
+                                onTap: () =>
+                                    context.push('/settings/notifications'),
+                              ),
+                              _ProfileMenuTile(
+                                icon: Icons.settings_outlined,
+                                iconColor: AppColors.paletteSage,
+                                title: 'Settings',
+                                subtitle: 'Appearance, preferences, and more',
+                                onTap: () => context.push('/settings'),
+                              ),
+                              _ProfileMenuTile(
+                                icon: Icons.manage_accounts_outlined,
+                                iconColor: AppColors.paletteCoral,
+                                title: 'Account',
+                                subtitle: 'Email, sign out, and data',
+                                onTap: () => context.push('/settings/account'),
+                              ),
+                            ]),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          Constants.tagline,
+                          style: theme.textTheme.bodySmall,
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(
+                          height: ScreenPadding.bottomNavClearance(context),
+                        ),
+                      ]),
+                    ),
+                  ),
+                ],
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                child: Text(supabaseErrorMessage(error)),
+              ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  List<Widget> _withDividers(BuildContext context, List<Widget> items) {
+    final result = <Widget>[];
+    for (var i = 0; i < items.length; i++) {
+      result.add(items[i]);
+      if (i < items.length - 1) {
+        result.add(Divider(
+          height: 1,
+          indent: 72,
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
+        ));
+      }
+    }
+    return result;
   }
 }
 
@@ -140,55 +167,60 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Row(
-      children: [
-        Container(
-          width: 72,
-          height: 72,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [AppColors.primaryTeal, AppColors.secondaryBlue],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primaryTeal.withValues(alpha: 0.25),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
+    return GlassSurface(
+      padding: const EdgeInsets.all(AppSpacing.xs),
+      borderRadius: AppSpacing.radiusLg,
+      child: Row(
+        children: [
+          Container(
+            width: 72,
+            height: 72,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [
+                  AppColors.paletteCoral,
+                  AppColors.paletteGold,
+                  AppColors.paletteTealLight,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ],
-          ),
-          child: Center(
-            child: Text(
-              displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.5),
+                width: 2,
               ),
             ),
+            child: Center(
+              child: Text(
+                displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(displayName, style: theme.textTheme.titleLarge),
-              if (subtitle != null && subtitle!.isNotEmpty) ...[
-                const SizedBox(height: 2),
-                Text(subtitle!, style: theme.textTheme.bodyMedium),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(displayName, style: theme.textTheme.titleLarge),
+                if (subtitle != null && subtitle!.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(subtitle!, style: theme.textTheme.bodyMedium),
+                ],
+                if (email.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(email, style: theme.textTheme.bodySmall),
+                ],
               ],
-              if (email.isNotEmpty) ...[
-                const SizedBox(height: 4),
-                Text(email, style: theme.textTheme.bodySmall),
-              ],
-            ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -213,25 +245,25 @@ class _QuickStatsRow extends StatelessWidget {
             icon: Icons.local_fire_department,
             value: '$streak',
             label: 'Streak',
-            color: AppColors.accentCoral,
+            color: AppColors.paletteCoral,
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: AppSpacing.xxs + 2),
         Expanded(
           child: _MiniStat(
             icon: Icons.phone_in_talk_outlined,
             value: '$totalCalls',
             label: 'Calls',
-            color: AppColors.primaryTeal,
+            color: AppColors.paletteTeal,
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: AppSpacing.xxs + 2),
         Expanded(
           child: _MiniStat(
             icon: Icons.people_outline,
             value: '$reconnected',
             label: 'People',
-            color: AppColors.secondaryBlue,
+            color: AppColors.paletteGold,
           ),
         ),
       ],
@@ -254,66 +286,37 @@ class _MiniStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 22),
-            const SizedBox(height: 6),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontSize: 20,
-                  ),
-            ),
-            Text(label, style: Theme.of(context).textTheme.bodySmall),
-          ],
-        ),
+    return GlassSurface(
+      padding: const EdgeInsets.symmetric(
+        vertical: AppSpacing.xs + 2,
+        horizontal: AppSpacing.xxs + 4,
       ),
-    );
-  }
-}
-
-class _MenuCard extends StatelessWidget {
-  final List<Widget> children;
-
-  const _MenuCard({required this.children});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      clipBehavior: Clip.antiAlias,
       child: Column(
-        children: _withDividers(context, children),
+        children: [
+          Icon(icon, color: color, size: 22),
+          const SizedBox(height: AppSpacing.xxs - 2),
+          Text(
+            value,
+            style:
+                Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
+          ),
+          Text(label, style: Theme.of(context).textTheme.bodySmall),
+        ],
       ),
     );
-  }
-
-  List<Widget> _withDividers(BuildContext context, List<Widget> items) {
-    final result = <Widget>[];
-    for (var i = 0; i < items.length; i++) {
-      result.add(items[i]);
-      if (i < items.length - 1) {
-        result.add(Divider(
-          height: 1,
-          indent: 72,
-          color: Theme.of(context).dividerColor,
-        ));
-      }
-    }
-    return result;
   }
 }
 
 class _ProfileMenuTile extends StatelessWidget {
   final IconData icon;
+  final Color iconColor;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
 
   const _ProfileMenuTile({
     required this.icon,
+    required this.iconColor,
     required this.title,
     required this.subtitle,
     required this.onTap,
@@ -323,19 +326,26 @@ class _ProfileMenuTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      leading: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: AppColors.primaryTeal.withValues(alpha: 0.12),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, color: AppColors.primaryTeal, size: 22),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+        vertical: AppSpacing.xxs - 2,
       ),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-      subtitle: Text(subtitle),
+      leading: Container(
+        width: AppSpacing.minTouchTarget,
+        height: AppSpacing.minTouchTarget,
+        decoration: BoxDecoration(
+          color: iconColor.withValues(alpha: 0.14),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        ),
+        child: Icon(icon, color: iconColor, size: 22),
+      ),
+      title: Text(
+        title,
+        style: const TextStyle(fontWeight: FontWeight.w600, height: 1.5),
+      ),
+      subtitle: Text(subtitle, style: const TextStyle(height: 1.5)),
       trailing: const Icon(Icons.chevron_right, size: 22),
+      minVerticalPadding: 0,
     );
   }
 }

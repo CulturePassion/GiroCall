@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
-/// Responsive horizontal padding for mobile-first layouts.
+import '../app_spacing.dart';
+
+/// Responsive padding on 8px grid.
 class ScreenPadding {
   static EdgeInsets horizontal(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
-    final horizontal = width >= 600 ? 32.0 : 20.0;
+    final horizontal = width >= 600 ? AppSpacing.md : AppSpacing.xs;
     return EdgeInsets.symmetric(horizontal: horizontal);
   }
 
@@ -14,5 +16,5 @@ class ScreenPadding {
   }
 
   static double bottomNavClearance(BuildContext context) =>
-      kBottomNavigationBarHeight + MediaQuery.paddingOf(context).bottom + 16;
+      88 + MediaQuery.paddingOf(context).bottom + AppSpacing.xs;
 }

@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/app_colors.dart';
 import '../../../core/constants.dart';
 import '../../../core/utils/screen_padding.dart';
+import '../../../core/app_spacing.dart';
 import '../../../shared/widgets/app_scaffold.dart';
+import '../../../shared/widgets/glass_surface.dart';
 import '../../notifications/providers/settings_repository_provider.dart';
 import '../providers/stats_provider.dart';
 
@@ -39,7 +41,7 @@ class StatsScreen extends ConsumerWidget {
         value: '${stats.callsToday}',
         unit: 'of $dailyGoal',
         icon: Icons.flag_outlined,
-        color: AppColors.secondaryBlue,
+        color: AppColors.paletteGold,
       ),
       _StatItem(
         label: 'Total calls',
@@ -53,7 +55,7 @@ class StatsScreen extends ConsumerWidget {
         value: '${stats.uniqueContactsCalled}',
         unit: 'people',
         icon: Icons.people,
-        color: AppColors.secondaryBlue,
+        color: AppColors.paletteGold,
       ),
       _StatItem(
         label: 'Avg rating',
@@ -101,16 +103,20 @@ class StatsScreen extends ConsumerWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
-                child: SizedBox(
-                  height: 200,
-                  child: _ActivityChart(
-                    today: stats.callsToday,
-                    week: stats.callsThisWeek,
-                    month: stats.callsThisMonth,
-                  ),
+            GlassSurface(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.xxs,
+                AppSpacing.xs,
+                AppSpacing.xxs,
+                AppSpacing.xxs,
+              ),
+              borderRadius: AppSpacing.radiusLg,
+              child: SizedBox(
+                height: 200,
+                child: _ActivityChart(
+                  today: stats.callsToday,
+                  week: stats.callsThisWeek,
+                  month: stats.callsThisMonth,
                 ),
               ),
             ),
@@ -145,42 +151,36 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: item.color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(item.icon, color: item.color, size: 20),
+    return GlassSurface(
+      padding: const EdgeInsets.all(AppSpacing.xs + 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.xxs),
+            decoration: BoxDecoration(
+              color: item.color.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
             ),
-            const Spacer(),
-            Text(
-              item.value,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontSize: 24,
-                  ),
-            ),
-            Text(
-              item.unit,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              item.label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
+            child: Icon(item.icon, color: item.color, size: 20),
+          ),
+          const Spacer(),
+          Text(
+            item.value,
+            style:
+                Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 24),
+          ),
+          Text(item.unit, style: Theme.of(context).textTheme.bodySmall),
+          const SizedBox(height: 2),
+          Text(
+            item.label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w500,
+                ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
@@ -245,7 +245,7 @@ class _ActivityChart extends StatelessWidget {
             barRods: [
               BarChartRodData(
                 toY: entry.value.value,
-                color: AppColors.primaryTeal,
+                color: AppColors.paletteTeal,
                 width: 36,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(8),

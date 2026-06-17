@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../core/app_colors.dart';
+import '../../core/app_spacing.dart';
 
-/// Branded primary CTA button.
+/// Branded primary CTA — coral accent, 44px min height, thumb-friendly.
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -19,32 +20,54 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: isLoading ? null : onPressed,
-      child: isLoading
-          ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: Colors.white,
-              ),
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (icon != null) ...[
-                  Icon(icon, size: 20),
-                  const SizedBox(width: 8),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        boxShadow: onPressed != null && !isLoading
+            ? [
+                BoxShadow(
+                  color: AppColors.paletteCoral.withValues(alpha: 0.35),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ]
+            : null,
+      ),
+      child: ElevatedButton(
+        onPressed: isLoading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.paletteCoral,
+          foregroundColor: Colors.white,
+          minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget + 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          ),
+        ),
+        child: isLoading
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: Colors.white,
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, size: 22),
+                    const SizedBox(width: AppSpacing.xxs),
+                  ],
+                  Text(label),
                 ],
-                Text(label),
-              ],
-            ),
+              ),
+      ),
     );
   }
 }
 
-/// Branded secondary/outline button.
+/// Glass-outline secondary button.
 class SecondaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -62,14 +85,15 @@ class SecondaryButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.primaryTeal,
+        foregroundColor: AppColors.paletteTeal,
+        minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (icon != null) ...[
             Icon(icon, size: 20),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.xxs),
           ],
           Text(label),
         ],
