@@ -18,6 +18,7 @@ import 'features/profile/screens/profile_edit_screen.dart';
 import 'features/profile/screens/profile_screen.dart';
 import 'features/profile/screens/public_card_screen.dart';
 import 'features/settings/screens/account_screen.dart';
+import 'features/settings/screens/change_password_screen.dart';
 import 'features/settings/screens/settings_screen.dart';
 import 'features/stats/screens/stats_screen.dart';
 import 'features/status/screens/status_screen.dart';
@@ -147,6 +148,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'account',
             builder: (context, state) => const AccountScreen(),
+            routes: [
+              GoRoute(
+                path: 'password',
+                builder: (context, state) => const ChangePasswordScreen(),
+              ),
+            ],
           ),
         ],
       ),

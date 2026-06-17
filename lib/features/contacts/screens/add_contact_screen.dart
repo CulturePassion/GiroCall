@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/utils/responsive_layout.dart';
 import '../../../shared/widgets/app_scaffold.dart';
+import '../../../shared/widgets/responsive_page.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../providers/contacts_notifier.dart';
 import '../widgets/contact_form_fields.dart';
@@ -54,6 +56,7 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
   Widget build(BuildContext context) {
     return AppScaffold(
       title: 'Add Contact',
+      responsiveWidth: ResponsivePageWidth.form,
       actions: [
         IconButton(
           icon: const Icon(Icons.qr_code_scanner),
@@ -62,7 +65,7 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
         ),
       ],
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(ResponsiveLayout.horizontalPadding(context)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

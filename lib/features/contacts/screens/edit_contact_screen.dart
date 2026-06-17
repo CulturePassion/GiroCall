@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/app_colors.dart';
 import '../../../core/constants.dart';
+import '../../../core/utils/responsive_layout.dart';
 import '../../../shared/models/contact.dart';
 import '../../../shared/widgets/app_scaffold.dart';
+import '../../../shared/widgets/responsive_page.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../providers/contact_by_id_provider.dart';
 import '../providers/contacts_notifier.dart';
@@ -79,8 +81,9 @@ class _EditContactScreenState extends ConsumerState<EditContactScreen> {
 
         return AppScaffold(
           title: 'Edit Contact',
+          responsiveWidth: ResponsivePageWidth.form,
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(ResponsiveLayout.horizontalPadding(context)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

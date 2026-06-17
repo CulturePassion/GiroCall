@@ -6,10 +6,12 @@ import '../../../core/app_colors.dart';
 import '../../../core/app_spacing.dart';
 import '../../../core/constants.dart';
 import '../../../core/supabase_provider.dart';
+import '../../../core/utils/responsive_layout.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../core/utils/supabase_error_message.dart';
 import '../../../shared/widgets/glass_surface.dart';
 import '../../../shared/widgets/gradient_background.dart';
+import '../../../shared/widgets/responsive_page.dart';
 import '../../stats/providers/stats_provider.dart';
 import '../providers/profile_notifier.dart';
 
@@ -34,27 +36,35 @@ class ProfileScreen extends ConsumerWidget {
                   'GiroCall user';
               final email = user?.email ?? '';
 
-              return CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: ScreenPadding.all(context).copyWith(
-                        top: AppSpacing.xs,
-                        bottom: AppSpacing.xxs,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Profile',
-                            style: theme.textTheme.displaySmall,
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          _ProfileHeader(
-                            displayName: displayName,
-                            email: email,
-                            subtitle: profile?.title,
-                          ),
+              return ResponsivePage(
+                width: ResponsivePageWidth.content,
+                scrollable: false,
+                padding: EdgeInsets.zero,
+                child: CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          ResponsiveLayout.horizontalPadding(context),
+                          AppSpacing.xs,
+                          ResponsiveLayout.horizontalPadding(context),
+                          AppSpacing.xxs,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Profile',
+                              style: theme.textTheme.displaySmall,
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            _ProfileHeader(
+                              displayName: displayName,
+                              email: email,
+                              subtitle: profile?.title,
+                              avatarUrl: profile?.avatarUrl,
+                              onEdit: () => context.push('/profile/edit'),
+                            ),
                           const SizedBox(height: AppSpacing.sm),
                           _QuickStatsRow(
                             streak: stats.currentStreak,
@@ -65,19 +75,28 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  SliverPadding(
-                    padding: ScreenPadding.horizontal(context),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        GlassSurface(
-                          padding: EdgeInsets.zero,
-                          borderRadius: AppSpacing.radiusLg,
-                          child: Column(
-                            children: _withDividers(context, [
-                              _ProfileMenuTile(
-                                icon: Icons.badge_outlined,
-                                iconColor: AppColors.paletteTeal,
-                                title: 'My Digital Card',
+                    SliverPadding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: ResponsiveLayout.horizontalPadding(context),
+                      ),
+                      sliver: SliverList(
+                        delegate: SliverChildListDelegate([
+                          GlassSurface(
+                            padding: EdgeInsets.zero,
+                            borderRadius: AppSpacing.radiusLg,
+                            child: Column(
+                              children: _withDividers(context, [
+                                _ProfileMenuTile(
+                                  icon: Icons.edit_outlined,
+                                  iconColor: AppColors.main,
+                                  title: 'Edit profile & photo',
+                                  subtitle: 'Avatar, name, and contact details',
+                                  onTap: () => context.push('/profile/edit'),
+                                ),
+                                _ProfileMenuTile(
+                                  icon: Icons.badge_outlined,
+                                  iconColor: AppColors.blue,
+                                  title: 'My Digital Card',
                                 subtitle: profile?.isPublic == true
                                     ? 'Public · ${profile!.slug}'
                                     : 'Private — tap to share when ready',
@@ -120,7 +139,8 @@ class ProfileScreen extends ConsumerWidget {
                       ]),
                     ),
                   ),
-                ],
+                  ],
+                ),
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
@@ -156,11 +176,15 @@ class _ProfileHeader extends StatelessWidget {
   final String displayName;
   final String email;
   final String? subtitle;
+  final String? avatarUrl;
+  final VoidCallback onEdit;
 
   const _ProfileHeader({
     required this.displayName,
     required this.email,
     this.subtitle,
+    this.avatarUrl,
+    required this.onEdit,
   });
 
   @override
@@ -172,35 +196,9 @@ class _ProfileHeader extends StatelessWidget {
       borderRadius: AppSpacing.radiusLg,
       child: Row(
         children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [
-                  AppColors.main,
-                  AppColors.royalBlue,
-                  AppColors.sunsetOrange,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.5),
-                width: 2,
-              ),
-            ),
-            child: Center(
-              child: Text(
-                displayName.isNotEmpty ? displayName[0].toUpperCase() : '?',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+          _HeaderAvatar(
+            imageUrl: avatarUrl,
+            name: displayName,
           ),
           const SizedBox(width: AppSpacing.xs),
           Expanded(
@@ -219,7 +217,66 @@ class _ProfileHeader extends StatelessWidget {
               ],
             ),
           ),
+          IconButton(
+            onPressed: onEdit,
+            tooltip: 'Edit profile',
+            icon: const Icon(Icons.edit_outlined),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _HeaderAvatar extends StatelessWidget {
+  final String? imageUrl;
+  final String name;
+
+  const _HeaderAvatar({this.imageUrl, required this.name});
+
+  @override
+  Widget build(BuildContext context) {
+    final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        child: Image.network(
+          imageUrl!,
+          width: 72,
+          height: 72,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _gradientBox(initial),
+        ),
+      );
+    }
+    return _gradientBox(initial);
+  }
+
+  Widget _gradientBox(String initial) {
+    return Container(
+      width: 72,
+      height: 72,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [AppColors.main, AppColors.royalBlue, AppColors.sunsetOrange],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(
+          color: Colors.white.withValues(alpha: 0.5),
+          width: 2,
+        ),
+      ),
+      child: Center(
+        child: Text(
+          initial,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
     );
   }

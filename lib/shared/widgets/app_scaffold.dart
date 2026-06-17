@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/app_spacing.dart';
 import 'gradient_background.dart';
+import 'responsive_page.dart';
 
 /// Consistent scaffold with colorful gradient + optional glass app bar.
 class AppScaffold extends StatelessWidget {
@@ -13,6 +14,8 @@ class AppScaffold extends StatelessWidget {
   final bool showBackButton;
   final PreferredSizeWidget? bottom;
   final bool useGradientBackground;
+  final ResponsivePageWidth? responsiveWidth;
+  final bool responsiveScrollable;
 
   const AppScaffold({
     super.key,
@@ -24,12 +27,25 @@ class AppScaffold extends StatelessWidget {
     this.showBackButton = true,
     this.bottom,
     this.useGradientBackground = true,
+    this.responsiveWidth = ResponsivePageWidth.content,
+    this.responsiveScrollable = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final content =
-        useGradientBackground ? GradientBackground(child: body) : body;
+    var resolvedBody = body;
+    if (responsiveWidth != null) {
+      resolvedBody = ResponsivePage(
+        width: responsiveWidth!,
+        scrollable: responsiveScrollable,
+        padding: EdgeInsets.zero,
+        child: body,
+      );
+    }
+
+    final content = useGradientBackground
+        ? GradientBackground(child: resolvedBody)
+        : resolvedBody;
 
     return Scaffold(
       extendBodyBehindAppBar: title != null,

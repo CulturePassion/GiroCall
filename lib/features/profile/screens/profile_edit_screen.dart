@@ -1,13 +1,21 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/app_colors.dart';
+import '../../../core/app_spacing.dart';
+import '../../../core/utils/responsive_layout.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../core/utils/supabase_error_message.dart';
 import '../../../shared/models/user_profile.dart';
 import '../../../shared/widgets/app_scaffold.dart';
+import '../../../shared/widgets/glass_surface.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../shared/widgets/profile_avatar_picker.dart';
+import '../../../shared/widgets/responsive_page.dart';
+import '../providers/avatar_upload_provider.dart';
 import '../providers/profile_notifier.dart';
 import '../providers/profile_repository_provider.dart';
 
@@ -42,6 +50,8 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   bool _isPublic = false;
   bool _initialized = false;
   bool _saving = false;
+  bool _uploadingAvatar = false;
+  String? _avatarUrl;
 
   @override
   void dispose() {
@@ -91,10 +101,38 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
     _tiktok.text = profile.tiktokUrl ?? '';
     _youtube.text = profile.youtubeUrl ?? '';
     _isPublic = profile.isPublic;
+    _avatarUrl = profile.avatarUrl;
     _initialized = true;
   }
 
   String? _optional(String value) => value.trim().isEmpty ? null : value.trim();
+
+  Future<void> _uploadAvatar(
+    UserProfile profile, {
+    required Uint8List bytes,
+    required String mimeType,
+  }) async {
+    setState(() => _uploadingAvatar = true);
+    try {
+      final service = ref.read(avatarUploadServiceProvider);
+      final url = await service.uploadAvatar(
+        bytes: bytes,
+        mimeType: mimeType,
+      );
+      final updated = profile.copyWith(avatarUrl: url);
+      await ref.read(profileNotifierProvider.notifier).saveProfile(updated);
+      if (mounted) {
+        setState(() => _avatarUrl = url);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile photo updated.')),
+        );
+      }
+    } catch (e) {
+      _showError(supabaseErrorMessage(e));
+    } finally {
+      if (mounted) setState(() => _uploadingAvatar = false);
+    }
+  }
 
   Future<void> _save(UserProfile existing) async {
     setState(() => _saving = true);
@@ -132,6 +170,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
         tiktokUrl: _optional(_tiktok.text),
         youtubeUrl: _optional(_youtube.text),
         isPublic: _isPublic,
+        avatarUrl: _avatarUrl,
       );
 
       await ref.read(profileNotifierProvider.notifier).saveProfile(updated);
@@ -152,12 +191,14 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(profileNotifierProvider);
+    final hPad = ResponsiveLayout.horizontalPadding(context);
 
     return profileAsync.when(
       data: (profile) {
         if (profile == null) {
           return const AppScaffold(
             title: 'Edit Card',
+            responsiveWidth: ResponsivePageWidth.form,
             body: Center(child: Text('Sign in to edit your card.')),
           );
         }
@@ -166,11 +207,39 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
 
         return AppScaffold(
           title: 'Edit Card',
+          responsiveWidth: ResponsivePageWidth.form,
           body: SingleChildScrollView(
-            padding: ScreenPadding.all(context),
+            padding: EdgeInsets.fromLTRB(
+              hPad,
+              AppSpacing.xs,
+              hPad,
+              ScreenPadding.bottomNavClearance(context),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                GlassSurface(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: AppSpacing.sm,
+                    horizontal: AppSpacing.xs,
+                  ),
+                  borderRadius: AppSpacing.radiusLg,
+                  child: Center(
+                    child: ProfileAvatarPicker(
+                      imageUrl: _avatarUrl,
+                      initials: _displayName.text.isNotEmpty
+                          ? _displayName.text
+                          : profile.displayName,
+                      uploading: _uploadingAvatar,
+                      onImagePicked: (picked) => _uploadAvatar(
+                        profile,
+                        bytes: picked.bytes,
+                        mimeType: picked.mimeType,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
                 _sectionTitle(context, 'Public link'),
                 SwitchListTile(
                   value: _isPublic,
@@ -325,10 +394,12 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
       },
       loading: () => const AppScaffold(
         title: 'Edit Card',
+        responsiveWidth: ResponsivePageWidth.form,
         body: Center(child: CircularProgressIndicator()),
       ),
       error: (error, _) => AppScaffold(
         title: 'Edit Card',
+        responsiveWidth: ResponsivePageWidth.form,
         body: Center(child: Text(supabaseErrorMessage(error))),
       ),
     );
