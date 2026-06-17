@@ -44,11 +44,11 @@ class AppTheme {
     final isDark = brightness == Brightness.dark;
     final colorScheme = ColorScheme(
       brightness: brightness,
-      primary: AppColors.paletteTeal,
+      primary: AppColors.main,
       onPrimary: Colors.white,
-      secondary: AppColors.paletteCoral,
+      secondary: AppColors.orange,
       onSecondary: Colors.white,
-      tertiary: AppColors.paletteGold,
+      tertiary: AppColors.cadmiumOrange,
       onTertiary: AppColors.textPrimary,
       error: AppColors.error,
       onError: Colors.white,
@@ -83,31 +83,31 @@ class AppTheme {
         elevation: 0,
         height: 72,
         backgroundColor: Colors.transparent,
-        indicatorColor: AppColors.paletteTeal.withValues(alpha: 0.18),
+        indicatorColor: AppColors.main.withValues(alpha: 0.18),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return TextStyle(
             fontSize: 11,
             fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-            color: selected ? AppColors.paletteTeal : onSurfaceVariant,
+            color: selected ? AppColors.main : onSurfaceVariant,
             height: 1.5,
           );
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return IconThemeData(
-            color: selected ? AppColors.paletteTeal : onSurfaceVariant,
+            color: selected ? AppColors.main : onSurfaceVariant,
             size: 24,
           );
         }),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.paletteCoral,
+          backgroundColor: AppColors.orange,
           foregroundColor: Colors.white,
           minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget),
           elevation: 0,
-          shadowColor: AppColors.paletteCoral.withValues(alpha: 0.35),
+          shadowColor: AppColors.orange.withValues(alpha: 0.35),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
@@ -120,7 +120,7 @@ class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: AppColors.paletteTeal,
+          backgroundColor: AppColors.main,
           foregroundColor: Colors.white,
           minimumSize:
               const Size(AppSpacing.minTouchTarget, AppSpacing.minTouchTarget),
@@ -131,10 +131,10 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.paletteTeal,
+          foregroundColor: AppColors.main,
           minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget),
           side: BorderSide(
-            color: AppColors.paletteTeal.withValues(alpha: 0.6),
+            color: AppColors.main.withValues(alpha: 0.6),
             width: 1.5,
           ),
           shape: RoundedRectangleBorder(
@@ -178,7 +178,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-          borderSide: const BorderSide(color: AppColors.paletteTeal, width: 2),
+          borderSide: const BorderSide(color: AppColors.main, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.xs,
@@ -213,13 +213,13 @@ class AppTheme {
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.paletteTeal;
+            return AppColors.main;
           }
           return null;
         }),
         trackColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppColors.paletteTeal.withValues(alpha: 0.35);
+            return AppColors.main.withValues(alpha: 0.35);
           }
           return null;
         }),
@@ -243,7 +243,7 @@ class AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: AppColors.paletteTeal,
+        backgroundColor: AppColors.main,
         foregroundColor: Colors.white,
         elevation: 4,
         extendedPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
@@ -252,9 +252,9 @@ class AppTheme {
         ),
       ),
       sliderTheme: SliderThemeData(
-        activeTrackColor: AppColors.paletteTeal,
-        thumbColor: AppColors.paletteTeal,
-        overlayColor: AppColors.paletteTeal.withValues(alpha: 0.12),
+        activeTrackColor: AppColors.main,
+        thumbColor: AppColors.main,
+        overlayColor: AppColors.main.withValues(alpha: 0.12),
       ),
     );
   }

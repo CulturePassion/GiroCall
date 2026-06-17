@@ -178,9 +178,9 @@ class _ProfileHeader extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [
-                  AppColors.paletteCoral,
-                  AppColors.paletteGold,
-                  AppColors.paletteTealLight,
+                  AppColors.main,
+                  AppColors.royalBlue,
+                  AppColors.sunsetOrange,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,

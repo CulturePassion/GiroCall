@@ -62,7 +62,7 @@ class WheelPainter extends CustomPainter {
         center,
         radius + 20,
         [
-          AppColors.paletteTeal.withValues(alpha: 0.15),
+          AppColors.main.withValues(alpha: 0.15),
           Colors.transparent,
         ],
       );
@@ -79,7 +79,7 @@ class WheelPainter extends CustomPainter {
     final shadow = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 6
-      ..color = AppColors.paletteTeal.withValues(alpha: 0.08)
+      ..color = AppColors.main.withValues(alpha: 0.08)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
     canvas.drawCircle(center, radius + 4, shadow);
   }
@@ -165,7 +165,7 @@ class WheelPainter extends CustomPainter {
 
   void _drawGlassHub(Canvas canvas, Offset center, double hubRadius) {
     final hubShadow = Paint()
-      ..color = AppColors.paletteTeal.withValues(alpha: 0.2)
+      ..color = AppColors.main.withValues(alpha: 0.2)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
     canvas.drawCircle(center, hubRadius + 4, hubShadow);
 
@@ -175,7 +175,7 @@ class WheelPainter extends CustomPainter {
         hubRadius,
         [
           Colors.white.withValues(alpha: 0.95),
-          AppColors.paletteMintSoft.withValues(alpha: 0.9),
+          AppColors.mainPale.withValues(alpha: 0.9),
         ],
       );
     canvas.drawCircle(center, hubRadius, hubFill);
@@ -183,7 +183,7 @@ class WheelPainter extends CustomPainter {
     final hubBorder = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5
-      ..color = AppColors.paletteTeal.withValues(alpha: 0.5);
+      ..color = AppColors.main.withValues(alpha: 0.5);
     canvas.drawCircle(center, hubRadius, hubBorder);
 
     final iconPainter = TextPainter(
@@ -212,7 +212,7 @@ class WheelPainter extends CustomPainter {
       ..shader = ui.Gradient.linear(
         Offset(center.dx, pointerY - 4),
         Offset(center.dx, pointerY + 18),
-        [AppColors.paletteGold, AppColors.paletteCoral],
+        [AppColors.cadmiumOrange, AppColors.orange],
       )
       ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 0);
 

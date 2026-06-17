@@ -8,7 +8,7 @@ enum ContactTag {
   family('family', 'Family', Icons.home_outlined, AppColors.secondaryBlue),
   work('work', 'Work', Icons.work_outline, AppColors.primaryTeal),
   business('business', 'Business', Icons.business_center_outlined,
-      Color(0xFF7C3AED));
+      AppColors.persianBlue);
 
   const ContactTag(this.value, this.label, this.icon, this.color);
 

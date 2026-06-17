@@ -112,9 +112,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
                             colors: [
-                              AppColors.paletteTeal,
-                              AppColors.paletteTealLight,
-                              AppColors.paletteGold,
+                              AppColors.main,
+                              AppColors.blue,
+                              AppColors.orange,
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,

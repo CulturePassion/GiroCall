@@ -1,62 +1,83 @@
 import 'package:flutter/material.dart';
 
-/// GiroCall palette — 60-30-10 rule from brand tile artwork.
+/// GiroCall palette — blue & orange brand system.
 ///
-/// 60% dominant: [paletteCream] surfaces & backgrounds
-/// 30% secondary: [paletteTeal] navigation, cards, structure
-/// 10% accent:    [paletteCoral] + [paletteGold] CTAs & highlights
+/// Main: [#00ADEF] · 60% light surfaces · 30% blues · 10% oranges
 abstract class AppColors {
-  // Palette (reference: Downloads tile artwork)
-  static const Color paletteCoral = Color(0xFFE07A5F);
-  static const Color paletteCoralDeep = Color(0xFFC96A52);
-  static const Color paletteTeal = Color(0xFF2D6A6A);
-  static const Color paletteTealLight = Color(0xFF5BA3A3);
-  static const Color paletteTealMuted = Color(0xFF3D8B8B);
-  static const Color paletteGold = Color(0xFFD4A84B);
-  static const Color paletteGoldDeep = Color(0xFFC99B3A);
-  static const Color paletteMint = Color(0xFFA8D4D4);
-  static const Color paletteMintSoft = Color(0xFFD4EBEB);
-  static const Color paletteSage = Color(0xFF6B7B6E);
-  static const Color paletteCream = Color(0xFFF5F0EA);
-  static const Color paletteCreamDeep = Color(0xFFEDE6DC);
+  // Primary
+  static const Color main = Color(0xFF00ADEF);
 
-  // Semantic aliases
-  static const Color primaryTeal = paletteTeal;
-  static const Color accentCoral = paletteCoral;
-  static const Color accentGold = paletteGold;
-  static const Color secondaryBlue = paletteTealLight;
+  // Blues
+  static const Color blue = Color(0xFF0088CC);
+  static const Color pureBlue = Color(0xFF0000FF);
+  static const Color persianBlue = Color(0xFF1A37B8);
+  static const Color royalBlue = Color(0xFF2563EB);
+
+  // Oranges
+  static const Color orange = Color(0xFFFF5733);
+  static const Color pureOrange = Color(0xFFFFA500);
+  static const Color cadmiumOrange = Color(0xFFF7882E);
+  static const Color sunsetOrange = Color(0xFFFE6B35);
+
+  // Tints & shades (derived from main)
+  static const Color mainLight = Color(0xFF5CC8F5);
+  static const Color mainSoft = Color(0xFFB3E5FA);
+  static const Color mainPale = Color(0xFFE8F7FD);
+  static const Color mainDeep = Color(0xFF0088CC);
+
+  // Semantic aliases (kept for existing call sites)
+  static const Color primaryTeal = main;
+  static const Color accentCoral = orange;
+  static const Color accentGold = pureOrange;
+  static const Color secondaryBlue = blue;
+
+  // Legacy palette names → new colors
+  static const Color paletteCoral = orange;
+  static const Color paletteCoralDeep = sunsetOrange;
+  static const Color paletteTeal = main;
+  static const Color paletteTealLight = mainLight;
+  static const Color paletteTealMuted = blue;
+  static const Color paletteGold = cadmiumOrange;
+  static const Color paletteGoldDeep = pureOrange;
+  static const Color paletteMint = mainSoft;
+  static const Color paletteMintSoft = mainPale;
+  static const Color paletteSage = royalBlue;
+  static const Color paletteCream = mainPale;
+  static const Color paletteCreamDeep = Color(0xFFD6EEF9);
 
   static const Color error = Color(0xFFDC4E4E);
-  static const Color success = Color(0xFF3D9A6A);
+  static const Color success = Color(0xFF22A06B);
 
   // Light theme (60-30-10)
-  static const Color background = paletteCream;
-  static const Color surface = Color(0xFFFFFFF5);
-  static const Color surfaceVariant = paletteMintSoft;
-  static const Color textPrimary = Color(0xFF1E3333);
-  static const Color textSecondary = Color(0xFF4A5E5E);
-  static const Color divider = Color(0xFFD4E0E0);
+  static const Color background = mainPale;
+  static const Color surface = Color(0xFFFAFEFF);
+  static const Color surfaceVariant = mainSoft;
+  static const Color textPrimary = Color(0xFF0A2540);
+  static const Color textSecondary = Color(0xFF3D5A73);
+  static const Color divider = Color(0xFFC5E4F3);
   static const Color navBarBackground = Color(0xE6FFFFFF);
 
   // Dark theme
-  static const Color darkBackground = Color(0xFF1A2E2E);
-  static const Color darkSurface = Color(0xFF243D3D);
-  static const Color darkSurfaceVariant = Color(0xFF2F4F4F);
-  static const Color darkTextPrimary = Color(0xFFF5F0EA);
-  static const Color darkTextSecondary = Color(0xFFA8C4C4);
-  static const Color darkDivider = Color(0xFF3D5C5C);
-  static const Color darkNavBarBackground = Color(0xCC243D3D);
+  static const Color darkBackground = Color(0xFF0A1628);
+  static const Color darkSurface = Color(0xFF122240);
+  static const Color darkSurfaceVariant = Color(0xFF1A3050);
+  static const Color darkTextPrimary = Color(0xFFF0FAFE);
+  static const Color darkTextSecondary = Color(0xFF8ECAE6);
+  static const Color darkDivider = Color(0xFF2A4A6E);
+  static const Color darkNavBarBackground = Color(0xCC122240);
 
-  /// Wheel slice palette — cycles tile colors from brand artwork.
+  /// Wheel slice palette — alternates blues and oranges.
   static const List<Color> wheelSliceColors = [
-    paletteCoral,
-    paletteTealMuted,
-    paletteGold,
-    paletteMint,
-    paletteSage,
-    paletteTealLight,
-    paletteCoralDeep,
-    paletteGoldDeep,
+    main,
+    orange,
+    blue,
+    sunsetOrange,
+    royalBlue,
+    cadmiumOrange,
+    persianBlue,
+    pureOrange,
+    mainLight,
+    pureBlue,
   ];
 
   static Color onSurface(BuildContext context) =>

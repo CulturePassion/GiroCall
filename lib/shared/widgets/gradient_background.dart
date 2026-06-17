@@ -25,13 +25,13 @@ class GradientBackground extends StatelessWidget {
               colors: isDark
                   ? [
                       AppColors.darkBackground,
-                      const Color(0xFF1E3838),
+                      AppColors.persianBlue.withValues(alpha: 0.35),
                       AppColors.darkBackground,
                     ]
                   : [
-                      AppColors.paletteCream,
-                      AppColors.paletteMintSoft.withValues(alpha: 0.55),
-                      AppColors.paletteCreamDeep,
+                      AppColors.mainPale,
+                      AppColors.mainSoft.withValues(alpha: 0.55),
+                      AppColors.mainPale,
                     ],
             ),
           ),
@@ -48,22 +48,22 @@ class GradientBackground extends StatelessWidget {
       Positioned(
         top: -80,
         right: -40,
-        child: _colorBlob(AppColors.paletteCoral, 200, alpha),
+        child: _colorBlob(AppColors.orange, 200, alpha),
       ),
       Positioned(
         top: 120,
         left: -60,
-        child: _colorBlob(AppColors.paletteTealLight, 180, alpha * 0.9),
+        child: _colorBlob(AppColors.main, 180, alpha * 0.9),
       ),
       Positioned(
         bottom: 80,
         right: -20,
-        child: _colorBlob(AppColors.paletteGold, 160, alpha * 0.85),
+        child: _colorBlob(AppColors.cadmiumOrange, 160, alpha * 0.85),
       ),
       Positioned(
         bottom: -40,
         left: 40,
-        child: _colorBlob(AppColors.paletteMint, 140, alpha * 0.7),
+        child: _colorBlob(AppColors.royalBlue, 140, alpha * 0.7),
       ),
     ];
   }

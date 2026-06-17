@@ -123,7 +123,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = selected
-        ? AppColors.paletteTeal
+        ? AppColors.main
         : Theme.of(context).colorScheme.onSurfaceVariant;
 
     return Expanded(
@@ -179,16 +179,14 @@ class _GiroNavButton extends StatelessWidget {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: selected
-                      ? [AppColors.paletteCoral, AppColors.paletteGold]
-                      : [AppColors.paletteTeal, AppColors.paletteTealLight],
+                      ? [AppColors.sunsetOrange, AppColors.orange]
+                      : [AppColors.main, AppColors.blue],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: (selected
-                            ? AppColors.paletteCoral
-                            : AppColors.paletteTeal)
+                    color: (selected ? AppColors.orange : AppColors.main)
                         .withValues(alpha: 0.4),
                     blurRadius: 16,
                     offset: const Offset(0, 6),

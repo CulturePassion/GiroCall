@@ -26,7 +26,7 @@ class PrimaryButton extends StatelessWidget {
         boxShadow: onPressed != null && !isLoading
             ? [
                 BoxShadow(
-                  color: AppColors.paletteCoral.withValues(alpha: 0.35),
+                  color: AppColors.orange.withValues(alpha: 0.35),
                   blurRadius: 16,
                   offset: const Offset(0, 6),
                 ),
@@ -36,7 +36,7 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.paletteCoral,
+          backgroundColor: AppColors.orange,
           foregroundColor: Colors.white,
           minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget + 8),
           shape: RoundedRectangleBorder(
@@ -85,7 +85,7 @@ class SecondaryButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.paletteTeal,
+        foregroundColor: AppColors.main,
         minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget),
       ),
       child: Row(
