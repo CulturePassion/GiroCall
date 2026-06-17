@@ -28,9 +28,8 @@ class UserStatusStory {
       id: json['id'] as String,
       userId: json['user_id'] as String,
       textContent: json['text_content'] as String,
-      statusType:
-          PresenceType.fromValue(json['status_type'] as String?) ??
-              PresenceType.custom,
+      statusType: PresenceType.fromValue(json['status_type'] as String?) ??
+          PresenceType.custom,
       createdAt: DateTime.parse(json['created_at'] as String),
       expiresAt: DateTime.parse(json['expires_at'] as String),
     );

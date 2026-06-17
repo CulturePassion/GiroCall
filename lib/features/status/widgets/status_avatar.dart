@@ -42,8 +42,7 @@ class StatusAvatar extends StatelessWidget {
       child: CircleAvatar(
         radius: radius,
         backgroundColor: AppColors.primaryTeal,
-        backgroundImage:
-            imageUrl != null ? NetworkImage(imageUrl!) : null,
+        backgroundImage: imageUrl != null ? NetworkImage(imageUrl!) : null,
         child: imageUrl == null
             ? Text(
                 initials,

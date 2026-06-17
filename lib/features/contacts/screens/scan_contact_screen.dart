@@ -88,7 +88,8 @@ class _ScanContactScreenState extends ConsumerState<ScanContactScreen> {
   Future<void> _save() async {
     final error = _formData.validate();
     if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(error)));
       return;
     }
 
@@ -171,7 +172,8 @@ class _ScanContactScreenState extends ConsumerState<ScanContactScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.qr_code_scanner, size: 64, color: AppColors.primaryTeal),
+                const Icon(Icons.qr_code_scanner,
+                    size: 64, color: AppColors.primaryTeal),
                 const SizedBox(height: 16),
                 const Text(
                   'QR scanning works best on iPhone and Android.',

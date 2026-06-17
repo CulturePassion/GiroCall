@@ -73,7 +73,8 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
             const SizedBox(height: 24),
             PrimaryButton(
               label: 'Save contact',
-              onPressed: _formData.validate() == null && !_saving ? _save : null,
+              onPressed:
+                  _formData.validate() == null && !_saving ? _save : null,
               isLoading: _saving,
             ),
           ],

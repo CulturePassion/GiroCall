@@ -27,8 +27,9 @@ class _ContactListScreenState extends ConsumerState<ContactListScreen> {
   Future<void> _syncDeviceContacts() async {
     setState(() => _syncing = true);
     try {
-      final count =
-          await ref.read(contactsNotifierProvider.notifier).syncDeviceContacts();
+      final count = await ref
+          .read(contactsNotifierProvider.notifier)
+          .syncDeviceContacts();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

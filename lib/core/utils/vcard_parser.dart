@@ -8,10 +8,7 @@ class VCardParser {
   const VCardParser._();
 
   static ContactDraft? parse(String raw, {required String userId}) {
-    final unfolded = raw
-        .replaceAll('\r\n ', '')
-        .replaceAll('\n ', '')
-        .trim();
+    final unfolded = raw.replaceAll('\r\n ', '').replaceAll('\n ', '').trim();
 
     if (!unfolded.toUpperCase().contains('BEGIN:VCARD')) {
       return _parseGiroCallPayload(unfolded, userId: userId);
@@ -48,8 +45,10 @@ class VCardParser {
           fn = value;
         case 'N':
           final parts = value.split(';');
-          if (parts.length > 1) lastName = parts[0].trim().isEmpty ? null : parts[0];
-          if (parts.length > 2) firstName = parts[1].trim().isEmpty ? null : parts[1];
+          if (parts.length > 1)
+            lastName = parts[0].trim().isEmpty ? null : parts[0];
+          if (parts.length > 2)
+            firstName = parts[1].trim().isEmpty ? null : parts[1];
         case 'TEL':
           final normalized = PhoneFormatter.normalize(value);
           if (PhoneFormatter.looksValid(normalized)) {
@@ -81,7 +80,8 @@ class VCardParser {
           if (parts.length > 5 && parts[5].trim().isNotEmpty) {
             postalCode = parts[5];
           }
-          if (parts.length > 6 && parts[6].trim().isNotEmpty) country = parts[6];
+          if (parts.length > 6 && parts[6].trim().isNotEmpty)
+            country = parts[6];
       }
     }
 
@@ -115,7 +115,8 @@ class VCardParser {
     );
   }
 
-  static ContactDraft? _parseGiroCallPayload(String raw, {required String userId}) {
+  static ContactDraft? _parseGiroCallPayload(String raw,
+      {required String userId}) {
     if (!raw.startsWith('{')) return null;
     try {
       final map = jsonDecode(raw) as Map<String, dynamic>;

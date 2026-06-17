@@ -38,8 +38,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
     final type = _selected;
     if (type == null) return;
 
-    if (type == PresenceType.custom &&
-        _customController.text.trim().isEmpty) {
+    if (type == PresenceType.custom && _customController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Enter a custom status message.')),
       );
@@ -90,8 +89,8 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
     final feedAsync = ref.watch(contactStatusFeedProvider);
     final overdue = ref.watch(recommendationsProvider);
     final timeFormat = DateFormat.jm();
-    final missingPhone =
-        profile != null && (profile.phone == null || profile.phone!.trim().isEmpty);
+    final missingPhone = profile != null &&
+        (profile.phone == null || profile.phone!.trim().isEmpty);
 
     return AppScaffold(
       title: 'Status',
@@ -124,7 +123,8 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
                   padding: const EdgeInsets.all(12),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline, color: AppColors.accentCoral),
+                      const Icon(Icons.info_outline,
+                          color: AppColors.accentCoral),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -222,7 +222,8 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
                               : '${contact.daysSinceLastCall} days since last call',
                         ),
                         trailing: IconButton(
-                          icon: const Icon(Icons.phone, color: AppColors.primaryTeal),
+                          icon: const Icon(Icons.phone,
+                              color: AppColors.primaryTeal),
                           onPressed: () => context.push('/call/${contact.id}'),
                         ),
                         onTap: () => context.push('/contacts/${contact.id}'),

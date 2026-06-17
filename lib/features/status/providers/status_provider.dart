@@ -13,7 +13,8 @@ final contactStatusFeedProvider =
   return ref.watch(statusRepositoryProvider).fetchContactStatuses(contacts);
 });
 
-final myPresenceProvider = Provider<({PresenceType? type, String? message})>((ref) {
+final myPresenceProvider =
+    Provider<({PresenceType? type, String? message})>((ref) {
   final profile = ref.watch(profileNotifierProvider).value;
   if (profile == null) return (type: null, message: null);
   return (

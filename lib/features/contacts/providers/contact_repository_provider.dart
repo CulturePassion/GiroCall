@@ -39,9 +39,7 @@ class ContactRepository {
         .stream(primaryKey: ['id'])
         .eq('user_id', userId)
         .map((rows) {
-          final contacts = rows
-              .map((json) => Contact.fromJson(json))
-              .toList();
+          final contacts = rows.map((json) => Contact.fromJson(json)).toList();
           contacts.sort((a, b) => a.name.compareTo(b.name));
           return contacts;
         });

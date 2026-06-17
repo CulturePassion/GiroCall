@@ -83,10 +83,7 @@ class Contact {
   String get initials {
     final first = firstName?.trim();
     final last = lastName?.trim();
-    if (first != null &&
-        first.isNotEmpty &&
-        last != null &&
-        last.isNotEmpty) {
+    if (first != null && first.isNotEmpty && last != null && last.isNotEmpty) {
       return '${first[0]}${last[0]}'.toUpperCase();
     }
     if (first != null && first.isNotEmpty) return first[0].toUpperCase();

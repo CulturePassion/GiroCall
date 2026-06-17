@@ -3,7 +3,8 @@ import '../../../shared/models/contact.dart';
 bool get supportsDeviceContactSync => false;
 
 Future<List<Contact>> pullDeviceContacts({required String userId}) async {
-  throw UnsupportedError('Device contact sync is not available on this platform.');
+  throw UnsupportedError(
+      'Device contact sync is not available on this platform.');
 }
 
 Future<void> pushContactToDevice(Contact contact) async {}

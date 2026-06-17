@@ -139,7 +139,9 @@ class ContactDetailScreen extends ConsumerWidget {
               ),
             ],
             const SizedBox(height: 32),
-            _InfoRow(label: 'Call frequency', value: 'Every ${contact.targetFrequencyDays} days'),
+            _InfoRow(
+                label: 'Call frequency',
+                value: 'Every ${contact.targetFrequencyDays} days'),
             if (contact.email?.isNotEmpty == true)
               _InfoRow(label: 'Email', value: contact.email!),
             if (contact.website?.isNotEmpty == true)
