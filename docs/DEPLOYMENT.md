@@ -1,109 +1,81 @@
 # GiroCall Deployment Guide
 
-## 1. Supabase Setup
+Project ref: `gtvpsukmmjhszpopulfe`
 
-1. Create a Supabase project.
-2. Go to **Project Settings > API** and copy the URL and anon key.
-3. Run all SQL migrations in `supabase/migrations/` (in order) via the SQL Editor or CLI:
+GiroCall is **Flutter-only** — web deploys as a PWA from `build/web/`.
 
-```bash
-supabase login
-supabase link --project-ref your-project-ref
-supabase db push
-# or from the project root:
-make setup-db
-```
-
-Migration files (run in order):
-
-| File | Purpose |
-|------|---------|
-| `001_initial_schema.sql` | Core tables, RLS, account deletion |
-| `002_security_hardening.sql` | Auth trigger hardening |
-| `003_reminder_timezone.sql` | Timezone offset for reminders |
-| `004_rls_policy_split.sql` | Granular RLS policies |
-| `005_profiles_and_tags.sql` | User profiles, digital cards, contact tags |
-
-## 2. Edge Function (daily reminders)
-
-The `daily-reminder` function is deployed to Supabase. Set these **Edge Function secrets** in the dashboard:
-
-| Secret | Purpose |
-|--------|---------|
-| `FCM_SERVER_KEY` | Firebase Cloud Messaging server key (mobile push) |
-| `CRON_SECRET` | Random string used to authenticate cron invocations |
-
-**Schedule the function** in [Supabase Dashboard → Edge Functions → daily-reminder → Schedules](https://supabase.com/dashboard/project/gtvpsukmmjhszpopulfe/functions):
-
-- Cron: `* * * * *` (every minute)
-- HTTP header: `Authorization: Bearer <your-CRON_SECRET>`
-
-Or redeploy manually:
-
-```bash
-supabase functions deploy daily-reminder --no-verify-jwt
-supabase secrets set FCM_SERVER_KEY=your-fcm-key CRON_SECRET=your-random-secret
-```
-
-## 3. Flutter Build
-
-### Android
-
-```bash
-flutter build apk --release
-```
-
-### iOS
-
-Minimum deployment target: **iOS 15.0** (required by Firebase 4.x).
-
-If the app crashes on launch with `SwiftFlutterContactsPlugin`, stale CocoaPods
-symlinks are usually the cause. Refresh the iOS build:
-
-```bash
-make clean-ios
-flutter run -d ios --dart-define-from-file=.env
-```
-
-```bash
-flutter build ios --release
-```
-
-### Web PWA
-
-```bash
-flutter build web --release
-```
-
-## 4. Environment Variables
-
-Copy `.env.example` to `.env` and fill in your credentials. The Makefile and VS Code launch configs load them automatically:
+## Quick start
 
 ```bash
 cp .env.example .env
-make run
+make deploy-all               # migrations + edge functions + secrets + verify
+make deploy-hosting           # build Flutter web PWA
 ```
 
-Or pass defines manually:
+## 1. Supabase
+
+### Credentials
+
+| Variable | Where to get it |
+|----------|-----------------|
+| `SUPABASE_URL` | Dashboard → Project Settings → API |
+| `SUPABASE_ANON_KEY` | Same page (publishable anon key) |
+| `SUPABASE_ACCESS_TOKEN` | [Account tokens](https://supabase.com/dashboard/account/tokens) |
+
+### Migrations & verify
 
 ```bash
-flutter run \
-  --dart-define=SUPABASE_URL=https://your-project.supabase.co \
-  --dart-define=SUPABASE_ANON_KEY=your-anon-key
+make setup-db
+make verify-supabase          # 15 health checks
 ```
 
-Optional: `APP_BASE_URL` for public digital card links (defaults to `https://girocall.com`).
+### Auth redirect URLs
 
-For CI/CD, add these as secrets.
+**Dashboard → Authentication → URL Configuration:**
 
-## 5. Push Notifications (Mobile)
+- Site URL: `https://girocall.com`
+- Redirect URLs: `http://localhost:62792`, `https://girocall.com`, `https://www.girocall.com`
 
-1. Create a Firebase project and add Android + iOS apps for `com.girocall.app`.
-2. Run `flutterfire configure` (or manually add `google-services.json` and `GoogleService-Info.plist`).
-3. Set `FCM_SERVER_KEY` in Supabase Edge Function secrets.
-4. Build and run on a device — the app registers FCM tokens in `public.fcm_tokens` on sign-in.
-5. Enable daily reminders in the app (saves local time + timezone offset).
+### Edge functions
 
-## 6. CI/CD
+```bash
+make deploy-edge-all
+make deploy-secrets
+```
 
-GitHub Actions workflow is in `.github/workflows/flutter.yml`.
+Schedule `daily-reminder`: cron `* * * * *`, header `Authorization: Bearer <CRON_SECRET>`.
+
+## 2. Flutter builds
+
+```bash
+make build-apk
+make build-ios
+make build-web                # output: build/web/
+```
+
+## 3. Web hosting
+
+Upload `build/web/` to Vercel, Netlify, Firebase Hosting, or Cloudflare Pages.
+
+Add your production URL to Supabase Auth redirect URLs.
+
+## 4. Environment variables
+
+```bash
+cp .env.example .env
+```
+
+Required: `SUPABASE_URL`, `SUPABASE_ANON_KEY`  
+Deploy: `SUPABASE_ACCESS_TOKEN`, `CRON_SECRET`, `FCM_SERVER_KEY`  
+Optional: `APP_BASE_URL` (defaults to `https://girocall.com`)
+
+## Makefile reference
+
+| Target | Action |
+|--------|--------|
+| `make setup-db` | Apply pending SQL migrations |
+| `make deploy-edge-all` | Deploy edge functions |
+| `make deploy-secrets` | Push secrets from `.env` |
+| `make verify-supabase` | Run health checks |
+| `make deploy-all` | Full Supabase stack |
+| `make deploy-hosting` | Build Flutter web PWA |

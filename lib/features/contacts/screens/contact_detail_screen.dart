@@ -1,37 +1,284 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/app_colors.dart';
+import '../../../core/design/colors.dart';
+import '../../../core/design/spacing.dart';
+import '../../../core/design/tokens.dart';
+import '../../../core/utils/screen_padding.dart';
 import '../../../shared/models/contact.dart';
 import '../../../shared/widgets/app_scaffold.dart';
-import '../../../shared/widgets/primary_button.dart';
-import '../../status/widgets/status_avatar.dart';
+import '../../call_log/providers/call_log_notifier.dart';
 import '../providers/contact_by_id_provider.dart';
-import '../providers/contacts_notifier.dart';
 
 class ContactDetailScreen extends ConsumerWidget {
   final String contactId;
 
-  const ContactDetailScreen({
-    super.key,
-    required this.contactId,
-  });
+  const ContactDetailScreen({super.key, required this.contactId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final contactAsync = ref.watch(contactByIdProvider(contactId));
+    final callLogsAsync = ref.watch(callLogNotifierProvider);
 
     return contactAsync.when(
       data: (contact) {
         if (contact == null) {
           return const AppScaffold(
             title: 'Contact',
-            body: Center(child: Text('Contact not found.')),
+            body: Center(child: Text('Contact not found')),
           );
         }
-        return _buildBody(context, ref, contact);
+
+        final logs = callLogsAsync.value?.where((log) => log.contactId == contactId).toList() ?? [];
+        
+        return AppScaffold(
+          title: contact.name,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () => context.push('/contacts/$contactId/edit'),
+            ),
+          ],
+          body: SingleChildScrollView(
+            padding: ScreenPadding.all(context),
+            child: Column(
+              children: [
+                // Contact avatar and basic info
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(AppTokens.radiusXl),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      _buildAvatar(contact),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        contact.name,
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                      if (contact.firstName != null || contact.lastName != null)
+                        Text(
+                          '${contact.firstName ?? ''} ${contact.lastName ?? ''}'.trim(),
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                        ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.phone,
+                            color: AppColors.primaryTeal,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            contact.phone,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ),
+                      if (contact.email != null) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.email,
+                              color: AppColors.primaryTeal,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              contact.email!,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                
+                const SizedBox(height: AppSpacing.md),
+                
+                // Action buttons
+                Wrap(
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
+                  children: [
+                    _buildActionChip(
+                      context: context,
+                      icon: Icons.phone,
+                      label: 'Call',
+                      color: AppColors.primaryTeal,
+                      onPressed: () => _callContact(contact),
+                    ),
+                    _buildActionChip(
+                      context: context,
+                      icon: Icons.sms,
+                      label: 'Message',
+                      color: AppColors.goldenYellow,
+                      onPressed: () => _messageContact(contact),
+                    ),
+                    _buildActionChip(
+                      context: context,
+                      icon: Icons.history,
+                      label: 'Log Call',
+                      color: AppColors.accentCoral,
+                      onPressed: () => context.push('/call/$contactId'),
+                    ),
+                    if (contact.website != null)
+                      _buildActionChip(
+                        context: context,
+                        icon: Icons.public,
+                        label: 'Visit Site',
+                        color: AppColors.premiumPurple,
+                        onPressed: () => _openWebsite(contact.website!),
+                      ),
+                  ],
+                ),
+                
+                const SizedBox(height: AppSpacing.md),
+                
+                // Contact details section
+                if (contact.notes != null || 
+                    contact.company != null || 
+                    contact.jobTitle != null ||
+                    contact.formattedAddress != null)
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppTokens.radiusLg),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (contact.notes != null) ...[
+                          Text(
+                            'Notes',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            contact.notes!,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          const Divider(height: AppSpacing.md),
+                        ],
+                        if (contact.company != null || contact.jobTitle != null) ...[
+                          Text(
+                            'Work',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          if (contact.jobTitle != null)
+                            Text(
+                              contact.jobTitle!,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          if (contact.company != null)
+                            Text(
+                              contact.company!,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
+                            ),
+                          if (contact.company != null || contact.jobTitle != null)
+                            const Divider(height: AppSpacing.md),
+                        ],
+                        if (contact.formattedAddress != null) ...[
+                          Text(
+                            'Address',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            contact.formattedAddress!,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                
+                const SizedBox(height: AppSpacing.md),
+                
+                // Call history
+                if (logs.isNotEmpty) ...[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Call History',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  ...logs.take(5).map((log) => Card(
+                        child: ListTile(
+                          leading: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: AppColors.softBlue,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.phone_missed,
+                              color: AppColors.primaryTeal,
+                            ),
+                          ),
+                          title: Text(
+                            'Called on ${log.calledAt.day}/${log.calledAt.month}/${log.calledAt.year}',
+                          ),
+                          subtitle: Text(
+                            log.notes ?? 'No notes',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: log.callRating != null
+                              ? Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: List.generate(
+                                    5,
+                                    (index) => Icon(
+                                      index < log.callRating!
+                                          ? Icons.star
+                                          : Icons.star_border,
+                                      color: index < log.callRating!
+                                          ? Colors.orange
+                                          : null,
+                                      size: 16,
+                                    ),
+                                  ),
+                                )
+                              : null,
+                        ),
+                      )),
+                ],
+              ],
+            ),
+          ),
+        );
       },
       loading: () => const AppScaffold(
         title: 'Contact',
@@ -44,169 +291,71 @@ class ContactDetailScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, WidgetRef ref, Contact contact) {
-    final birthdayFormat = DateFormat.yMMMMd();
-
-    return AppScaffold(
-      title: contact.name,
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.edit_outlined),
-          onPressed: () => context.push('/contacts/$contactId/edit'),
-        ),
-        IconButton(
-          icon: const Icon(Icons.delete_outline),
-          onPressed: () async {
-            final confirmed = await showDialog<bool>(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Delete contact?'),
-                content: Text('Remove ${contact.name} from GiroCall?'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: const Text('Cancel'),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: const Text(
-                      'Delete',
-                      style: TextStyle(color: AppColors.error),
-                    ),
-                  ),
-                ],
-              ),
-            );
-
-            if (confirmed == true) {
-              await ref
-                  .read(contactsNotifierProvider.notifier)
-                  .deleteContact(contactId);
-              if (context.mounted) context.pop();
-            }
-          },
-        ),
-      ],
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: StatusAvatar(
-                initials: contact.initials,
-                imageUrl: contact.photoUrl,
-                radius: 48,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              contact.name,
-              style: Theme.of(context).textTheme.displaySmall,
-              textAlign: TextAlign.center,
-            ),
-            if (contact.jobTitle?.isNotEmpty == true ||
-                contact.company?.isNotEmpty == true)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  [
-                    if (contact.jobTitle?.isNotEmpty == true) contact.jobTitle!,
-                    if (contact.company?.isNotEmpty == true) contact.company!,
-                  ].join(' · '),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            const SizedBox(height: 8),
-            Text(
-              contact.phone,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-              textAlign: TextAlign.center,
-            ),
-            if (contact.secondaryPhone?.isNotEmpty == true) ...[
-              const SizedBox(height: 4),
-              Text(
-                contact.secondaryPhone!,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-            const SizedBox(height: 32),
-            _InfoRow(
-                label: 'Call frequency',
-                value: 'Every ${contact.targetFrequencyDays} days'),
-            if (contact.email?.isNotEmpty == true)
-              _InfoRow(label: 'Email', value: contact.email!),
-            if (contact.website?.isNotEmpty == true)
-              _InfoRow(label: 'Website', value: contact.website!),
-            if (contact.birthday != null)
-              _InfoRow(
-                label: 'Birthday',
-                value: birthdayFormat.format(contact.birthday!),
-              ),
-            if (contact.formattedAddress != null)
-              _InfoRow(label: 'Address', value: contact.formattedAddress!),
-            if (contact.notes?.isNotEmpty == true)
-              _InfoRow(label: 'Notes', value: contact.notes!),
-            if (contact.syncToDevice)
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Row(
-                  children: [
-                    Icon(Icons.sync, size: 16, color: AppColors.primaryTeal),
-                    SizedBox(width: 8),
-                    Text('Synced to phone contacts'),
-                  ],
-                ),
-              ),
-            const SizedBox(height: 32),
-            PrimaryButton(
-              label: 'Call now',
-              icon: Icons.phone,
-              onPressed: () => context.push('/call/${contact.id}'),
-            ),
-          ],
+  Widget _buildAvatar(Contact contact) {
+    final initials = contact.initials;
+    return CircleAvatar(
+      radius: 50,
+      backgroundColor: AppColors.primaryTeal,
+      child: Text(
+        initials,
+        style: const TextStyle(
+          fontSize: 32,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
   }
-}
 
-class _InfoRow extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _InfoRow({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildActionChip({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return FilterChip(
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
+          Icon(icon, size: 16, color: Colors.white),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white),
           ),
         ],
       ),
+      selected: false,
+      onSelected: (_) => onPressed(),
+      selectedColor: color,
+      backgroundColor: color.withValues(alpha: 0.2),
+      showCheckmark: false,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+        side: BorderSide.none,
+      ),
     );
+  }
+
+  Future<void> _callContact(Contact contact) async {
+    final uri = Uri(scheme: 'tel', path: contact.phone);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Future<void> _messageContact(Contact contact) async {
+    final uri = Uri(scheme: 'sms', path: contact.phone);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  Future<void> _openWebsite(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
 }

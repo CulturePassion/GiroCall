@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/app_colors.dart';
-import '../../../core/app_spacing.dart';
+import '../../../core/design/colors.dart';
+import '../../../core/design/spacing.dart';
+import '../../../core/design/tokens.dart';
 import '../../../core/utils/responsive_layout.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../core/utils/supabase_error_message.dart';
@@ -223,7 +224,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                     vertical: AppSpacing.sm,
                     horizontal: AppSpacing.xs,
                   ),
-                  borderRadius: AppSpacing.radiusLg,
+                  borderRadius: AppTokens.radiusLg,
                   child: Center(
                     child: ProfileAvatarPicker(
                       imageUrl: _avatarUrl,

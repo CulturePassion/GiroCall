@@ -1,9 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:logging/logging.dart';
 
 import '../../../core/supabase_provider.dart';
 import '../../../shared/models/contact.dart';
 import '../../../shared/widgets/phone_formatter.dart';
+
+// Logger for debugging purposes
+final _log = Logger('ContactRepository');
 
 /// Repository for CRUD operations on contacts.
 class ContactRepository {
@@ -13,107 +17,203 @@ class ContactRepository {
 
   String? get userId => _client.auth.currentUser?.id;
 
-  String? get _userId => userId;
-
   Future<List<Contact>> fetchContacts() async {
-    final userId = _userId;
-    if (userId == null) return [];
+    _log.fine('Fetching contacts for user');
+    
+    final userId = this.userId;
+    if (userId == null) {
+      _log.warning('User not authenticated');
+      return [];
+    }
 
-    final response = await _client
-        .from('contacts')
-        .select()
-        .eq('user_id', userId)
-        .order('name');
+    try {
+      final response = await _client
+          .from('contacts')
+          .select()
+          .eq('user_id', userId)
+          .order('name');
 
-    return (response as List)
-        .map((json) => Contact.fromJson(json as Map<String, dynamic>))
-        .toList();
+      _log.fine('Fetched ${response.length} contacts');
+      
+      return List<Map<String, dynamic>>.from(response)
+          .map((json) => Contact.fromJson(json))
+          .toList();
+    } catch (e, stackTrace) {
+      _log.severe('Error fetching contacts: $e', stackTrace);
+      rethrow;
+    }
   }
 
   Stream<List<Contact>> watchContacts() {
-    final userId = _userId;
-    if (userId == null) return Stream.value([]);
+    _log.fine('Watching contacts for user');
+    
+    final userId = this.userId;
+    if (userId == null) {
+      _log.warning('User not authenticated');
+      return Stream.value([]);
+    }
 
-    return _client
-        .from('contacts')
-        .stream(primaryKey: ['id'])
-        .eq('user_id', userId)
-        .map((rows) {
-          final contacts = rows.map((json) => Contact.fromJson(json)).toList();
-          contacts.sort((a, b) => a.name.compareTo(b.name));
-          return contacts;
-        });
+    try {
+      return _client
+          .from('contacts')
+          .stream(primaryKey: ['id'])
+          .eq('user_id', userId)
+          .map((rows) {
+            final contacts = rows.map((json) => Contact.fromJson(json)).toList();
+            contacts.sort((a, b) => a.name.compareTo(b.name));
+            _log.fine('Stream updated with ${contacts.length} contacts');
+            return contacts;
+          });
+    } catch (e, stackTrace) {
+      _log.severe('Error watching contacts: $e', stackTrace);
+      rethrow;
+    }
   }
 
   Future<Contact> addContact(Contact contact) async {
-    final userId = _userId;
-    if (userId == null) throw Exception('User not authenticated');
+    _log.fine('Adding new contact: ${contact.name}');
+    
+    final userId = this.userId;
+    if (userId == null) {
+      _log.severe('User not authenticated');
+      throw Exception('User not authenticated');
+    }
 
-    _validateContact(contact);
+    try {
+      _validateContact(contact);
 
-    final payload = contact.copyWith(userId: userId).toJson();
-    final response =
-        await _client.from('contacts').insert(payload).select().single();
+      final payload = contact.copyWith(userId: userId).toJson();
+      final response =
+          await _client.from('contacts').insert(payload).select().single();
 
-    return Contact.fromJson(response);
+      _log.info('Contact added successfully: ${contact.name}');
+      return Contact.fromJson(response);
+    } catch (e, stackTrace) {
+      _log.severe('Error adding contact: $e', stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> updateContact(Contact contact) async {
-    final userId = _userId;
-    if (userId == null) throw Exception('User not authenticated');
-    if (contact.id == null) throw ArgumentError('Contact id is required');
+    _log.fine('Updating contact: ${contact.id}');
+    
+    final userId = this.userId;
+    if (userId == null) {
+      _log.severe('User not authenticated');
+      throw Exception('User not authenticated');
+    }
+    if (contact.id == null) {
+      _log.severe('Contact id is required');
+      throw ArgumentError('Contact id is required');
+    }
 
-    _validateContact(contact);
+    try {
+      _validateContact(contact);
 
-    await _client
-        .from('contacts')
-        .update(contact.toUpdateJson())
-        .eq('id', contact.id!)
-        .eq('user_id', userId);
+      await _client
+          .from('contacts')
+          .update(contact.toUpdateJson())
+          .eq('id', contact.id!)
+          .eq('user_id', userId);
+          
+      _log.info('Contact updated successfully: ${contact.id}');
+    } catch (e, stackTrace) {
+      _log.severe('Error updating contact: $e', stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> deleteContact(String id) async {
-    final userId = _userId;
-    if (userId == null) throw Exception('User not authenticated');
+    _log.fine('Deleting contact: $id');
+    
+    final userId = this.userId;
+    if (userId == null) {
+      _log.severe('User not authenticated');
+      throw Exception('User not authenticated');
+    }
 
-    await _client.from('contacts').delete().eq('id', id).eq('user_id', userId);
+    try {
+      await _client.from('contacts').delete().eq('id', id).eq('user_id', userId);
+      _log.info('Contact deleted successfully: $id');
+    } catch (e, stackTrace) {
+      _log.severe('Error deleting contact: $e', stackTrace);
+      rethrow;
+    }
   }
 
   Future<Contact?> getContact(String id) async {
-    final userId = _userId;
-    if (userId == null) return null;
+    _log.fine('Getting contact: $id');
+    
+    final userId = this.userId;
+    if (userId == null) {
+      _log.warning('User not authenticated');
+      return null;
+    }
 
-    final response = await _client
-        .from('contacts')
-        .select()
-        .eq('id', id)
-        .eq('user_id', userId)
-        .maybeSingle();
+    try {
+      final response = await _client
+          .from('contacts')
+          .select()
+          .eq('id', id)
+          .eq('user_id', userId)
+          .maybeSingle();
 
-    if (response == null) return null;
-    return Contact.fromJson(response);
+      if (response == null) {
+        _log.fine('Contact not found: $id');
+        return null;
+      }
+      
+      _log.fine('Contact found: $id');
+      return Contact.fromJson(response);
+    } catch (e, stackTrace) {
+      _log.severe('Error getting contact: $e', stackTrace);
+      rethrow;
+    }
   }
 
   Future<void> upsertContacts(List<Contact> contacts) async {
-    final userId = _userId;
-    if (userId == null) throw Exception('User not authenticated');
+    _log.fine('Upserting ${contacts.length} contacts');
+    
+    final userId = this.userId;
+    if (userId == null) {
+      _log.severe('User not authenticated');
+      throw Exception('User not authenticated');
+    }
 
-    final payload = contacts.map((c) {
-      _validateContact(c);
-      return c.copyWith(userId: userId).toJson();
-    }).toList();
+    if (contacts.isEmpty) {
+      _log.fine('No contacts to upsert');
+      return;
+    }
 
-    await _client.from('contacts').upsert(payload, ignoreDuplicates: true);
+    try {
+      final payload = contacts.map((c) {
+        _validateContact(c);
+        return c.copyWith(userId: userId).toJson();
+      }).toList();
+
+      await _client.from('contacts').upsert(payload, ignoreDuplicates: true);
+      _log.info('Successfully upserted ${contacts.length} contacts');
+    } catch (e, stackTrace) {
+      _log.severe('Error upserting contacts: $e', stackTrace);
+      rethrow;
+    }
   }
 
   void _validateContact(Contact contact) {
+    _log.fine('Validating contact: ${contact.name}');
+    
     final name = contact.name.trim();
     if (name.isEmpty) {
+      _log.warning('Contact name is required');
       throw ArgumentError('Contact name is required');
     }
+    
     if (!PhoneFormatter.looksValid(contact.phone)) {
+      _log.warning('Contact phone number is invalid: ${contact.phone}');
       throw ArgumentError('Contact phone number is invalid');
     }
+    
+    _log.fine('Contact validated successfully: ${contact.name}');
   }
 }
 

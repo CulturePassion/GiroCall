@@ -2,12 +2,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/app_colors.dart';
 import '../../../core/constants.dart';
+import '../../../core/design/colors.dart';
+import '../../../core/design/microcopy.dart';
+import '../../../core/design/spacing.dart';
 import '../../../core/utils/screen_padding.dart';
-import '../../../core/app_spacing.dart';
 import '../../../shared/widgets/app_scaffold.dart';
-import '../../../shared/widgets/glass_surface.dart';
+import '../../../shared/widgets/page_header.dart';
+import '../../../shared/widgets/premium_card.dart';
 import '../../notifications/providers/settings_repository_provider.dart';
 import '../providers/stats_provider.dart';
 
@@ -22,48 +24,18 @@ class StatsScreen extends ConsumerWidget {
         settingsAsync.value?.dailyCallGoal ?? Constants.defaultDailyCallGoal;
 
     final statItems = [
-      _StatItem(
-        label: 'Current streak',
-        value: '${stats.currentStreak}',
-        unit: 'days',
-        icon: Icons.local_fire_department,
-        color: AppColors.accentCoral,
-      ),
-      _StatItem(
-        label: 'Longest streak',
-        value: '${stats.longestStreak}',
-        unit: 'days',
-        icon: Icons.emoji_events_outlined,
-        color: AppColors.accentCoral,
-      ),
-      _StatItem(
-        label: 'Today\'s goal',
-        value: '${stats.callsToday}',
-        unit: 'of $dailyGoal',
-        icon: Icons.flag_outlined,
-        color: AppColors.paletteGold,
-      ),
-      _StatItem(
-        label: 'Total calls',
-        value: '${stats.totalCalls}',
-        unit: 'calls',
-        icon: Icons.phone_in_talk,
-        color: AppColors.primaryTeal,
-      ),
-      _StatItem(
-        label: 'Reconnected',
-        value: '${stats.uniqueContactsCalled}',
-        unit: 'people',
-        icon: Icons.people,
-        color: AppColors.paletteGold,
-      ),
-      _StatItem(
-        label: 'Avg rating',
-        value: stats.averageRating.toStringAsFixed(1),
-        unit: 'stars',
-        icon: Icons.star,
-        color: const Color(0xFFF59E0B),
-      ),
+      _StatItem('Current streak', '${stats.currentStreak}', 'days',
+          Icons.local_fire_department, AppColors.orange),
+      _StatItem('Longest streak', '${stats.longestStreak}', 'days',
+          Icons.emoji_events_outlined, AppColors.goldenYellow),
+      _StatItem('Today\'s goal', '${stats.callsToday}', 'of $dailyGoal',
+          Icons.flag_outlined, AppColors.secondaryBlue),
+      _StatItem('Total calls', '${stats.totalCalls}', 'calls',
+          Icons.phone_in_talk, AppColors.main),
+      _StatItem('Reconnected', '${stats.uniqueContactsCalled}', 'people',
+          Icons.favorite, AppColors.softPink),
+      _StatItem('Avg rating', stats.averageRating.toStringAsFixed(1), 'stars',
+          Icons.star_rounded, AppColors.goldenYellow),
     ];
 
     return AppScaffold(
@@ -74,11 +46,10 @@ class StatsScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              'Nice work staying connected.',
-              style: Theme.of(context).textTheme.bodyMedium,
+            const PageHeader(
+              title: Microcopy.statsGreeting,
+              subtitle: Microcopy.statsEncouragement,
             ),
-            const SizedBox(height: 16),
             LayoutBuilder(
               builder: (context, constraints) {
                 final crossAxisCount = constraints.maxWidth >= 500 ? 3 : 2;
@@ -87,9 +58,9 @@ class StatsScreen extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: crossAxisCount,
-                    mainAxisSpacing: 10,
-                    crossAxisSpacing: 10,
-                    childAspectRatio: crossAxisCount == 3 ? 1.3 : 1.1,
+                    mainAxisSpacing: AppSpacing.xxs,
+                    crossAxisSpacing: AppSpacing.xxs,
+                    childAspectRatio: crossAxisCount == 3 ? 1.05 : 0.95,
                   ),
                   itemCount: statItems.length,
                   itemBuilder: (context, index) =>
@@ -97,22 +68,23 @@ class StatsScreen extends ConsumerWidget {
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.md),
             Text(
-              'Recent activity',
-              style: Theme.of(context).textTheme.titleLarge,
+              Microcopy.statsActivity,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
             ),
-            const SizedBox(height: 12),
-            GlassSurface(
+            const SizedBox(height: AppSpacing.xs),
+            PremiumCard(
               padding: const EdgeInsets.fromLTRB(
-                AppSpacing.xxs,
                 AppSpacing.xs,
-                AppSpacing.xxs,
-                AppSpacing.xxs,
+                AppSpacing.sm,
+                AppSpacing.xs,
+                AppSpacing.xs,
               ),
-              borderRadius: AppSpacing.radiusLg,
               child: SizedBox(
-                height: 200,
+                height: 220,
                 child: _ActivityChart(
                   today: stats.callsToday,
                   week: stats.callsThisWeek,
@@ -120,7 +92,7 @@ class StatsScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            SizedBox(height: ScreenPadding.bottomNavClearance(context) - 56),
+            SizedBox(height: ScreenPadding.bottomNavClearance(context)),
           ],
         ),
       ),
@@ -135,13 +107,13 @@ class _StatItem {
   final IconData icon;
   final Color color;
 
-  const _StatItem({
-    required this.label,
-    required this.value,
-    required this.unit,
-    required this.icon,
-    required this.color,
-  });
+  const _StatItem(
+    this.label,
+    this.value,
+    this.unit,
+    this.icon,
+    this.color,
+  );
 }
 
 class _StatCard extends StatelessWidget {
@@ -151,33 +123,36 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GlassSurface(
-      padding: const EdgeInsets.all(AppSpacing.xs + 2),
+    return PremiumCard(
+      accentColor: item.color,
+      padding: const EdgeInsets.all(AppSpacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             padding: const EdgeInsets.all(AppSpacing.xxs),
             decoration: BoxDecoration(
               color: item.color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(item.icon, color: item.color, size: 20),
+            child: Icon(item.icon, color: item.color, size: 22),
           ),
           const Spacer(),
           Text(
             item.value,
-            style:
-                Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 24),
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           Text(item.unit, style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           Text(
             item.label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w500,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
         ],
@@ -205,19 +180,23 @@ class _ActivityChart extends StatelessWidget {
       _ChartData('30 days', month.toDouble()),
     ];
     final maxVal = [today, week, month].reduce((a, b) => a > b ? a : b);
+    final labelColor = Theme.of(context).colorScheme.onSurfaceVariant;
 
     return BarChart(
       BarChartData(
         alignment: BarChartAlignment.spaceAround,
-        maxY: maxVal.toDouble() + 1,
+        maxY: maxVal.toDouble() + 2,
         barTouchData: const BarTouchData(enabled: false),
         titlesData: FlTitlesData(
-          leftTitles:
-              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles:
-              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          topTitles:
-              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          leftTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
@@ -230,7 +209,10 @@ class _ActivityChart extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
                     data[index].label,
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: labelColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                 );
               },
@@ -245,10 +227,14 @@ class _ActivityChart extends StatelessWidget {
             barRods: [
               BarChartRodData(
                 toY: entry.value.value,
-                color: AppColors.paletteTeal,
-                width: 36,
+                width: 40,
                 borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(8),
+                  top: Radius.circular(10),
+                ),
+                gradient: const LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [AppColors.main, AppColors.heroGradientMid],
                 ),
               ),
             ],

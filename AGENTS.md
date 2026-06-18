@@ -3,7 +3,7 @@
 **Project Name:** GiroCall  
 **Tagline:** "Spin the Giro. Make the Call. Stay Connected."  
 **Domain:** GiroCall.com  
-**Status:** Initial development phase (brand + foundation complete)
+**Status:** v2.0 — Flutter-only rebuild (design system + app layer consolidated)
 
 This file is the **single source of truth** for all AI coding agents and human developers working on GiroCall. Read this file completely before making any changes.
 
@@ -62,14 +62,18 @@ GiroCall is a cross-platform relationship maintenance app centered around a fun 
 ```
 GiroCall/
 ├── lib/
-│   ├── core/                    # Theme, constants, utils, config, DI
-│   │   └── theme/               # ThemeMode provider (light/dark/system)
+│   ├── app/                     # Bootstrap, shell (centered Giro nav)
+│   ├── core/
+│   │   ├── design/              # colors, theme, spacing, tokens, microcopy
+│   │   ├── theme/               # ThemeMode provider (light/dark/system)
+│   │   ├── sync/                # Cross-device refresh
+│   │   └── utils/               # Weighting, vCard, platform helpers
 │   ├── features/
 │   │   ├── auth/
 │   │   ├── contacts/            # Import, list, edit, frequency settings
 │   │   ├── wheel/               # Spin animation + selection logic
 │   │   ├── call_log/            # Call logging and rating
-│   │   ├── recommendations/     # Smart "call again" list
+│   │   ├── status/              # Presence + overdue call suggestions
 │   │   ├── stats/               # Streaks, history, charts
 │   │   ├── profile/             # Profile hub + digital business card
 │   │   ├── settings/            # App settings + account management
@@ -232,14 +236,12 @@ Before any PR or handoff: Run `flutter analyze` and `flutter test` — they must
 
 ---
 
-## 9. Current Status & Next Steps (as of 2026-06-17)
+## 9. Current Status & Next Steps (as of 2026-06-18)
 
-- Brand finalized (GiroCall + logo + colors + tagline)
-- Full Flutter scaffold with Supabase Auth, contacts, wheel, call log, recommendations, stats
-- Dark theme + Profile / Settings / Account screens
-- Digital business card (profiles, QR, wallet pass edge function)
-- Daily reminders (local notifications + Edge Function skeleton)
-- Dependencies upgraded to Riverpod 3, GoRouter 17, Firebase 4.x, fl_chart 1.x
+- **v2.0 ground-up UI rebuild** — consolidated `lib/core/design/`, `lib/app/` bootstrap + shell
+- Flutter-only (Next.js `site/` removed); web = Flutter PWA via `build/web/`
+- Brand, Supabase backend, wheel, contacts, status, stats, profile, settings intact
+- 24 tests passing, `flutter analyze` clean
 
 **Next recommended steps:**
 
@@ -262,7 +264,7 @@ Example:
 This file is the single source of truth.  
 Any AI agent or developer working on GiroCall must follow the guidelines here.
 
-Last updated: 2026-06-17
+Last updated: 2026-06-18
 
 ## Updates
 
@@ -271,5 +273,6 @@ Last updated: 2026-06-17
 - Dark theme, Profile/Settings/Account UI, mobile UX polish, dependency upgrades (Riverpod 3, GoRouter 17, Firebase 4.x) — 2026-06-17
 - Launcher icons generated for Android, iOS, and Web (PWA) using `flutter_launcher_icons`; pre-existing lint issues resolved so `flutter analyze` passes cleanly — 2026-06-17
 - App now runs on Android emulator; fixed `LoginScreen` negative `BoxConstraints` bug and moved `ref.listen` into `build()` in `main.dart`; cleaned up duplicate Android `build.gradle.kts`/`settings.gradle.kts` files and aligned NDK version — 2026-06-17
+- v2.0 ground-up UI rebuild: `lib/core/design/`, `lib/app/`, removed Next.js site, merged recommendations into status — 2026-06-18
 
 GiroCall — Helping people stay connected, one spin at a time.

@@ -9,7 +9,7 @@ Generates Apple Wallet (`.pkpass`) or Google Wallet pass data for a user's publi
 ```bash
 make deploy-edge
 # or:
-supabase functions deploy wallet-pass
+supabase functions deploy wallet-pass --no-verify-jwt
 ```
 
 ## Called from Flutter

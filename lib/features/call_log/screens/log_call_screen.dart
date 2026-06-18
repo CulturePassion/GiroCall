@@ -3,14 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/app_colors.dart';
+import '../../../core/design/colors.dart';
+import '../../../core/design/spacing.dart';
+import '../../../core/design/microcopy.dart';
 import '../../../shared/models/call_log.dart';
 import '../../../shared/models/contact.dart';
 import '../../../shared/widgets/app_scaffold.dart';
+import '../../../shared/widgets/premium_card.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/star_rating.dart';
 import '../../contacts/providers/contact_by_id_provider.dart';
 import '../../contacts/providers/contacts_notifier.dart';
+import '../../status/widgets/status_avatar.dart';
 import '../providers/call_log_notifier.dart';
 
 class LogCallScreen extends ConsumerStatefulWidget {
@@ -56,7 +60,10 @@ class _LogCallScreenState extends ConsumerState<LogCallScreen> {
 
   Future<void> _logCall() async {
     final contact = _currentContact;
-    if (contact == null) return;
+    if (contact == null) {
+      _showError('Contact not found.');
+      return;
+    }
 
     final userId = ref.read(contactsNotifierProvider.notifier).currentUserId;
     if (userId == null) {
@@ -70,24 +77,28 @@ class _LogCallScreenState extends ConsumerState<LogCallScreen> {
 
     setState(() => _isSubmitting = true);
 
-    await ref.read(callLogNotifierProvider.notifier).addLog(CallLog(
-          userId: userId,
-          contactId: widget.contactId,
-          calledAt: DateTime.now(),
-          durationSeconds: durationSeconds,
-          callRating: _rating,
-          notes: _notesController.text.trim().isEmpty
-              ? null
-              : _notesController.text.trim(),
-        ));
+    try {
+      await ref.read(callLogNotifierProvider.notifier).addLog(CallLog(
+            userId: userId,
+            contactId: widget.contactId,
+            calledAt: DateTime.now(),
+            durationSeconds: durationSeconds,
+            callRating: _rating,
+            notes: _notesController.text.trim().isEmpty
+                ? null
+                : _notesController.text.trim(),
+          ));
 
-    setState(() => _isSubmitting = false);
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Great call! How did it feel?')),
-      );
-      context.go('/');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text(Microcopy.callSaved)),
+        );
+        context.go('/');
+      }
+    } catch (e) {
+      _showError('Failed to save call log: ${e.toString()}');
+    } finally {
+      setState(() => _isSubmitting = false);
     }
   }
 
@@ -130,80 +141,95 @@ class _LogCallScreenState extends ConsumerState<LogCallScreen> {
     return AppScaffold(
       title: 'Log Call',
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacing.sm),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            CircleAvatar(
-              radius: 40,
-              backgroundColor: AppColors.primaryTeal,
-              child: Text(
-                contact.name.isNotEmpty ? contact.name[0].toUpperCase() : '?',
-                style: const TextStyle(
-                  fontSize: 32,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+            PremiumCard(
+              accentColor: AppColors.main,
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                children: [
+                  StatusAvatar(
+                    initials: contact.initials,
+                    imageUrl: contact.photoUrl,
+                    radius: 40,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    contact.name,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    contact.phone,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  PrimaryButton(
+                    label: Microcopy.callTapToCall,
+                    icon: Icons.phone,
+                    backgroundColor: AppColors.main,
+                    onPressed: _call,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              contact.name,
-              style: Theme.of(context).textTheme.displaySmall,
-              textAlign: TextAlign.center,
-            ),
-            Text(
-              contact.phone,
-              style: Theme.of(context).textTheme.bodyMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 32),
-            PrimaryButton(
-              label: 'Tap to call',
-              icon: Icons.phone,
-              onPressed: _call,
-            ),
-            const SizedBox(height: 32),
-            Text(
-              'How did the call feel?',
-              style: Theme.of(context).textTheme.titleMedium,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            Center(
-              child: StarRating(
-                rating: _rating,
-                onChanged: (rating) => setState(() => _rating = rating),
+            const SizedBox(height: AppSpacing.md),
+            PremiumCard(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    Microcopy.callFeelPrompt,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Center(
+                    child: StarRating(
+                      rating: _rating,
+                      onChanged: (rating) => setState(() => _rating = rating),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  TextField(
+                    controller: _durationController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Duration in minutes (optional)',
+                      prefixIcon: Icon(Icons.timer_outlined),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  TextField(
+                    controller: _notesController,
+                    maxLines: 3,
+                    decoration: const InputDecoration(
+                      labelText: 'Notes (optional)',
+                      hintText: 'A sweet moment to remember…',
+                      alignLabelWithHint: true,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
-            TextField(
-              controller: _durationController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Duration in minutes (optional)',
-                prefixIcon: Icon(Icons.timer_outlined),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _notesController,
-              maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'Notes (optional)',
-                alignLabelWithHint: true,
-              ),
-            ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.md),
             PrimaryButton(
               label: 'Save call',
               onPressed: _logCall,
               isLoading: _isSubmitting,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.xs),
             TextButton(
               onPressed: () => context.pop(),
-              child: const Text('Cancel'),
+              child: const Text('Not now'),
             ),
           ],
         ),

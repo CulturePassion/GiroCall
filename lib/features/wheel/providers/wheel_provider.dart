@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
@@ -77,6 +78,8 @@ class WheelNotifier extends StateNotifier<WheelState> {
 
     // Wait for the animation duration.
     await Future.delayed(const Duration(seconds: 3));
+
+    await HapticFeedback.heavyImpact();
 
     final selected = contacts[selectedIndex];
     state = state.copyWith(

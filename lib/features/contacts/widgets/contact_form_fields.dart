@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/app_colors.dart';
+import '../../../core/design/colors.dart';
 import '../../../core/constants.dart';
 import '../../../shared/models/contact.dart';
 import '../../../shared/models/contact_tag.dart';
@@ -29,6 +29,7 @@ class ContactFormData {
   int frequencyDays = Constants.defaultTargetFrequencyDays;
   int? relationshipScore;
   bool syncToDevice = true;
+  bool isFavorite = false;
 
   void applyFromDraft({
     String? firstName,
@@ -85,6 +86,7 @@ class ContactFormData {
     frequencyDays = contact.targetFrequencyDays;
     relationshipScore = contact.relationshipScore;
     syncToDevice = contact.syncToDevice;
+    isFavorite = contact.isFavorite;
   }
 
   String? validate() {
@@ -138,6 +140,7 @@ class ContactFormData {
       deviceNativeId: deviceNativeId,
       syncToDevice: syncToDevice,
       lastCalledAt: lastCalledAt,
+      isFavorite: isFavorite,
     );
   }
 }
@@ -443,6 +446,20 @@ class _ContactFormFieldsState extends State<ContactFormFields> {
             },
           ),
         ],
+        const SizedBox(height: 8),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Add to favorites'),
+          secondary: Icon(
+            data.isFavorite ? Icons.favorite : Icons.favorite_border,
+            color: data.isFavorite ? Colors.red : null,
+          ),
+          value: data.isFavorite,
+          onChanged: (value) {
+            setState(() => data.isFavorite = value);
+            widget.onChanged();
+          },
+        ),
       ],
     );
   }

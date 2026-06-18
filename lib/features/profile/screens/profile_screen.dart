@@ -1,226 +1,233 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/app_colors.dart';
-import '../../../core/app_spacing.dart';
-import '../../../core/constants.dart';
-import '../../../core/supabase_provider.dart';
-import '../../../core/utils/responsive_layout.dart';
+import '../../../core/design/colors.dart';
+import '../../../core/design/microcopy.dart';
+import '../../../core/design/spacing.dart';
+import '../../../core/design/tokens.dart';
 import '../../../core/utils/screen_padding.dart';
-import '../../../core/utils/supabase_error_message.dart';
-import '../../../shared/widgets/glass_surface.dart';
-import '../../../shared/widgets/gradient_background.dart';
-import '../../../shared/widgets/responsive_page.dart';
-import '../../stats/providers/stats_provider.dart';
+import '../../../shared/models/user_profile.dart';
+import '../../../shared/widgets/app_scaffold.dart';
+import '../../../shared/widgets/premium_card.dart';
+import '../../../shared/widgets/profile_avatar_picker.dart';
+import '../../auth/providers/auth_provider.dart';
 import '../providers/profile_notifier.dart';
 
-/// Profile hub — glass cards, colorful stats, thumb-friendly navigation.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(authUserProvider).value?.session?.user;
     final profileAsync = ref.watch(profileNotifierProvider);
-    final stats = ref.watch(statsProvider);
-    final theme = Theme.of(context);
 
-    return Scaffold(
-      body: GradientBackground(
-        child: SafeArea(
-          child: profileAsync.when(
-            data: (profile) {
-              final displayName = profile?.displayName ??
-                  user?.email?.split('@').first ??
-                  'GiroCall user';
-              final email = user?.email ?? '';
-
-              return ResponsivePage(
-                width: ResponsivePageWidth.content,
-                scrollable: false,
-                padding: EdgeInsets.zero,
-                child: CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(
-                          ResponsiveLayout.horizontalPadding(context),
-                          AppSpacing.xs,
-                          ResponsiveLayout.horizontalPadding(context),
-                          AppSpacing.xxs,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Profile',
-                              style: theme.textTheme.displaySmall,
-                            ),
-                            const SizedBox(height: AppSpacing.sm),
-                            _ProfileHeader(
-                              displayName: displayName,
-                              email: email,
-                              subtitle: profile?.title,
-                              avatarUrl: profile?.avatarUrl,
-                              onEdit: () => context.push('/profile/edit'),
-                            ),
-                          const SizedBox(height: AppSpacing.sm),
-                          _QuickStatsRow(
-                            streak: stats.currentStreak,
-                            totalCalls: stats.totalCalls,
-                            reconnected: stats.uniqueContactsCalled,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                    SliverPadding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: ResponsiveLayout.horizontalPadding(context),
-                      ),
-                      sliver: SliverList(
-                        delegate: SliverChildListDelegate([
-                          GlassSurface(
-                            padding: EdgeInsets.zero,
-                            borderRadius: AppSpacing.radiusLg,
-                            child: Column(
-                              children: _withDividers(context, [
-                                _ProfileMenuTile(
-                                  icon: Icons.edit_outlined,
-                                  iconColor: AppColors.main,
-                                  title: 'Edit profile & photo',
-                                  subtitle: 'Avatar, name, and contact details',
-                                  onTap: () => context.push('/profile/edit'),
-                                ),
-                                _ProfileMenuTile(
-                                  icon: Icons.badge_outlined,
-                                  iconColor: AppColors.blue,
-                                  title: 'My Digital Card',
-                                subtitle: profile?.isPublic == true
-                                    ? 'Public · ${profile!.slug}'
-                                    : 'Private — tap to share when ready',
-                                onTap: () => context.push('/profile/card'),
-                              ),
-                              _ProfileMenuTile(
-                                icon: Icons.notifications_outlined,
-                                iconColor: AppColors.paletteGold,
-                                title: 'Reminders',
-                                subtitle: 'Daily spin nudges and call goals',
-                                onTap: () =>
-                                    context.push('/settings/notifications'),
-                              ),
-                              _ProfileMenuTile(
-                                icon: Icons.settings_outlined,
-                                iconColor: AppColors.paletteSage,
-                                title: 'Settings',
-                                subtitle: 'Appearance, preferences, and more',
-                                onTap: () => context.push('/settings'),
-                              ),
-                              _ProfileMenuTile(
-                                icon: Icons.manage_accounts_outlined,
-                                iconColor: AppColors.paletteCoral,
-                                title: 'Account',
-                                subtitle: 'Email, sign out, and data',
-                                onTap: () => context.push('/settings/account'),
-                              ),
-                            ]),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          Constants.tagline,
-                          style: theme.textTheme.bodySmall,
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(
-                          height: ScreenPadding.bottomNavClearance(context),
-                        ),
-                      ]),
-                    ),
-                  ),
-                  ],
-                ),
-              );
-            },
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, _) => Center(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                child: Text(supabaseErrorMessage(error)),
-              ),
-            ),
-          ),
+    return AppScaffold(
+      title: 'My Profile',
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.edit),
+          onPressed: () => context.push('/profile/edit'),
         ),
+      ],
+      body: profileAsync.when(
+        data: (profile) {
+          if (profile == null) {
+            return const Center(child: Text('Loading profile...'));
+          }
+          return _ProfileContent(profile: profile);
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(child: Text('Error: $error')),
       ),
     );
   }
-
-  List<Widget> _withDividers(BuildContext context, List<Widget> items) {
-    final result = <Widget>[];
-    for (var i = 0; i < items.length; i++) {
-      result.add(items[i]);
-      if (i < items.length - 1) {
-        result.add(Divider(
-          height: 1,
-          indent: 72,
-          color: Theme.of(context).dividerColor.withValues(alpha: 0.5),
-        ));
-      }
-    }
-    return result;
-  }
 }
 
-class _ProfileHeader extends StatelessWidget {
-  final String displayName;
-  final String email;
-  final String? subtitle;
-  final String? avatarUrl;
-  final VoidCallback onEdit;
+class _ProfileContent extends ConsumerWidget {
+  final UserProfile profile;
 
-  const _ProfileHeader({
-    required this.displayName,
-    required this.email,
-    this.subtitle,
-    this.avatarUrl,
-    required this.onEdit,
-  });
+  const _ProfileContent({required this.profile});
 
   @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return GlassSurface(
-      padding: const EdgeInsets.all(AppSpacing.xs),
-      borderRadius: AppSpacing.radiusLg,
-      child: Row(
+  Widget build(BuildContext context, WidgetRef ref) {
+    return SingleChildScrollView(
+      padding: ScreenPadding.all(context).copyWith(
+        bottom: ScreenPadding.bottomNavClearance(context),
+      ),
+      child: Column(
         children: [
-          _HeaderAvatar(
-            imageUrl: avatarUrl,
-            name: displayName,
-          ),
-          const SizedBox(width: AppSpacing.xs),
-          Expanded(
+          PremiumCard(
+            accentColor: AppColors.main,
+            borderRadius: AppTokens.radiusXl,
+            padding: const EdgeInsets.all(AppSpacing.lg),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(displayName, style: theme.textTheme.titleLarge),
-                if (subtitle != null && subtitle!.isNotEmpty) ...[
-                  const SizedBox(height: 2),
-                  Text(subtitle!, style: theme.textTheme.bodyMedium),
-                ],
-                if (email.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(email, style: theme.textTheme.bodySmall),
+                ProfileAvatarPicker(
+                  imageUrl: profile.avatarUrl,
+                  initials: profile.displayName.isNotEmpty
+                      ? profile.displayName[0].toUpperCase()
+                      : '?',
+                  readonly: true,
+                  radius: 60,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  profile.displayName,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                if (profile.title != null || profile.company != null)
+                  Text(
+                    [
+                      if (profile.title != null) profile.title!,
+                      if (profile.company != null) profile.company!,
+                    ].join(' • '),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textMuted(context),
+                        ),
+                  ),
+                if (profile.bio != null) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    profile.bio!,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ],
               ],
             ),
           ),
-          IconButton(
-            onPressed: onEdit,
-            tooltip: 'Edit profile',
-            icon: const Icon(Icons.edit_outlined),
+          const SizedBox(height: AppSpacing.md),
+          if (profile.hasContactInfo)
+            PremiumCard(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    Microcopy.profileContactInfo,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  if (profile.phone != null)
+                    _InfoRow(
+                      icon: Icons.phone,
+                      label: 'Phone',
+                      value: profile.phone!,
+                    ),
+                  if (profile.email != null)
+                    _InfoRow(
+                      icon: Icons.email,
+                      label: 'Email',
+                      value: profile.email!,
+                    ),
+                  if (profile.formattedAddress != null)
+                    _InfoRow(
+                      icon: Icons.location_on,
+                      label: 'Address',
+                      value: profile.formattedAddress!,
+                    ),
+                ],
+              ),
+            ),
+          if (profile.hasContactInfo) const SizedBox(height: AppSpacing.md),
+          if (profile.socialLinks.isNotEmpty)
+            PremiumCard(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    Microcopy.profileSocialLinks,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Wrap(
+                    spacing: AppSpacing.sm,
+                    runSpacing: AppSpacing.sm,
+                    children: profile.socialLinks
+                        .map(
+                          (link) => _SocialLinkChip(
+                            platform: link.platform,
+                            label: link.label,
+                            url: link.url,
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ],
+              ),
+            ),
+          if (profile.socialLinks.isNotEmpty)
+            const SizedBox(height: AppSpacing.md),
+          PremiumCard(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  Microcopy.profilePrivacy,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text('Public profile'),
+                  value: profile.isPublic,
+                  onChanged: (_) {
+                    // TODO: Implement profile privacy toggle
+                  },
+                  secondary: Icon(
+                    Icons.visibility,
+                    color: profile.isPublic
+                        ? AppColors.success
+                        : AppColors.error,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Card(
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: AppColors.softBlue,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.card_membership,
+                  color: AppColors.primaryTeal,
+                ),
+              ),
+              title: const Text('My Digital Card'),
+              subtitle: const Text('Share your contact info easily'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/profile/card'),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          OutlinedButton.icon(
+            onPressed: () => ref.read(authNotifierProvider.notifier).signOut(),
+            icon: const Icon(Icons.logout),
+            label: const Text('Sign out'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.sm,
+              ),
+              side: const BorderSide(color: AppColors.error),
+              foregroundColor: AppColors.error,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppTokens.radiusLg),
+              ),
+            ),
           ),
         ],
       ),
@@ -228,181 +235,110 @@ class _ProfileHeader extends StatelessWidget {
   }
 }
 
-class _HeaderAvatar extends StatelessWidget {
-  final String? imageUrl;
-  final String name;
-
-  const _HeaderAvatar({this.imageUrl, required this.name});
-
-  @override
-  Widget build(BuildContext context) {
-    final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        child: Image.network(
-          imageUrl!,
-          width: 72,
-          height: 72,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _gradientBox(initial),
-        ),
-      );
-    }
-    return _gradientBox(initial);
-  }
-
-  Widget _gradientBox(String initial) {
-    return Container(
-      width: 72,
-      height: 72,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.main, AppColors.royalBlue, AppColors.sunsetOrange],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.5),
-          width: 2,
-        ),
-      ),
-      child: Center(
-        child: Text(
-          initial,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _QuickStatsRow extends StatelessWidget {
-  final int streak;
-  final int totalCalls;
-  final int reconnected;
-
-  const _QuickStatsRow({
-    required this.streak,
-    required this.totalCalls,
-    required this.reconnected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _MiniStat(
-            icon: Icons.local_fire_department,
-            value: '$streak',
-            label: 'Streak',
-            color: AppColors.paletteCoral,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.xxs + 2),
-        Expanded(
-          child: _MiniStat(
-            icon: Icons.phone_in_talk_outlined,
-            value: '$totalCalls',
-            label: 'Calls',
-            color: AppColors.paletteTeal,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.xxs + 2),
-        Expanded(
-          child: _MiniStat(
-            icon: Icons.people_outline,
-            value: '$reconnected',
-            label: 'People',
-            color: AppColors.paletteGold,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _MiniStat extends StatelessWidget {
+class _InfoRow extends StatelessWidget {
   final IconData icon;
-  final String value;
   final String label;
-  final Color color;
+  final String value;
 
-  const _MiniStat({
+  const _InfoRow({
     required this.icon,
-    required this.value,
     required this.label,
-    required this.color,
+    required this.value,
   });
 
   @override
   Widget build(BuildContext context) {
-    return GlassSurface(
-      padding: const EdgeInsets.symmetric(
-        vertical: AppSpacing.xs + 2,
-        horizontal: AppSpacing.xxs + 4,
-      ),
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Row(
         children: [
-          Icon(icon, color: color, size: 22),
-          const SizedBox(height: AppSpacing.xxs - 2),
-          Text(
-            value,
-            style:
-                Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 20),
+          Icon(icon, color: AppColors.primaryTeal),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textMuted(context),
+                      ),
+                ),
+                Text(value, style: Theme.of(context).textTheme.bodyMedium),
+              ],
+            ),
           ),
-          Text(label, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );
   }
 }
 
-class _ProfileMenuTile extends StatelessWidget {
-  final IconData icon;
-  final Color iconColor;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
+class _SocialLinkChip extends StatelessWidget {
+  final String platform;
+  final String label;
+  final String url;
 
-  const _ProfileMenuTile({
-    required this.icon,
-    required this.iconColor,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
+  const _SocialLinkChip({
+    required this.platform,
+    required this.label,
+    required this.url,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xs,
-        vertical: AppSpacing.xxs - 2,
+    final (icon, color) = _platformStyle(platform);
+
+    return FilterChip(
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: Colors.white),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
+        ],
       ),
-      leading: Container(
-        width: AppSpacing.minTouchTarget,
-        height: AppSpacing.minTouchTarget,
-        decoration: BoxDecoration(
-          color: iconColor.withValues(alpha: 0.14),
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-        ),
-        child: Icon(icon, color: iconColor, size: 22),
+      selected: false,
+      onSelected: (_) => _launchUrl(url),
+      selectedColor: color,
+      backgroundColor: color.withValues(alpha: 0.85),
+      showCheckmark: false,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+        side: BorderSide.none,
       ),
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.w600, height: 1.5),
-      ),
-      subtitle: Text(subtitle, style: const TextStyle(height: 1.5)),
-      trailing: const Icon(Icons.chevron_right, size: 22),
-      minVerticalPadding: 0,
     );
+  }
+
+  (IconData, Color) _platformStyle(String platform) {
+    switch (platform.toLowerCase()) {
+      case 'linkedin':
+        return (Icons.work, AppColors.royalBlue);
+      case 'twitter':
+      case 'x':
+        return (Icons.tag, AppColors.warmBlue);
+      case 'instagram':
+        return (Icons.camera_alt, AppColors.softPink);
+      case 'facebook':
+        return (Icons.groups, AppColors.warmBlue);
+      case 'tiktok':
+        return (Icons.movie, AppColors.persianBlue);
+      case 'youtube':
+        return (Icons.play_circle, AppColors.error);
+      case 'website':
+        return (Icons.public, AppColors.primaryTeal);
+      default:
+        return (Icons.link, AppColors.warmGray);
+    }
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
   }
 }

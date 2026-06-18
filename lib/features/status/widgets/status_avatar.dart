@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/app_colors.dart';
+import '../../../core/design/colors.dart';
 import '../../../shared/models/presence_status.dart';
 
-/// WhatsApp-style status ring around a contact avatar.
+/// Solid ring around a contact avatar for status.
 class StatusAvatar extends StatelessWidget {
   final String initials;
   final PresenceType? statusType;
@@ -28,31 +28,30 @@ class StatusAvatar extends StatelessWidget {
       decoration: hasStatus
           ? BoxDecoration(
               shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: [
-                  ringColor,
-                  ringColor.withValues(alpha: 0.5),
-                  AppColors.accentCoral,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: ringColor,
             )
           : null,
-      child: CircleAvatar(
-        radius: radius,
-        backgroundColor: AppColors.primaryTeal,
-        backgroundImage: imageUrl != null ? NetworkImage(imageUrl!) : null,
-        child: imageUrl == null
-            ? Text(
-                initials,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: radius * 0.75,
-                ),
-              )
-            : null,
+      child: Container(
+        padding: EdgeInsets.all(hasStatus ? 2 : 0),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          shape: BoxShape.circle,
+        ),
+        child: CircleAvatar(
+          radius: radius,
+          backgroundColor: AppColors.primaryTeal,
+          backgroundImage: imageUrl != null ? NetworkImage(imageUrl!) : null,
+          child: imageUrl == null
+              ? Text(
+                  initials,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: radius * 0.75,
+                  ),
+                )
+              : null,
+        ),
       ),
     );
   }

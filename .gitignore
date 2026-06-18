@@ -73,12 +73,6 @@ hs_err_pid*.log
 # Environment (never commit secrets)
 .env
 .env.local
-site/.env.local
-
-# Node / Next.js (site/)
-node_modules/
-site/node_modules/
-site/.next/
 
 # Generated migrations bundle (regenerate with: node scripts/combine_migrations.mjs)
 supabase/combined_migrations.sql

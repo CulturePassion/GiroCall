@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../core/app_colors.dart';
-import '../../core/app_spacing.dart';
-import 'glass_surface.dart';
+import '../../core/design/colors.dart';
+import '../../core/design/spacing.dart';
+import '../../core/design/tokens.dart';
+import 'premium_card.dart';
 
-/// Friendly empty state with glass card and CTA in thumb zone.
+/// Friendly empty state with premium card and CTA.
 class EmptyState extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -26,9 +27,9 @@ class EmptyState extends StatelessWidget {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
-        child: GlassSurface(
-          padding: const EdgeInsets.all(AppSpacing.sm),
-          borderRadius: AppSpacing.radiusLg,
+        child: PremiumCard(
+          accentColor: AppColors.orange,
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -36,47 +37,50 @@ class EmptyState extends StatelessWidget {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.paletteMint.withValues(alpha: 0.5),
-                      AppColors.paletteTealLight.withValues(alpha: 0.35),
-                    ],
+                  gradient: const LinearGradient(
+                    colors: [AppColors.softTeal, AppColors.softOrange],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: AppColors.main.withValues(alpha: 0.2),
+                    width: 2,
                   ),
                 ),
-                child: Icon(
-                  icon,
-                  size: 40,
-                  color: AppColors.paletteTeal,
-                ),
+                child: Icon(icon, size: 40, color: AppColors.main),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 title,
-                style: Theme.of(context).textTheme.titleLarge,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xxs),
               Text(
                 message,
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      height: 1.5,
+                    ),
                 textAlign: TextAlign.center,
               ),
               if (actionLabel != null && onAction != null) ...[
-                const SizedBox(height: AppSpacing.sm),
+                const SizedBox(height: AppSpacing.md),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: onAction,
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.paletteCoral,
+                      backgroundColor: AppColors.orange,
+                      foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(
-                        AppSpacing.minTouchTarget,
+                        AppTokens.minTouchTarget,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(AppTokens.radiusLg),
                       ),
                     ),
                     child: Text(actionLabel!),

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/app_colors.dart';
-import '../../../core/app_spacing.dart';
+import '../../../core/design/colors.dart';
+import '../../../core/design/spacing.dart';
+import '../../../core/design/tokens.dart';
 import '../../../core/supabase_provider.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/glass_surface.dart';
@@ -36,7 +37,7 @@ class AccountScreen extends ConsumerWidget {
           children: [
             GlassSurface(
               padding: const EdgeInsets.all(AppSpacing.sm),
-              borderRadius: AppSpacing.radiusLg,
+              borderRadius: AppTokens.radiusLg,
               child: Row(
                 children: [
                   _AccountAvatar(
@@ -218,7 +219,7 @@ class _AccountAvatar extends StatelessWidget {
 
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppTokens.radiusMd),
         child: Image.network(
           imageUrl!,
           width: 64,
@@ -239,7 +240,7 @@ class _AccountAvatar extends StatelessWidget {
         gradient: const LinearGradient(
           colors: [AppColors.main, AppColors.royalBlue],
         ),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: BorderRadius.circular(AppTokens.radiusMd),
       ),
       child: Center(
         child: Text(

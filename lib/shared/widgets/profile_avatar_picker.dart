@@ -2,14 +2,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../core/app_colors.dart';
-import '../../core/app_spacing.dart';
+import '../../core/design/colors.dart';
+import '../../core/design/spacing.dart';
+import '../../core/design/tokens.dart';
 
 /// Tap-to-upload profile photo with preview.
 class ProfileAvatarPicker extends StatelessWidget {
   final String? imageUrl;
   final String initials;
   final bool uploading;
+  final bool readonly;
+  final double radius;
   final ValueChanged<({Uint8List bytes, String mimeType})>? onImagePicked;
 
   const ProfileAvatarPicker({
@@ -17,6 +20,8 @@ class ProfileAvatarPicker extends StatelessWidget {
     this.imageUrl,
     required this.initials,
     this.uploading = false,
+    this.readonly = false,
+    this.radius = 56,
     this.onImagePicked,
   });
 
@@ -80,6 +85,8 @@ class ProfileAvatarPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     final letter =
         initials.trim().isNotEmpty ? initials.trim()[0].toUpperCase() : '?';
+    final diameter = radius * 2;
+    final canEdit = !readonly && onImagePicked != null;
 
     return Column(
       children: [
@@ -87,12 +94,14 @@ class ProfileAvatarPicker extends StatelessWidget {
           alignment: Alignment.bottomRight,
           children: [
             GestureDetector(
-              onTap: uploading ? null : () => _showSourceSheet(context),
+              onTap: canEdit && !uploading
+                  ? () => _showSourceSheet(context)
+                  : null,
               child: Container(
-                width: 112,
-                height: 112,
+                width: diameter,
+                height: diameter,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                  borderRadius: BorderRadius.circular(AppTokens.radiusLg),
                   gradient: imageUrl == null
                       ? const LinearGradient(
                           colors: [AppColors.main, AppColors.royalBlue],
@@ -122,9 +131,9 @@ class ProfileAvatarPicker extends StatelessWidget {
                     ? Center(
                         child: Text(
                           letter,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
-                            fontSize: 40,
+                            fontSize: radius * 0.7,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -138,7 +147,7 @@ class ProfileAvatarPicker extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.35),
                     borderRadius:
-                        BorderRadius.circular(AppSpacing.radiusLg),
+                        BorderRadius.circular(AppTokens.radiusLg),
                   ),
                   child: const Center(
                     child: SizedBox(
@@ -152,7 +161,7 @@ class ProfileAvatarPicker extends StatelessWidget {
                   ),
                 ),
               )
-            else
+            else if (canEdit)
               Material(
                 color: AppColors.orange,
                 shape: const CircleBorder(),
@@ -160,19 +169,21 @@ class ProfileAvatarPicker extends StatelessWidget {
                   customBorder: const CircleBorder(),
                   onTap: () => _showSourceSheet(context),
                   child: const SizedBox(
-                    width: AppSpacing.minTouchTarget,
-                    height: AppSpacing.minTouchTarget,
+                    width: AppTokens.minTouchTarget,
+                    height: AppTokens.minTouchTarget,
                     child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
                   ),
                 ),
               ),
           ],
         ),
-        const SizedBox(height: AppSpacing.xxs),
-        Text(
-          'Tap to upload profile photo',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
+        if (canEdit) ...[
+          const SizedBox(height: AppSpacing.xxs),
+          Text(
+            'Tap to upload profile photo',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
       ],
     );
   }

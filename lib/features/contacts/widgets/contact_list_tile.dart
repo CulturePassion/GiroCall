@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/app_colors.dart';
-import '../../../core/app_spacing.dart';
+import '../../../core/design/colors.dart';
+import '../../../core/design/spacing.dart';
+import '../../../core/design/tokens.dart';
 import '../../../core/extensions/date_time_extensions.dart';
 import '../../../shared/models/contact.dart';
-import '../../../shared/widgets/glass_surface.dart';
 import '../../status/providers/contact_status_map_provider.dart';
 import '../../status/widgets/status_avatar.dart';
+import '../providers/contacts_notifier.dart';
 
 class ContactListTile extends ConsumerWidget {
   final Contact contact;
   final VoidCallback? onTap;
   final VoidCallback? onCall;
+  final bool selected;
 
   const ContactListTile({
     super.key,
     required this.contact,
     this.onTap,
     this.onCall,
+    this.selected = false,
   });
 
   @override
@@ -26,107 +29,154 @@ class ContactListTile extends ConsumerWidget {
     final statusType = ref.watch(contactStatusMapProvider)[contact.id];
     final daysSince = contact.daysSinceLastCall;
     final statusText = daysSince == null
-        ? 'Never called'
+        ? 'Never called — maybe today?'
         : 'Last called ${contact.lastCalledAt!.toRelativeDateString()}';
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.xxs),
-      child: GlassSurface(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.xs - 4,
-          vertical: AppSpacing.xxs + 2,
+      child: Material(
+        color: AppColors.cardSurface(context),
+        elevation: selected ? 2 : 0,
+        shadowColor: AppColors.main.withValues(alpha: 0.1),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+          side: BorderSide(
+            color: selected
+                ? AppColors.main
+                : (AppColors.isDark(context)
+                    ? AppColors.darkDivider
+                    : AppColors.grey200),
+            width: selected ? 2 : 1,
+          ),
         ),
-        onTap: onTap,
-        child: Row(
-          children: [
-            StatusAvatar(
-              initials: contact.initials,
-              statusType: statusType,
-              imageUrl: contact.photoUrl,
-              radius: 24,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xs,
+              vertical: AppSpacing.xxs + 2,
             ),
-            const SizedBox(width: AppSpacing.xs - 4),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+            child: Row(
+              children: [
+                StatusAvatar(
+                  initials: contact.initials,
+                  statusType: statusType,
+                  imageUrl: contact.photoUrl,
+                  radius: 24,
+                ),
+                const SizedBox(width: AppSpacing.xs),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          contact.name,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall
-                              ?.copyWith(fontSize: 15),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              contact.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (contact.isFavorite)
+                            const Padding(
+                              padding: EdgeInsets.only(left: 4),
+                              child: Icon(
+                                Icons.favorite,
+                                size: 14,
+                                color: AppColors.orange,
+                              ),
+                            ),
+                          if (contact.tag != null) ...[
+                            const SizedBox(width: AppSpacing.xxs),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.xxs,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.softTeal,
+                                borderRadius: BorderRadius.circular(
+                                  AppTokens.radiusSm,
+                                ),
+                                border: Border.all(
+                                  color: contact.tag!.color,
+                                ),
+                              ),
+                              child: Text(
+                                contact.tag!.label,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: contact.tag!.color,
+                                  height: 1.5,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
-                      if (contact.tag != null) ...[
-                        const SizedBox(width: AppSpacing.xxs),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.xxs,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: contact.tag!.color.withValues(alpha: 0.15),
-                            borderRadius:
-                                BorderRadius.circular(AppSpacing.radiusSm),
-                            border: Border.all(
-                              color: contact.tag!.color.withValues(alpha: 0.3),
+                      const SizedBox(height: 2),
+                      Text(
+                        contact.phone,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      Text(
+                        statusText,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: contact.isOverdue
+                                  ? AppColors.orange
+                                  : AppColors.textSecondary,
+                              fontWeight:
+                                  contact.isOverdue ? FontWeight.w600 : null,
                             ),
-                          ),
-                          child: Text(
-                            contact.tag!.label,
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: contact.tag!.color,
-                              height: 1.5,
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    contact.phone,
-                    style: Theme.of(context).textTheme.bodySmall,
+                ),
+                IconButton(
+                  tooltip: contact.isFavorite
+                      ? 'Remove from favorites'
+                      : 'Add to favorites',
+                  icon: Icon(
+                    contact.isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color: contact.isFavorite
+                        ? AppColors.orange
+                        : AppColors.warmGray,
                   ),
-                  Text(
-                    statusText,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color:
-                              contact.isOverdue ? AppColors.paletteCoral : null,
-                          fontWeight:
-                              contact.isOverdue ? FontWeight.w600 : null,
+                  onPressed: () => ref
+                      .read(contactsNotifierProvider.notifier)
+                      .toggleFavorite(contact),
+                ),
+                if (onCall != null)
+                  Material(
+                    color: AppColors.softTeal,
+                    borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+                    child: InkWell(
+                      onTap: onCall,
+                      borderRadius: BorderRadius.circular(AppTokens.radiusSm),
+                      child: const SizedBox(
+                        width: AppTokens.minTouchTarget,
+                        height: AppTokens.minTouchTarget,
+                        child: Icon(
+                          Icons.phone,
+                          color: AppColors.main,
+                          size: 22,
                         ),
-                  ),
-                ],
-              ),
-            ),
-            if (onCall != null)
-              Material(
-                color: AppColors.paletteTeal.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                child: InkWell(
-                  onTap: onCall,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
-                  child: const SizedBox(
-                    width: AppSpacing.minTouchTarget,
-                    height: AppSpacing.minTouchTarget,
-                    child: Icon(
-                      Icons.phone,
-                      color: AppColors.paletteTeal,
-                      size: 22,
+                      ),
                     ),
                   ),
-                ),
-              ),
-          ],
+              ],
+            ),
+          ),
         ),
       ),
     );

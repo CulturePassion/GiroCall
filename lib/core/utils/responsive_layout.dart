@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../app_spacing.dart';
+import '../design/spacing.dart';
 
 /// Breakpoints and max-widths for mobile-first + web-friendly layouts.
 abstract class ResponsiveLayout {

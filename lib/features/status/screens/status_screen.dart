@@ -3,14 +3,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-import '../../../core/app_colors.dart';
+import '../../../core/design/colors.dart';
+import '../../../core/design/spacing.dart';
+import '../../../core/design/microcopy.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../core/utils/supabase_error_message.dart';
 import '../../../shared/models/presence_status.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/page_header.dart';
+import '../../../shared/widgets/premium_card.dart';
 import '../../profile/providers/profile_notifier.dart';
-import '../../recommendations/providers/recommendations_provider.dart';
+import '../providers/overdue_contacts_provider.dart';
 import '../providers/status_provider.dart';
 import '../providers/status_repository.dart';
 import '../widgets/presence_selector.dart';
@@ -55,7 +59,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       ref.invalidate(contactStatusFeedProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Status set to ${type.label}')),
+          SnackBar(content: Text('Status set to ${type.label} ✨')),
         );
       }
     } catch (e) {
@@ -96,6 +100,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       title: 'Status',
       showBackButton: false,
       body: RefreshIndicator(
+        color: AppColors.main,
         onRefresh: () async {
           ref.invalidate(contactStatusFeedProvider);
           await ref.read(contactStatusFeedProvider.future);
@@ -105,90 +110,91 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
             bottom: ScreenPadding.bottomNavClearance(context),
           ),
           children: [
-            Text(
-              'My status',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Let your GiroCall contacts know when you\'re free to chat.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+            const PageHeader(
+              title: Microcopy.statusMyTitle,
+              subtitle: Microcopy.statusMySubtitle,
             ),
             if (missingPhone)
-              Card(
-                color: AppColors.accentCoral.withValues(alpha: 0.12),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.info_outline,
-                          color: AppColors.accentCoral),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Add your phone number in Profile → Edit so contacts can see your status.',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
+              PremiumCard(
+                accentColor: AppColors.orange,
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline, color: AppColors.orange),
+                    const SizedBox(width: AppSpacing.xs),
+                    Expanded(
+                      child: Text(
+                        'Add your phone number in Profile → Edit so friends can see your status.',
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            const SizedBox(height: 16),
-            PresenceSelector(
-              selected: _selected,
-              onSelected: (type) => setState(() => _selected = type),
-              customMessageController: _customController,
+            if (missingPhone) const SizedBox(height: AppSpacing.sm),
+            PremiumCard(
+              child: PresenceSelector(
+                selected: _selected,
+                onSelected: (type) => setState(() => _selected = type),
+                customMessageController: _customController,
+              ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.sm),
             FilledButton.icon(
               onPressed: _saving || _selected == null ? null : _savePresence,
               icon: _saving
                   ? const SizedBox(
                       width: 18,
                       height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
                     )
                   : const Icon(Icons.check),
               label: Text(_saving ? 'Saving…' : 'Update my status'),
             ),
-            const SizedBox(height: 32),
-            Text(
-              'Recent updates',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.lg),
+            const PageHeader(title: Microcopy.statusFeedTitle),
             feedAsync.when(
               data: (updates) {
                 if (updates.isEmpty) {
                   return const EmptyState(
                     icon: Icons.circle_outlined,
-                    title: 'No updates yet',
-                    message:
-                        'When your contacts set a status on GiroCall, you\'ll see it here.',
+                    title: Microcopy.statusEmptyTitle,
+                    message: Microcopy.statusEmptyMessage,
                   );
                 }
                 return Column(
                   children: updates.map((update) {
-                    return Card(
-                      child: ListTile(
-                        leading: StatusAvatar(
-                          initials: update.contactName.isNotEmpty
-                              ? update.contactName[0].toUpperCase()
-                              : '?',
-                          statusType: update.statusType,
-                          imageUrl: update.avatarUrl,
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.xxs),
+                      child: PremiumCard(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs,
+                          vertical: AppSpacing.xxs,
                         ),
-                        title: Text(update.contactName),
-                        subtitle: Text(update.message),
-                        trailing: Text(
-                          timeFormat.format(update.updatedAt.toLocal()),
-                          style: Theme.of(context).textTheme.bodySmall,
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: StatusAvatar(
+                            initials: update.contactName.isNotEmpty
+                                ? update.contactName[0].toUpperCase()
+                                : '?',
+                            statusType: update.statusType,
+                            imageUrl: update.avatarUrl,
+                          ),
+                          title: Text(
+                            update.contactName,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          subtitle: Text(update.message),
+                          trailing: Text(
+                            timeFormat.format(update.updatedAt.toLocal()),
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          onTap: () =>
+                              context.push('/contacts/${update.contactId}'),
                         ),
-                        onTap: () =>
-                            context.push('/contacts/${update.contactId}'),
                       ),
                     );
                   }).toList(),
@@ -198,35 +204,43 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
               error: (e, _) => Text(supabaseErrorMessage(e)),
             ),
             if (overdue.isNotEmpty) ...[
-              const SizedBox(height: 32),
-              Text(
-                'Due for a call',
-                style: Theme.of(context).textTheme.titleMedium,
+              const SizedBox(height: AppSpacing.lg),
+              const PageHeader(
+                title: Microcopy.statusDueTitle,
+                subtitle: Microcopy.statusDueSubtitle,
               ),
-              const SizedBox(height: 8),
-              Text(
-                'People you haven\'t reached in a while.',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-              ),
-              const SizedBox(height: 12),
               ...overdue.take(5).map(
-                    (contact) => Card(
-                      child: ListTile(
-                        leading: StatusAvatar(initials: contact.initials),
-                        title: Text(contact.name),
-                        subtitle: Text(
-                          contact.daysSinceLastCall == null
-                              ? 'Never called'
-                              : '${contact.daysSinceLastCall} days since last call',
+                    (contact) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.xxs),
+                      child: PremiumCard(
+                        accentColor: AppColors.orange,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.xs,
+                          vertical: AppSpacing.xxs,
                         ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.phone,
-                              color: AppColors.primaryTeal),
-                          onPressed: () => context.push('/call/${contact.id}'),
+                        child: ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          leading: StatusAvatar(initials: contact.initials),
+                          title: Text(
+                            contact.name,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          subtitle: Text(
+                            contact.daysSinceLastCall == null
+                                ? 'Never called — they\'d love to hear from you'
+                                : '${contact.daysSinceLastCall} days since last call',
+                          ),
+                          trailing: IconButton(
+                            tooltip: 'Call ${contact.name}',
+                            icon: const Icon(
+                              Icons.phone,
+                              color: AppColors.main,
+                            ),
+                            onPressed: () =>
+                                context.push('/call/${contact.id}'),
+                          ),
+                          onTap: () => context.push('/contacts/${contact.id}'),
                         ),
-                        onTap: () => context.push('/contacts/${contact.id}'),
                       ),
                     ),
                   ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/app_colors.dart';
+import '../../core/design/colors.dart';
 
 /// Interactive 1-5 star rating widget.
 class StarRating extends StatelessWidget {

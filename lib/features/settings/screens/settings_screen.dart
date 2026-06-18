@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/constants.dart';
+import '../../../core/design/microcopy.dart';
 import '../../../core/theme/theme_mode_provider.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../shared/widgets/app_scaffold.dart';
@@ -45,18 +46,41 @@ class SettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 20),
+          SettingsSection(
+            title: 'ACCOUNT',
+            children: [
+              SettingsTile(
+                icon: Icons.account_circle_outlined,
+                title: 'My Profile',
+                subtitle: 'Manage your personal info',
+                onTap: () => context.push('/profile'),
+              ),
+              SettingsTile(
+                icon: Icons.privacy_tip_outlined,
+                title: 'Privacy',
+                subtitle: 'Review privacy settings',
+                onTap: () => context.push('/profile'), // Link to profile privacy settings
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
           const SettingsSection(
             title: 'ABOUT',
             children: [
               SettingsTile(
+                icon: Icons.favorite_outlined,
+                title: 'Made with love',
+                subtitle: Microcopy.madeWithLove,
+              ),
+              SettingsTile(
                 icon: Icons.info_outline,
                 title: Constants.appName,
-                subtitle: Constants.tagline,
+                subtitle: 'Stay connected with those who matter',
               ),
               SettingsTile(
                 icon: Icons.verified_outlined,
                 title: 'Version',
-                subtitle: '1.0.0',
+                subtitle: '1.2.1',
               ),
             ],
           ),
@@ -87,7 +111,7 @@ class SettingsScreen extends ConsumerWidget {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Choose theme',
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
             ),

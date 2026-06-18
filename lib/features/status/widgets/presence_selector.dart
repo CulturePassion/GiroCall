@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/app_colors.dart';
+import '../../../core/design/colors.dart';
 import '../../../shared/models/presence_status.dart';
 
 class PresenceSelector extends StatelessWidget {

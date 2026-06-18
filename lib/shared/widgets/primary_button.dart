@@ -1,102 +1,69 @@
 import 'package:flutter/material.dart';
 
-import '../../core/app_colors.dart';
-import '../../core/app_spacing.dart';
+import '../../core/design/colors.dart';
+import '../../core/design/spacing.dart';
+import '../../core/design/tokens.dart';
 
-/// Branded primary CTA — coral accent, 44px min height, thumb-friendly.
+/// Standard primary action button with loading state.
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
-  final bool isLoading;
   final IconData? icon;
+  final bool isLoading;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final bool fullWidth;
 
   const PrimaryButton({
     super.key,
     required this.label,
     this.onPressed,
+    this.icon,
     this.isLoading = false,
-    this.icon,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.fullWidth = true,
   });
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        boxShadow: onPressed != null && !isLoading
-            ? [
-                BoxShadow(
-                  color: AppColors.orange.withValues(alpha: 0.35),
-                  blurRadius: 16,
-                  offset: const Offset(0, 6),
+    return FilledButton.icon(
+      onPressed: isLoading ? null : onPressed,
+      icon: isLoading
+          ? SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  foregroundColor ?? Colors.white,
                 ),
-              ]
-            : null,
-      ),
-      child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.orange,
-          foregroundColor: Colors.white,
-          minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget + 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          ),
-        ),
-        child: isLoading
-            ? const SizedBox(
-                height: 20,
-                width: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: Colors.white,
-                ),
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (icon != null) ...[
-                    Icon(icon, size: 22),
-                    const SizedBox(width: AppSpacing.xxs),
-                  ],
-                  Text(label),
-                ],
               ),
-      ),
-    );
-  }
-}
-
-/// Glass-outline secondary button.
-class SecondaryButton extends StatelessWidget {
-  final String label;
-  final VoidCallback? onPressed;
-  final IconData? icon;
-
-  const SecondaryButton({
-    super.key,
-    required this.label,
-    this.onPressed,
-    this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return OutlinedButton(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.main,
-        minimumSize: const Size.fromHeight(AppSpacing.minTouchTarget),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 20),
-            const SizedBox(width: AppSpacing.xxs),
-          ],
-          Text(label),
-        ],
+            )
+          : icon != null
+              ? Icon(icon, size: 20)
+              : null,
+      label: isLoading
+          ? const SizedBox(
+              width: 16,
+              height: 16,
+              child: SizedBox.shrink(),
+            )
+          : Text(label),
+      style: FilledButton.styleFrom(
+        backgroundColor: backgroundColor ?? AppColors.orange,
+        foregroundColor: foregroundColor ?? Colors.white,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppTokens.radiusLg),
+        ),
+        elevation: 4,
+        shadowColor: AppColors.orange.withValues(alpha: 0.4),
+        minimumSize: Size(fullWidth ? double.infinity : 0, 48),
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
     );
   }

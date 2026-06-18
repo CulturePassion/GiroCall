@@ -15,6 +15,9 @@ import 'contact_repository_provider.dart';
 /// Active tag filter for the contact list (null = all).
 final contactTagFilterProvider = StateProvider<ContactTag?>((ref) => null);
 
+/// Selected contact ID for master-detail view (null = none).
+final selectedContactIdProvider = StateProvider<String?>((ref) => null);
+
 /// Manages the contact list with Supabase realtime sync (all platforms).
 class ContactsNotifier extends StateNotifier<AsyncValue<List<Contact>>> {
   final ContactRepository _repository;
@@ -77,6 +80,11 @@ class ContactsNotifier extends StateNotifier<AsyncValue<List<Contact>>> {
     } catch (e, st) {
       state = AsyncValue.error(e, st);
     }
+  }
+
+  Future<void> toggleFavorite(Contact contact) async {
+    final updated = contact.copyWith(isFavorite: !contact.isFavorite);
+    await updateContact(updated);
   }
 
   /// Imports device contacts on iOS/Android. Not available on web.

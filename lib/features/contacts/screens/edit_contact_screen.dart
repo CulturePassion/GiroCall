@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/app_colors.dart';
+import '../../../core/design/colors.dart';
 import '../../../core/constants.dart';
 import '../../../core/utils/responsive_layout.dart';
 import '../../../shared/models/contact.dart';

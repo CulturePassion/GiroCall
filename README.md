@@ -11,7 +11,7 @@ GiroCall is a cross-platform relationship maintenance app built with Flutter and
 - Animated spinning wheel with smart weighting
 - One-tap calling with native dialer integration
 - Call logging and star ratings
-- Smart "Call Again" recommendations
+- Status tab with overdue call suggestions
 - Stats, streaks, and progress charts
 - Daily reminder notifications
 - Dark theme (system / light / dark)
@@ -22,105 +22,69 @@ GiroCall is a cross-platform relationship maintenance app built with Flutter and
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | Flutter 3.44+ (Dart 3.2+) |
-| Backend | Supabase (Auth, PostgreSQL, Realtime, Edge Functions) |
+| Frontend | Flutter 3.44+ (Dart 3.2+) — iOS, Android, Web PWA |
+| Backend | Supabase (Auth, PostgreSQL, Storage, Edge Functions) |
 | State | Riverpod 3 |
 | Navigation | GoRouter 17 |
 | Charts | fl_chart |
-| Theme persistence | shared_preferences |
 
 ## Getting Started
 
-### Prerequisites
-
-- Flutter SDK (stable channel, 3.22+)
-- A Supabase project
-
-### Setup
-
-1. Copy environment template and add credentials:
-
 ```bash
-cp .env.example .env
-```
-
-2. Run all SQL migrations in `supabase/migrations/` against your Supabase project (in order), or:
-
-```bash
-make setup-db
-```
-
-3. Install dependencies:
-
-```bash
+cp .env.example .env          # add Supabase URL + anon key
+make setup-db                 # apply migrations
 make install
+make run                      # Chrome
+make run-ios
+make run-android
 ```
-
-4. Run the app:
-
-```bash
-make run          # Web (Chrome)
-make run-ios      # iOS simulator
-make run-android  # Android emulator
-```
-
-Credentials are loaded from `.env` via `--dart-define-from-file`.
 
 ## App Navigation
 
-| Tab / Screen | Route | Purpose |
-|--------------|-------|---------|
-| Giro | `/` | Spin the wheel |
+| Tab | Route | Purpose |
+|-----|-------|---------|
+| **Giro** (center) | `/` | Spin the wheel |
 | People | `/contacts` | Contact list and import |
-| Suggest | `/recommendations` | Overdue call suggestions |
+| Status | `/status` | Presence + overdue suggestions |
 | Stats | `/stats` | Streaks and charts |
-| Profile | `/profile` | Account hub |
-| My Card | `/profile/card` | Digital business card |
-| Settings | `/settings` | Theme and preferences |
-| Account | `/settings/account` | Sign out, delete data |
-| Reminders | `/settings/notifications` | Daily nudges |
+| You | `/profile` | Account hub |
 
-## Build Commands
+Public digital cards: `/card/:slug` (no auth required)
+
+## Build & Deploy
 
 ```bash
-make build-apk    # Android release APK
-make build-ios    # iOS release
-make build-web    # Web PWA
+make build-apk
+make build-ios
+make build-web                # → build/web/ for static hosting
+make deploy-all               # Supabase migrations + edge functions
 ```
 
 ## Quality
 
 ```bash
-make format       # Format Dart code
-make analyze      # Static analysis
-make test         # Unit and widget tests
-make test-integration
+make analyze
+make test
+make format
 ```
 
 ## Project Structure
 
 ```
 lib/
-├── core/           # Theme, config, utils, Supabase bootstrap
-│   └── theme/      # Dark/light theme mode provider
-├── features/
-│   ├── auth/
-│   ├── contacts/
-│   ├── wheel/
-│   ├── call_log/
-│   ├── recommendations/
-│   ├── stats/
-│   ├── profile/    # Profile hub + digital card
-│   ├── settings/   # Settings + account screens
-│   └── notifications/
-├── shared/         # Reusable widgets and models
+├── app/            # Bootstrap, main shell (Giro-centered nav)
+├── core/
+│   ├── design/     # Colors, theme, spacing, tokens, microcopy
+│   └── theme/      # Light/dark/system mode
+├── features/       # auth, contacts, wheel, call_log, status, stats, profile, settings, notifications
+├── shared/         # Models and reusable widgets
 ├── main.dart
 └── router.dart
 ```
 
-See `AGENTS.md` for the full project specification and development guidelines.  
-See `docs/DEPLOYMENT.md` for Supabase, Edge Functions, and push notification setup.
+See `AGENTS.md` for the full specification.  
+See `docs/DEPLOYMENT.md` for Supabase and hosting setup.
 
 ## License
 
-Copyright © 2026 GiroCall. All rights reserved.# GiroCall
+Copyright © 2026 GiroCall. All rights reserved.

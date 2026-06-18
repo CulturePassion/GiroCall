@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'core/app_bootstrap.dart';
-import 'core/app_theme.dart';
+import 'app/bootstrap.dart';
 import 'core/constants.dart';
+import 'core/design/theme.dart';
 import 'core/supabase_config.dart';
 import 'core/supabase_provider.dart';
 import 'core/theme/theme_mode_provider.dart';
@@ -13,8 +13,6 @@ import 'router.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Supabase Flutter setup — credentials from .env via `make run`.
-  // Dashboard: Connect → Flutter → copy URL + publishable key into .env
   const supabaseUrl = String.fromEnvironment(Constants.supabaseUrlKey);
   const supabaseAnonKey = String.fromEnvironment(Constants.supabaseAnonKey);
   final config = SupabaseConfig.fromEnvironment(

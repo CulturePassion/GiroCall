@@ -1,4 +1,4 @@
-.PHONY: install upgrade run run-ios run-android analyze test format format-check build-apk build-ios build-web clean deploy-edge deploy-edge-all deploy-supabase verify-supabase supabase-link setup-db deploy-migrations site-install site-dev site-build clean-ios
+.PHONY: install upgrade run run-ios run-android analyze test format format-check build-apk build-ios build-web clean deploy-edge deploy-edge-all deploy-supabase deploy-all deploy-hosting deploy-secrets verify-supabase supabase-link setup-db deploy-migrations clean-ios
 
 SUPABASE_PROJECT_REF ?= gtvpsukmmjhszpopulfe
 
@@ -69,7 +69,7 @@ deploy-edge: deploy-edge-all
 
 deploy-edge-all:
 	supabase functions deploy daily-reminder --no-verify-jwt
-	supabase functions deploy wallet-pass
+	supabase functions deploy wallet-pass --no-verify-jwt
 
 setup-db:
 	@if [ ! -f .env ]; then \
@@ -82,14 +82,15 @@ deploy-migrations: setup-db
 
 deploy-supabase: setup-db deploy-edge-all verify-supabase
 
+deploy-secrets:
+	@./scripts/set_edge_secrets.sh
+
+deploy-hosting:
+	@./scripts/deploy_hosting.sh
+
+deploy-all: setup-db deploy-edge-all deploy-secrets verify-supabase
+	@echo ""
+	@echo "✓ Supabase stack deployed. Run 'make deploy-hosting' to build web artifacts."
+
 verify-supabase:
 	@./scripts/verify_supabase.mjs
-
-site-install:
-	cd site && npm install
-
-site-dev:
-	cd site && npm run dev
-
-site-build:
-	cd site && npm run build

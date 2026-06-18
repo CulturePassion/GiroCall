@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/app_colors.dart';
+import '../../../core/design/colors.dart';
 import '../../../core/utils/platform_capabilities.dart';
 import '../../../core/utils/supabase_error_message.dart';
 import '../providers/contacts_notifier.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/app_colors.dart';
+import '../../core/design/colors.dart';
 
 /// Relationship category for organizing the address book.
 enum ContactTag {

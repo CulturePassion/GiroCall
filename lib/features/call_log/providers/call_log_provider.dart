@@ -12,10 +12,8 @@ class CallLogRepository {
 
   String? get userId => _client.auth.currentUser?.id;
 
-  String? get _userId => userId;
-
   Future<List<CallLog>> fetchLogs({String? contactId}) async {
-    final userId = _userId;
+    final userId = this.userId;  // Changed from _userId to this.userId to follow encapsulation rules
     if (userId == null) return [];
 
     var query = _client.from('call_logs').select().eq('user_id', userId);
@@ -31,7 +29,7 @@ class CallLogRepository {
   }
 
   Future<CallLog> addLog(CallLog log) async {
-    final userId = _userId;
+    final userId = this.userId;  // Changed from _userId to this.userId to follow encapsulation rules
     if (userId == null) throw Exception('User not authenticated');
 
     final payload = log.copyWith(userId: userId).toJson();
@@ -42,14 +40,14 @@ class CallLogRepository {
   }
 
   Future<void> deleteLog(String id) async {
-    final userId = _userId;
+    final userId = this.userId;  // Changed from _userId to this.userId to follow encapsulation rules
     if (userId == null) throw Exception('User not authenticated');
 
     await _client.from('call_logs').delete().eq('id', id).eq('user_id', userId);
   }
 
   Stream<List<CallLog>> watchLogs() {
-    final userId = _userId;
+    final userId = this.userId;  // Changed from _userId to this.userId to follow encapsulation rules
     if (userId == null) return Stream.value([]);
 
     return _client

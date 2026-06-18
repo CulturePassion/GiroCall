@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../app_spacing.dart';
+import '../design/spacing.dart';
 
 /// Responsive padding on 8px grid.
 class ScreenPadding {

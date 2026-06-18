@@ -33,6 +33,7 @@ class Contact {
   final String? deviceNativeId;
   final bool syncToDevice;
   final DateTime? lastDeviceSyncAt;
+  final bool isFavorite;
 
   const Contact({
     this.id,
@@ -63,6 +64,7 @@ class Contact {
     this.deviceNativeId,
     this.syncToDevice = true,
     this.lastDeviceSyncAt,
+    this.isFavorite = false,
   });
 
   /// Builds a display name from first/last name parts with optional fallback.
@@ -155,6 +157,7 @@ class Contact {
     String? deviceNativeId,
     bool? syncToDevice,
     DateTime? lastDeviceSyncAt,
+    bool? isFavorite,
   }) {
     return Contact(
       id: id ?? this.id,
@@ -185,6 +188,7 @@ class Contact {
       deviceNativeId: deviceNativeId ?? this.deviceNativeId,
       syncToDevice: syncToDevice ?? this.syncToDevice,
       lastDeviceSyncAt: lastDeviceSyncAt ?? this.lastDeviceSyncAt,
+      isFavorite: isFavorite ?? this.isFavorite,
     );
   }
 
@@ -218,6 +222,7 @@ class Contact {
       'sync_to_device': syncToDevice,
       if (lastDeviceSyncAt != null)
         'last_device_sync_at': lastDeviceSyncAt!.toIso8601String(),
+      'is_favorite': isFavorite,
     };
   }
 
@@ -251,6 +256,7 @@ class Contact {
       'sync_to_device': syncToDevice,
       if (lastDeviceSyncAt != null)
         'last_device_sync_at': lastDeviceSyncAt!.toIso8601String(),
+      'is_favorite': isFavorite,
     };
   }
 
@@ -290,6 +296,7 @@ class Contact {
       lastDeviceSyncAt: json['last_device_sync_at'] != null
           ? DateTime.parse(json['last_device_sync_at'] as String)
           : null,
+      isFavorite: json['is_favorite'] as bool? ?? false,
     );
   }
 

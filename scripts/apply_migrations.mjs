@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Apply GiroCall SQL migrations to a remote Supabase project.
+ * Apply GiroCall SQL migrations to remote Supabase (skips already-applied).
  *
- * Option A (recommended): add DATABASE_URL to .env, then run `make setup-db`
- * Option B: add SUPABASE_ACCESS_TOKEN to .env, then run `node scripts/apply_migrations.mjs`
+ * Prefers: make setup-db  (uses DATABASE_URL, token, or CLI)
+ * Direct:  node scripts/apply_migrations.mjs
  */
 
 import { readFileSync, readdirSync } from 'node:fs';
@@ -22,26 +22,14 @@ if (!token) {
   console.error(
     'Missing SUPABASE_ACCESS_TOKEN.\n' +
       'Create one at https://supabase.com/dashboard/account/tokens\n' +
-      'Add it to .env, then run: node scripts/apply_migrations.mjs',
+      'Add it to .env, then run: make setup-db',
   );
-  process.exit(1);
-}
-
-const files = readdirSync(migrationsDir)
-  .filter((name) => name.endsWith('.sql'))
-  .sort();
-
-if (files.length === 0) {
-  console.error(`No migration files found in ${migrationsDir}`);
   process.exit(1);
 }
 
 const endpoint = `https://api.supabase.com/v1/projects/${projectRef}/database/query`;
 
-for (const file of files) {
-  const sql = readFileSync(resolve(migrationsDir, file), 'utf8');
-  console.log(`→ Applying ${file}...`);
-
+async function query(sql) {
   const response = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -53,11 +41,67 @@ for (const file of files) {
 
   if (!response.ok) {
     const body = await response.text();
-    console.error(`Migration failed on ${file} (${response.status}): ${body}`);
-    process.exit(1);
+    throw new Error(`${response.status}: ${body}`);
   }
 
-  console.log(`✓ ${file}`);
+  return response.json();
 }
 
-console.log(`All ${files.length} migrations applied successfully.`);
+async function getAppliedVersions() {
+  try {
+    const rows = await query(
+      `SELECT version FROM supabase_migrations.schema_migrations ORDER BY version;`,
+    );
+    return new Set(rows.map((row) => row.version));
+  } catch {
+    return new Set();
+  }
+}
+
+async function recordMigration(version) {
+  await query(
+    `INSERT INTO supabase_migrations.schema_migrations (version)
+     VALUES ('${version.replace(/'/g, "''")}')
+     ON CONFLICT (version) DO NOTHING;`,
+  );
+}
+
+const files = readdirSync(migrationsDir)
+  .filter((name) => name.endsWith('.sql'))
+  .sort();
+
+if (files.length === 0) {
+  console.error(`No migration files found in ${migrationsDir}`);
+  process.exit(1);
+}
+
+const applied = await getAppliedVersions();
+let ran = 0;
+let skipped = 0;
+
+for (const file of files) {
+  const version = file.replace(/\.sql$/, '');
+
+  if (applied.has(version)) {
+    console.log(`⊘ Skipping ${file} (already applied)`);
+    skipped += 1;
+    continue;
+  }
+
+  const sql = readFileSync(resolve(migrationsDir, file), 'utf8');
+  console.log(`→ Applying ${file}...`);
+
+  try {
+    await query(sql);
+    await recordMigration(version);
+    console.log(`✓ ${file}`);
+    ran += 1;
+  } catch (error) {
+    console.error(`Migration failed on ${file}: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+console.log(
+  `Done. Applied ${ran}, skipped ${skipped}, total ${files.length} migration file(s).`,
+);

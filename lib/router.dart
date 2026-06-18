@@ -23,7 +23,7 @@ import 'features/settings/screens/settings_screen.dart';
 import 'features/stats/screens/stats_screen.dart';
 import 'features/status/screens/status_screen.dart';
 import 'features/wheel/screens/wheel_screen.dart';
-import 'shared/widgets/main_shell.dart';
+import 'app/shell.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier(0);
@@ -45,7 +45,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (session != null && isAuthRoute) {
         return '/';
       }
-      if (session != null && location == '/recommendations') {
+      if (location == '/recommendations') {
         return '/status';
       }
       if (!supportsDeviceContactImport && location == '/contacts/import') {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../core/app_colors.dart';
+import '../../../core/design/colors.dart';
 import '../../../core/utils/card_url.dart';
 import '../../../shared/models/user_profile.dart';
 
@@ -40,20 +40,12 @@ class DigitalCardView extends StatelessWidget {
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side:
-                BorderSide(color: AppColors.primaryTeal.withValues(alpha: 0.2)),
+            side: const BorderSide(color: AppColors.divider),
           ),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  AppColors.primaryTeal.withValues(alpha: 0.08),
-                  AppColors.accentCoral.withValues(alpha: 0.06),
-                ],
-              ),
+              color: AppColors.softBlue,
             ),
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -127,8 +119,7 @@ class DigitalCardView extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                    color: AppColors.primaryTeal.withValues(alpha: 0.2)),
+                border: Border.all(color: AppColors.divider),
               ),
               child: QrImageView(
                 data: cardUrl,

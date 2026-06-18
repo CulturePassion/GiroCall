@@ -34,7 +34,10 @@ class ContactTagChip extends StatelessWidget {
         color: selected ? Colors.white : null,
         fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
       ),
-      side: BorderSide(color: color.withValues(alpha: 0.4)),
+      side: BorderSide(
+        color: selected ? Colors.transparent : color,
+        width: 1.5,
+      ),
     );
   }
 }

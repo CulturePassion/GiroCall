@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/app_spacing.dart';
+import '../../../core/design/spacing.dart';
+import '../../../core/design/tokens.dart';
 import '../../../core/supabase_provider.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/glass_surface.dart';
@@ -79,7 +80,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         scrollable: true,
         child: GlassSurface(
           padding: const EdgeInsets.all(AppSpacing.sm),
-          borderRadius: AppSpacing.radiusLg,
+          borderRadius: AppTokens.radiusLg,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

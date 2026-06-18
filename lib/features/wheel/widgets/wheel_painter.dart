@@ -1,12 +1,11 @@
 import 'dart:math';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
-import '../../../core/app_colors.dart';
+import '../../../core/design/colors.dart';
 import '../../../shared/models/contact.dart';
 
-/// Colorful glass-style segmented wheel using brand tile palette.
+/// Brand-inspired Giro wheel — rainbow segments, people chips, premium rim.
 class WheelPainter extends CustomPainter {
   final List<Contact> contacts;
   final double rotation;
@@ -16,16 +15,19 @@ class WheelPainter extends CustomPainter {
     required this.rotation,
   });
 
+  static const _hubGlobeRadiusFactor = 0.34;
+
   @override
   void paint(Canvas canvas, Size size) {
     if (contacts.isEmpty) return;
 
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = min(size.width, size.height) / 2 - 4;
+    final radius = min(size.width, size.height) / 2 - 10;
     final sliceAngle = 2 * pi / contacts.length;
+    final hubCutout = radius * _hubGlobeRadiusFactor;
 
-    _drawOuterGlow(canvas, center, radius);
-    _drawOuterRing(canvas, center, radius);
+    _drawOuterRim(canvas, center, radius);
+    _drawInnerShadowRing(canvas, center, radius);
 
     canvas.save();
     canvas.translate(center.dx, center.dy);
@@ -35,123 +37,177 @@ class WheelPainter extends CustomPainter {
     for (var i = 0; i < contacts.length; i++) {
       final baseColor =
           AppColors.wheelSliceColors[i % AppColors.wheelSliceColors.length];
-      final start = i * sliceAngle;
+      final start = i * sliceAngle - pi / 2;
 
-      _drawSlice(canvas, center, radius, start, sliceAngle, baseColor);
-      _drawSliceSeparator(canvas, center, radius, start);
-
-      final textAngle = start + sliceAngle / 2;
-      _drawSliceLabel(
+      _drawSlice(
         canvas,
         center,
         radius,
-        textAngle,
-        contacts[i].name.isNotEmpty ? contacts[i].name[0].toUpperCase() : '?',
+        hubCutout,
+        start,
+        sliceAngle,
+        baseColor,
+      );
+      _drawSliceSeparator(canvas, center, radius, hubCutout, start);
+      _drawPersonChip(
+        canvas,
+        center,
+        radius,
+        start + sliceAngle / 2,
+        contacts[i].name.isNotEmpty
+            ? contacts[i].name[0].toUpperCase()
+            : '?',
+        baseColor,
       );
     }
 
     canvas.restore();
 
-    _drawGlassHub(canvas, center, radius * 0.16);
+    _drawHubMask(canvas, center, hubCutout);
     _drawPointer(canvas, center, radius);
   }
 
-  void _drawOuterGlow(Canvas canvas, Offset center, double radius) {
-    final glow = Paint()
-      ..shader = ui.Gradient.radial(
-        center,
-        radius + 20,
-        [
-          AppColors.main.withValues(alpha: 0.15),
-          Colors.transparent,
-        ],
-      );
-    canvas.drawCircle(center, radius + 20, glow);
+  void _drawOuterRim(Canvas canvas, Offset center, double radius) {
+    canvas.drawCircle(
+      center,
+      radius + 5,
+      Paint()
+        ..color = Colors.white
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 6,
+    );
+    canvas.drawCircle(
+      center,
+      radius + 2,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..shader = const SweepGradient(
+          colors: [
+            AppColors.main,
+            AppColors.orange,
+            AppColors.secondaryBlue,
+            AppColors.premiumPurple,
+            AppColors.main,
+          ],
+        ).createShader(Rect.fromCircle(center: center, radius: radius)),
+    );
   }
 
-  void _drawOuterRing(Canvas canvas, Offset center, double radius) {
-    final ring = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3
-      ..color = Colors.white.withValues(alpha: 0.7);
-    canvas.drawCircle(center, radius + 2, ring);
-
-    final shadow = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 6
-      ..color = AppColors.main.withValues(alpha: 0.08)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8);
-    canvas.drawCircle(center, radius + 4, shadow);
+  void _drawInnerShadowRing(Canvas canvas, Offset center, double radius) {
+    canvas.drawCircle(
+      center,
+      radius - 2,
+      Paint()
+        ..color = Colors.black.withValues(alpha: 0.08)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4,
+    );
   }
 
   void _drawSlice(
     Canvas canvas,
     Offset center,
-    double radius,
+    double outerRadius,
+    double innerRadius,
     double start,
     double sweep,
-    Color base,
+    Color color,
   ) {
-    final rect = Rect.fromCircle(center: center, radius: radius);
-    final lighter = Color.lerp(base, Colors.white, 0.22)!;
-    final darker = Color.lerp(base, Colors.black, 0.12)!;
-
-    final paint = Paint()
-      ..shader = ui.Gradient.sweep(
-        center,
-        [lighter, base, darker, lighter],
-        [0, 0.35, 0.7, 1],
-        TileMode.clamp,
-        start,
-        start + sweep,
-      );
-
     final path = Path()
-      ..moveTo(center.dx, center.dy)
-      ..arcTo(rect, start, sweep, false)
+      ..moveTo(
+        center.dx + innerRadius * cos(start),
+        center.dy + innerRadius * sin(start),
+      )
+      ..arcTo(
+        Rect.fromCircle(center: center, radius: outerRadius - 14),
+        start,
+        sweep,
+        false,
+      )
+      ..arcTo(
+        Rect.fromCircle(center: center, radius: innerRadius),
+        start + sweep,
+        -sweep,
+        false,
+      )
       ..close();
+
+    final lighter = Color.lerp(color, Colors.white, 0.18)!;
+    final paint = Paint()
+      ..shader = RadialGradient(
+        center: Alignment.center,
+        colors: [lighter, color, color.withValues(alpha: 0.92)],
+        stops: const [0.0, 0.55, 1.0],
+      ).createShader(Rect.fromCircle(center: center, radius: outerRadius));
 
     canvas.drawPath(path, paint);
   }
 
   void _drawSliceSeparator(
-      Canvas canvas, Offset center, double radius, double angle) {
-    final linePaint = Paint()
+    Canvas canvas,
+    Offset center,
+    double outerRadius,
+    double innerRadius,
+    double angle,
+  ) {
+    final paint = Paint()
       ..color = Colors.white.withValues(alpha: 0.85)
       ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round;
-    final end = Offset(
-      center.dx + radius * cos(angle),
-      center.dy + radius * sin(angle),
+
+    canvas.drawLine(
+      Offset(
+        center.dx + innerRadius * cos(angle),
+        center.dy + innerRadius * sin(angle),
+      ),
+      Offset(
+        center.dx + (outerRadius - 14) * cos(angle),
+        center.dy + (outerRadius - 14) * sin(angle),
+      ),
+      paint,
     );
-    canvas.drawLine(center, end, linePaint);
   }
 
-  void _drawSliceLabel(
+  void _drawPersonChip(
     Canvas canvas,
     Offset center,
     double radius,
     double angle,
     String initial,
+    Color segmentColor,
   ) {
+    final chipRadius = radius * 0.11;
     final offset = Offset(
       center.dx + radius * 0.68 * cos(angle),
       center.dy + radius * 0.68 * sin(angle),
+    );
+
+    canvas.drawCircle(
+      offset,
+      chipRadius + 2,
+      Paint()..color = Colors.white,
+    );
+
+    canvas.drawCircle(
+      offset,
+      chipRadius,
+      Paint()
+        ..shader = RadialGradient(
+          colors: [
+            Colors.white,
+            Color.lerp(segmentColor, Colors.white, 0.35)!,
+          ],
+        ).createShader(Rect.fromCircle(center: offset, radius: chipRadius)),
     );
 
     final textPainter = TextPainter(
       text: TextSpan(
         text: initial,
         style: TextStyle(
-          color: Colors.white,
-          fontSize: radius * 0.11,
-          fontWeight: FontWeight.w700,
-          shadows: [
-            Shadow(
-              color: Colors.black.withValues(alpha: 0.25),
-              blurRadius: 4,
-            ),
-          ],
+          color: _contrastTextColor(segmentColor),
+          fontSize: chipRadius * 1.1,
+          fontWeight: FontWeight.w800,
         ),
       ),
       textDirection: TextDirection.ltr,
@@ -163,66 +219,50 @@ class WheelPainter extends CustomPainter {
     );
   }
 
-  void _drawGlassHub(Canvas canvas, Offset center, double hubRadius) {
-    final hubShadow = Paint()
-      ..color = AppColors.main.withValues(alpha: 0.2)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
-    canvas.drawCircle(center, hubRadius + 4, hubShadow);
+  Color _contrastTextColor(Color bg) {
+    return bg.computeLuminance() > 0.55
+        ? const Color(0xFF1E293B)
+        : Colors.white;
+  }
 
-    final hubFill = Paint()
-      ..shader = ui.Gradient.radial(
-        center,
-        hubRadius,
-        [
-          Colors.white.withValues(alpha: 0.95),
-          AppColors.mainPale.withValues(alpha: 0.9),
-        ],
-      );
-    canvas.drawCircle(center, hubRadius, hubFill);
-
-    final hubBorder = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.5
-      ..color = AppColors.main.withValues(alpha: 0.5);
-    canvas.drawCircle(center, hubRadius, hubBorder);
-
-    final iconPainter = TextPainter(
-      text: TextSpan(
-        text: String.fromCharCode(0x1F4DE),
-        style: const TextStyle(fontSize: 22),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    iconPainter.layout();
-    iconPainter.paint(
-      canvas,
-      center.translate(-iconPainter.width / 2, -iconPainter.height / 2),
+  void _drawHubMask(Canvas canvas, Offset center, double hubRadius) {
+    canvas.drawCircle(
+      center,
+      hubRadius + 4,
+      Paint()..color = Colors.white.withValues(alpha: 0.15),
     );
   }
 
   void _drawPointer(Canvas canvas, Offset center, double radius) {
-    final pointerY = center.dy - radius - 8;
+    final pointerY = center.dy - radius - 10;
     final pointer = Path()
-      ..moveTo(center.dx, pointerY + 18)
-      ..lineTo(center.dx - 14, pointerY - 4)
-      ..lineTo(center.dx + 14, pointerY - 4)
+      ..moveTo(center.dx, pointerY + 26)
+      ..lineTo(center.dx - 18, pointerY - 4)
+      ..lineTo(center.dx + 18, pointerY - 4)
       ..close();
 
-    final paint = Paint()
-      ..shader = ui.Gradient.linear(
-        Offset(center.dx, pointerY - 4),
-        Offset(center.dx, pointerY + 18),
-        [AppColors.cadmiumOrange, AppColors.orange],
-      )
-      ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 0);
+    canvas.drawPath(
+      pointer,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [AppColors.orange, AppColors.cadmiumOrange],
+        ).createShader(
+          Rect.fromPoints(
+            Offset(center.dx - 18, pointerY - 4),
+            Offset(center.dx + 18, pointerY + 26),
+          ),
+        ),
+    );
 
-    canvas.drawPath(pointer, paint);
-
-    final border = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.5
-      ..color = Colors.white.withValues(alpha: 0.8);
-    canvas.drawPath(pointer, border);
+    canvas.drawPath(
+      pointer,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5
+        ..color = Colors.white,
+    );
   }
 
   @override
