@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/design/colors.dart';
 
-/// Warm, kind gradient for hero screens (wheel, login).
+/// Warm, kind gradient for hero screens (wheel, login, profile).
 class GradientBackground extends StatelessWidget {
   final Widget child;
 
@@ -10,17 +10,26 @@ class GradientBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
+    final isDark = AppColors.isDark(context);
+    final colors = isDark
+        ? const [
+            AppColors.darkHeroGradientStart,
+            AppColors.darkHeroGradientMid,
+            AppColors.darkHeroGradientEnd,
+          ]
+        : const [
             AppColors.heroGradientStart,
             AppColors.heroGradientMid,
             AppColors.heroGradientEnd,
-          ],
-          stops: [0.0, 0.55, 1.0],
+          ];
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: colors,
+          stops: const [0.0, 0.55, 1.0],
         ),
       ),
       child: child,

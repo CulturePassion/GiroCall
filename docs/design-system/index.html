@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GiroCall Design System v2.0 — Premium Minimal 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --teal: #0D9488;
+      --teal-light: #2DD4BF;
+      --orange: #F97316;
+      --orange-dark: #FF9500;
+      --blue: #3B82F6;
+      --purple: #8B5CF6;
+      --bg-light: #F8FAFC;
+      --surface-light: #FFFFFF;
+      --text-light: #1E293B;
+      --text-muted-light: #64748B;
+      --border-light: #E2E8F0;
+      --bg-dark: #0F172A;
+      --surface-dark: #1E293B;
+      --text-dark: #F1F5F9;
+      --text-muted-dark: #94A3B8;
+      --border-dark: #334155;
+      --success: #10B981;
+      --error: #EF4444;
+      --radius-sm: 12px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+      --shadow-sm: 0 1px 3px rgba(15,23,42,.06), 0 1px 2px rgba(15,23,42,.04);
+      --shadow-md: 0 4px 16px rgba(15,23,42,.08);
+      --shadow-lg: 0 12px 40px rgba(15,23,42,.12);
+      --sidebar: 280px;
+      --unit: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      line-height: 1.5;
+      font-size: 15px;
+    }
+
+    /* ── Layout ── */
+    .nav-rail {
+      position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar);
+      background: var(--surface-light); border-right: 1px solid var(--border-light);
+      padding: 32px 24px; overflow-y: auto; z-index: 100;
+    }
+    .nav-rail .logo {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 40px;
+    }
+    .nav-rail .logo-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal), var(--orange));
+      display: grid; place-items: center; color: white; font-weight: 800; font-size: 14px;
+    }
+    .nav-rail h1 { font-size: 18px; font-weight: 700; }
+    .nav-rail .tag { font-size: 11px; color: var(--text-muted-light); margin-top: 2px; }
+    .nav-rail a {
+      display: block; padding: 8px 12px; border-radius: 8px;
+      color: var(--text-muted-light); text-decoration: none; font-size: 13px; font-weight: 500;
+      margin-bottom: 2px; transition: all .15s;
+    }
+    .nav-rail a:hover, .nav-rail a.active {
+      background: #CCFBF1; color: var(--teal); font-weight: 600;
+    }
+
+    main { margin-left: var(--sidebar); padding: 48px 64px 120px; max-width: 1200px; }
+
+    section { margin-bottom: 80px; scroll-margin-top: 32px; }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--teal); margin-bottom: 8px;
+    }
+    h2 { font-size: 32px; font-weight: 800; letter-spacing: -.5px; margin-bottom: 12px; }
+    .lead { font-size: 17px; color: var(--text-muted-light); max-width: 640px; margin-bottom: 32px; line-height: 1.6; }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #0D9488 0%, #2DD4BF 45%, #F97316 100%);
+      border-radius: var(--radius-lg); padding: 64px; color: white;
+      margin-bottom: 80px; position: relative; overflow: hidden;
+    }
+    .hero::after {
+      content: ''; position: absolute; right: -40px; top: -40px;
+      width: 280px; height: 280px; border-radius: 50%;
+      border: 32px solid rgba(255,255,255,.12);
+    }
+    .hero h2 { color: white; font-size: 48px; margin-bottom: 16px; }
+    .hero .lead { color: rgba(255,255,255,.9); font-size: 20px; }
+    .hero-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 32px; }
+    .badge {
+      background: rgba(255,255,255,.18); backdrop-filter: blur(8px);
+      padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 600;
+      border: 1px solid rgba(255,255,255,.25);
+    }
+
+    /* ── Tokens ── */
+    .token-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; }
+    .swatch {
+      border-radius: var(--radius-md); overflow: hidden;
+      border: 1px solid var(--border-light); background: var(--surface-light);
+    }
+    .swatch-color { height: 80px; }
+    .swatch-info { padding: 12px; }
+    .swatch-info .name { font-weight: 600; font-size: 13px; }
+    .swatch-info .hex { font-size: 12px; color: var(--text-muted-light); font-family: monospace; }
+    .swatch-info .use { font-size: 11px; color: var(--text-muted-light); margin-top: 4px; }
+
+    .option-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
+    .option-card {
+      border-radius: var(--radius-md); padding: 24px; border: 2px solid var(--border-light);
+      background: var(--surface-light);
+    }
+    .option-card.selected { border-color: var(--teal); box-shadow: 0 0 0 4px #CCFBF1; }
+    .option-card h4 { font-size: 15px; margin-bottom: 8px; }
+    .option-card p { font-size: 13px; color: var(--text-muted-light); }
+    .option-dots { display: flex; gap: 6px; margin-top: 16px; }
+    .option-dots span { width: 32px; height: 32px; border-radius: 50%; }
+
+    /* ── Typography ── */
+    .type-scale { background: var(--surface-light); border-radius: var(--radius-md); border: 1px solid var(--border-light); overflow: hidden; }
+    .type-row {
+      display: grid; grid-template-columns: 180px 1fr 100px 80px;
+      padding: 20px 24px; border-bottom: 1px solid var(--border-light); align-items: baseline;
+    }
+    .type-row:last-child { border-bottom: none; }
+    .type-meta { font-size: 12px; color: var(--text-muted-light); font-family: monospace; }
+
+    /* ── Spacing ── */
+    .spacing-demo { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; margin-bottom: 32px; }
+    .spacing-bar {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .spacing-bar .bar {
+      background: linear-gradient(180deg, var(--teal), var(--teal-light));
+      border-radius: 4px; width: 48px;
+    }
+    .spacing-bar .label { font-size: 12px; font-weight: 600; font-family: monospace; }
+
+    .grid-overlay-demo {
+      position: relative; background: var(--surface-light);
+      border-radius: var(--radius-md); border: 1px solid var(--border-light);
+      padding: 24px; min-height: 200px;
+    }
+    .grid-overlay-demo::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: repeating-linear-gradient(
+        90deg, transparent, transparent 7px, rgba(13,148,136,.06) 7px, rgba(13,148,136,.06) 8px
+      );
+      border-radius: var(--radius-md); pointer-events: none;
+    }
+
+    /* ── Components ── */
+    .component-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .component-card {
+      background: var(--surface-light); border-radius: var(--radius-md);
+      border: 1px solid var(--border-light); padding: 32px;
+    }
+    .component-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 20px; color: var(--text-muted-light); text-transform: uppercase; letter-spacing: .06em; }
+
+    .btn-primary {
+      background: var(--orange); color: white; border: none;
+      padding: 14px 32px; border-radius: var(--radius-lg); font-weight: 600;
+      font-size: 16px; min-height: 48px; cursor: pointer;
+      box-shadow: 0 4px 14px rgba(249,115,22,.35);
+    }
+    .btn-secondary {
+      background: transparent; color: var(--teal); border: 2px solid var(--teal);
+      padding: 12px 28px; border-radius: var(--radius-lg); font-weight: 600; font-size: 16px; min-height: 48px;
+    }
+    .btn-ghost {
+      background: var(--bg-light); color: var(--text-light); border: 1px solid var(--border-light);
+      padding: 12px 24px; border-radius: var(--radius-md); font-weight: 500; font-size: 14px;
+    }
+
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+      background: #CCFBF1; color: var(--teal);
+    }
+    .chip.orange { background: #FFF7ED; color: var(--orange); }
+
+    .card-premium {
+      background: var(--surface-light); border-radius: var(--radius-lg);
+      border: 1px solid var(--border-light); padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .streak-ring {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: conic-gradient(var(--orange) 75%, var(--border-light) 0);
+      display: grid; place-items: center; position: relative;
+    }
+    .streak-ring::after {
+      content: '12'; position: absolute; inset: 6px; border-radius: 50%;
+      background: var(--surface-light); display: grid; place-items: center;
+      font-weight: 800; font-size: 18px; color: var(--orange);
+    }
+
+    /* ── Wheel component ── */
+    .wheel-demo {
+      width: 200px; height: 200px; border-radius: 50%; margin: 0 auto;
+      background: conic-gradient(
+        #E53935 0deg 30deg, #1E88E5 30deg 60deg, #FB8C00 60deg 90deg,
+        #FDD835 90deg 120deg, #43A047 120deg 150deg, #8E24AA 150deg 180deg,
+        #00ACC1 180deg 210deg, #D81B60 210deg 240deg, #0D9488 240deg 270deg,
+        #5E35B1 270deg 300deg, #FF7043 300deg 330deg, #26A69A 330deg 360deg
+      );
+      position: relative; box-shadow: var(--shadow-lg);
+      animation: wheel-idle 8s ease-in-out infinite;
+    }
+    .wheel-demo::before {
+      content: ''; position: absolute; inset: 20%; border-radius: 50%;
+      background: white; box-shadow: inset 0 2px 8px rgba(0,0,0,.1);
+    }
+    .wheel-demo::after {
+      content: '📞'; position: absolute; inset: 0; display: grid; place-items: center;
+      font-size: 28px; z-index: 1;
+    }
+    .wheel-pointer {
+      position: absolute; top: -8px; left: 50%; transform: translateX(-50%);
+      width: 0; height: 0;
+      border-left: 10px solid transparent; border-right: 10px solid transparent;
+      border-top: 20px solid var(--orange);
+    }
+    @keyframes wheel-idle {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(3deg); }
+    }
+
+    /* ── Phone mockup frame ── */
+    .phone-frame {
+      width: 280px; background: #1a1a2e; border-radius: 40px; padding: 12px;
+      box-shadow: var(--shadow-lg); margin: 0 auto;
+    }
+    .phone-screen {
+      border-radius: 32px; overflow: hidden; min-height: 520px;
+      background: var(--bg-dark); position: relative;
+    }
+    .phone-screen.light { background: var(--bg-light); }
+
+    .bottom-nav {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: var(--surface-dark); padding: 8px 4px 20px;
+      display: flex; justify-content: space-around; align-items: center;
+      border-top: 1px solid var(--border-dark);
+    }
+    .bottom-nav.light { background: white; border-color: var(--border-light); }
+    .nav-item { text-align: center; font-size: 10px; color: var(--text-muted-dark); padding: 4px; }
+    .nav-item.light { color: var(--text-muted-light); }
+    .nav-item.active { color: var(--teal); font-weight: 600; }
+    .nav-item .icon { font-size: 20px; display: block; margin-bottom: 2px; }
+    .nav-item.giro .icon {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal), var(--orange));
+      display: grid; place-items: center; margin: -8px auto 2px;
+      box-shadow: 0 4px 16px rgba(249,115,22,.4); font-size: 18px;
+    }
+
+    /* ── Screen mockups CSS ── */
+    .screens-row { display: flex; gap: 32px; flex-wrap: wrap; justify-content: center; margin-bottom: 32px; }
+    .screen-annotated { position: relative; }
+    .annotation {
+      position: absolute; font-size: 10px; font-weight: 600; color: var(--teal);
+      background: #CCFBF1; padding: 2px 6px; border-radius: 4px;
+      border: 1px dashed var(--teal); white-space: nowrap; z-index: 10;
+    }
+
+    .mockup-img {
+      width: 100%; max-width: 900px; border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg); border: 1px solid var(--border-light);
+    }
+
+    /* ── Before / After ── */
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .compare-box {
+      border-radius: var(--radius-md); padding: 24px; border: 1px solid var(--border-light);
+    }
+    .compare-box.before { background: #FFF1F2; border-color: #FECACA; }
+    .compare-box.after { background: #F0FDF4; border-color: #BBF7D0; }
+    .compare-box h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 16px; }
+    .compare-box.before h4 { color: var(--error); }
+    .compare-box.after h4 { color: var(--success); }
+    .spacing-visual { display: flex; gap: 4px; align-items: center; margin: 8px 0; }
+    .spacing-visual .block { background: var(--teal); border-radius: 4px; opacity: .7; }
+    .spacing-visual .gap { background: #FECACA; border-radius: 2px; }
+    .spacing-visual .gap.fixed { background: #BBF7D0; }
+
+    /* ── Web dashboard ── */
+    .dashboard-mock {
+      display: grid; grid-template-columns: var(--sidebar) 1fr;
+      border-radius: var(--radius-lg); overflow: hidden;
+      border: 1px solid var(--border-light); box-shadow: var(--shadow-md);
+      min-height: 480px; background: var(--bg-light);
+    }
+    .dash-sidebar {
+      background: var(--surface-light); border-right: 1px solid var(--border-light);
+      padding: 24px 16px;
+    }
+    .dash-sidebar .item {
+      padding: 10px 12px; border-radius: 8px; font-size: 14px; font-weight: 500;
+      color: var(--text-muted-light); margin-bottom: 4px;
+    }
+    .dash-sidebar .item.on { background: #CCFBF1; color: var(--teal); font-weight: 600; }
+    .dash-main { padding: 32px 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+    .stat-card {
+      background: var(--surface-light); border-radius: var(--radius-md);
+      padding: 20px; border: 1px solid var(--border-light);
+    }
+    .stat-card .num { font-size: 32px; font-weight: 800; color: var(--teal); }
+    .stat-card .lbl { font-size: 13px; color: var(--text-muted-light); }
+
+    /* ── Interaction table ── */
+    table { width: 100%; border-collapse: collapse; background: var(--surface-light); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light); }
+    th, td { padding: 14px 20px; text-align: left; border-bottom: 1px solid var(--border-light); font-size: 14px; }
+    th { background: var(--bg-light); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted-light); }
+    tr:last-child td { border-bottom: none; }
+    code { background: var(--bg-light); padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+
+    /* ── Dark section ── */
+    .dark-panel {
+      background: var(--bg-dark); color: var(--text-dark);
+      border-radius: var(--radius-lg); padding: 48px; margin-top: 24px;
+    }
+    .dark-panel h3 { color: var(--text-dark); font-size: 20px; margin-bottom: 16px; }
+    .dark-panel p { color: var(--text-muted-dark); }
+
+    @media (max-width: 1100px) {
+      .nav-rail { display: none; }
+      main { margin-left: 0; padding: 24px; }
+      .option-cards, .component-grid, .compare, .dash-main { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav-rail">
+  <div class="logo">
+    <div class="logo-icon">G</div>
+    <div>
+      <h1>GiroCall</h1>
+      <div class="tag">Design System v2.0</div>
+    </div>
+  </div>
+  <a href="#overview" class="active">Overview</a>
+  <a href="#colors">Color Tokens</a>
+  <a href="#typography">Typography</a>
+  <a href="#spacing">8pt Grid</a>
+  <a href="#components">Components</a>
+  <a href="#screens">Screen Mockups</a>
+  <a href="#web">Web Dashboard</a>
+  <a href="#before-after">Before / After</a>
+  <a href="#motion">Motion & Interaction</a>
+  <a href="#a11y">Accessibility</a>
+</nav>
+
+<main>
+
+  <!-- HERO -->
+  <div class="hero" id="overview">
+    <h2>GiroCall Design System</h2>
+    <p class="lead">Spin the Giro. Make the Call. Stay Connected.<br>
+    A warm, premium, minimalist design language for joyful relationship maintenance — 2026.</p>
+    <div class="hero-badges">
+      <span class="badge">Flutter · iOS · Android · Web PWA</span>
+      <span class="badge">Dark mode first</span>
+      <span class="badge">8-point grid</span>
+      <span class="badge">Material 3 + HIG</span>
+      <span class="badge">WCAG AA</span>
+    </div>
+  </div>
+
+  <!-- COLOR DIRECTION -->
+  <section id="colors">
+    <div class="section-label">01 — Color System</div>
+    <h2>Color Tokens</h2>
+    <p class="lead">Warm teal as trust + connection. Coral orange for joyful CTAs. Calm neutrals let the spinning wheel be the hero.</p>
+
+    <h3 style="font-size:18px;margin-bottom:16px;">Direction Options (Selected: A)</h3>
+    <div class="option-cards">
+      <div class="option-card selected">
+        <h4>A · Warm Teal + Coral ✓</h4>
+        <p>Friendly, human, premium. Best for relationship apps. Current production palette.</p>
+        <div class="option-dots">
+          <span style="background:#0D9488"></span>
+          <span style="background:#F97316"></span>
+          <span style="background:#F8FAFC;border:1px solid #E2E8F0"></span>
+        </div>
+      </div>
+      <div class="option-card">
+        <h4>B · Indigo + Amber</h4>
+        <p>More corporate-calm. Good for enterprise pivot. Less playful.</p>
+        <div class="option-dots">
+          <span style="background:#4F46E5"></span>
+          <span style="background:#F59E0B"></span>
+          <span style="background:#FAFAF9"></span>
+        </div>
+      </div>
+      <div class="option-card">
+        <h4>C · Sage + Rose</h4>
+        <p>Soft wellness aesthetic. Lower energy for wheel interactions.</p>
+        <div class="option-dots">
+          <span style="background:#6B9080"></span>
+          <span style="background:#E8998D"></span>
+          <span style="background:#F6F4F0"></span>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:18px;margin:32px 0 16px;">Brand Palette</h3>
+    <div class="token-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#0D9488"></div><div class="swatch-info"><div class="name">Primary Teal</div><div class="hex">#0D9488</div><div class="use">Nav, links, focus</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#2DD4BF"></div><div class="swatch-info"><div class="name">Teal Light</div><div class="hex">#2DD4BF</div><div class="use">Gradients, hover</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#F97316"></div><div class="swatch-info"><div class="name">Accent Coral</div><div class="hex">#F97316</div><div class="use">CTAs, spin button</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#3B82F6"></div><div class="swatch-info"><div class="name">Secondary Blue</div><div class="hex">#3B82F6</div><div class="use">Info, charts</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#8B5CF6"></div><div class="swatch-info"><div class="name">Premium Purple</div><div class="hex">#8B5CF6</div><div class="use">Tertiary accent</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#10B981"></div><div class="swatch-info"><div class="name">Success</div><div class="hex">#10B981</div><div class="use">Streaks, confirmations</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#EF4444"></div><div class="swatch-info"><div class="name">Error</div><div class="hex">#EF4444</div><div class="use">Validation, alerts</div></div></div>
+    </div>
+
+    <h3 style="font-size:18px;margin:32px 0 16px;">Surfaces — Light & Dark</h3>
+    <div class="token-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#F8FAFC"></div><div class="swatch-info"><div class="name">Background</div><div class="hex">#F8FAFC</div><div class="use">Light page bg</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#FFFFFF;border-bottom:1px solid #E2E8F0"></div><div class="swatch-info"><div class="name">Surface</div><div class="hex">#FFFFFF</div><div class="use">Cards, sheets</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#1E293B"></div><div class="swatch-info"><div class="name">Text Primary</div><div class="hex">#1E293B</div><div class="use">Headlines</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#64748B"></div><div class="swatch-info"><div class="name">Text Secondary</div><div class="hex">#64748B</div><div class="use">Body, captions</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#0F172A"></div><div class="swatch-info"><div class="name">Dark Background</div><div class="hex">#0F172A</div><div class="use">Dark page bg</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#1E293B"></div><div class="swatch-info"><div class="name">Dark Surface</div><div class="hex">#1E293B</div><div class="use">Dark cards</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#F1F5F9"></div><div class="swatch-info"><div class="name">Dark Text</div><div class="hex">#F1F5F9</div><div class="use">Dark headlines</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#94A3B8"></div><div class="swatch-info"><div class="name">Dark Muted</div><div class="hex">#94A3B8</div><div class="use">Dark body</div></div></div>
+    </div>
+
+    <h3 style="font-size:18px;margin:32px 0 16px;">Wheel Slice Spectrum</h3>
+    <div style="height:24px;border-radius:12px;overflow:hidden;display:flex;">
+      <div style="flex:1;background:#E53935"></div><div style="flex:1;background:#1E88E5"></div>
+      <div style="flex:1;background:#FB8C00"></div><div style="flex:1;background:#FDD835"></div>
+      <div style="flex:1;background:#43A047"></div><div style="flex:1;background:#8E24AA"></div>
+      <div style="flex:1;background:#00ACC1"></div><div style="flex:1;background:#0D9488"></div>
+    </div>
+    <p style="font-size:13px;color:var(--text-muted-light);margin-top:8px;">12-segment rainbow — playful but balanced. Brand teal anchors the palette.</p>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section id="typography">
+    <div class="section-label">02 — Typography</div>
+    <h2>Type Scale</h2>
+    <p class="lead">Inter (web) · SF Pro (iOS) · Roboto (Android). Generous line height. Clear hierarchy with the wheel area using Display sizes.</p>
+    <div class="type-scale">
+      <div class="type-row"><span class="type-meta">displayLarge</span><span style="font-size:36px;font-weight:800;letter-spacing:-.5px">GiroCall</span><span class="type-meta">36 / 800</span><span class="type-meta">1.2</span></div>
+      <div class="type-row"><span class="type-meta">displayMedium</span><span style="font-size:32px;font-weight:800;letter-spacing:-.5px">Spin the Giro</span><span class="type-meta">32 / 800</span><span class="type-meta">1.2</span></div>
+      <div class="type-row"><span class="type-meta">headlineMedium</span><span style="font-size:24px;font-weight:600">Who's it going to be today?</span><span class="type-meta">24 / 600</span><span class="type-meta">1.3</span></div>
+      <div class="type-row"><span class="type-meta">titleLarge</span><span style="font-size:22px;font-weight:600">Sarah Mitchell</span><span class="type-meta">22 / 600</span><span class="type-meta">1.4</span></div>
+      <div class="type-row"><span class="type-meta">bodyLarge</span><span style="font-size:16px;line-height:1.5">Connect with loved ones through fun, meaningful conversations.</span><span class="type-meta">16 / 400</span><span class="type-meta">1.5</span></div>
+      <div class="type-row"><span class="type-meta">bodyMedium</span><span style="font-size:14px;color:var(--text-muted-light);line-height:1.4">Last called 32 days ago · Family</span><span class="type-meta">14 / 400</span><span class="type-meta">1.4</span></div>
+      <div class="type-row"><span class="type-meta">labelSmall</span><span style="font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-muted-light)">GENTLE NUDGES</span><span class="type-meta">11 / 600</span><span class="type-meta">1.3</span></div>
+    </div>
+  </section>
+
+  <!-- SPACING -->
+  <section id="spacing">
+    <div class="section-label">03 — Spacing</div>
+    <h2>8-Point Grid</h2>
+    <p class="lead">All spacing uses multiples of 8. Non-negotiable for cross-platform polish. Maps to <code>AppSpacing</code> in Flutter.</p>
+
+    <div class="spacing-demo">
+      <div class="spacing-bar"><div class="bar" style="height:8px"></div><div class="label">xxs · 8</div></div>
+      <div class="spacing-bar"><div class="bar" style="height:16px"></div><div class="label">xs · 16</div></div>
+      <div class="spacing-bar"><div class="bar" style="height:24px"></div><div class="label">sm · 24</div></div>
+      <div class="spacing-bar"><div class="bar" style="height:32px"></div><div class="label">md · 32</div></div>
+      <div class="spacing-bar"><div class="bar" style="height:40px"></div><div class="label">lg · 40</div></div>
+      <div class="spacing-bar"><div class="bar" style="height:48px"></div><div class="label">xl · 48</div></div>
+      <div class="spacing-bar"><div class="bar" style="height:64px"></div><div class="label">xxl · 64</div></div>
+    </div>
+
+    <table>
+      <thead><tr><th>Context</th><th>Token</th><th>Value</th><th>Usage</th></tr></thead>
+      <tbody>
+        <tr><td>Screen horizontal padding</td><td><code>xs – lg</code></td><td>16–40px</td><td>Scales with breakpoint</td></tr>
+        <tr><td>Section gap</td><td><code>md – lg</code></td><td>32–40px</td><td>Between major blocks</td></tr>
+        <tr><td>Card padding</td><td><code>sm – md</code></td><td>24–32px</td><td>Premium cards, forms</td></tr>
+        <tr><td>Element gap (in card)</td><td><code>xs – sm</code></td><td>16–24px</td><td>Form fields, list items</td></tr>
+        <tr><td>Wheel breathing room</td><td><code>lg+</code></td><td>≥40px</td><td>Min margin around wheel hero</td></tr>
+        <tr><td>Touch target</td><td><code>min 48dp</code></td><td>48×48</td><td>Buttons, nav items, FABs</td></tr>
+        <tr><td>Web sidebar</td><td><code>fixed</code></td><td>280px</td><td>Dashboard navigation</td></tr>
+        <tr><td>Web content gutter</td><td><code>md – xxl</code></td><td>32–64px</td><td>Main area padding</td></tr>
+      </tbody>
+    </table>
+
+    <div class="grid-overlay-demo" style="margin-top:32px;">
+      <p style="font-weight:600;margin-bottom:8px;">Grid overlay on card layout</p>
+      <p style="font-size:13px;color:var(--text-muted-light);">16px inset · 24px between elements · 32px section gap</p>
+    </div>
+  </section>
+
+  <!-- COMPONENTS -->
+  <section id="components">
+    <div class="section-label">04 — Components</div>
+    <h2>Component Library</h2>
+    <p class="lead">Reusable building blocks. Subtle borders over heavy shadows. The wheel is always the visual anchor.</p>
+
+    <div class="component-grid">
+      <div class="component-card">
+        <h4>Buttons</h4>
+        <div style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;">
+          <button class="btn-primary">Spin the Giro</button>
+          <button class="btn-secondary">Call Now</button>
+          <button class="btn-ghost">Skip for now</button>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted-light);margin-top:16px;">Primary: 48dp min height · radius 24px · coral shadow</p>
+      </div>
+
+      <div class="component-card">
+        <h4>Spinning Wheel</h4>
+        <div style="position:relative;width:200px;margin:0 auto;">
+          <div class="wheel-pointer"></div>
+          <div class="wheel-demo"></div>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted-light);margin-top:16px;text-align:center;">3s spin · easeOutCubic · pointer at 12 o'clock</p>
+      </div>
+
+      <div class="component-card">
+        <h4>Cards & Chips</h4>
+        <div class="card-premium" style="margin-bottom:16px;">
+          <div style="font-weight:600;margin-bottom:4px;">Sarah Mitchell</div>
+          <div style="font-size:13px;color:var(--text-muted-light);">★★★★☆ · Last called 32d ago</div>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <span class="chip">Family</span>
+            <span class="chip orange">Overdue</span>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted-light);">Radius 24px · 1px border · 24px padding</p>
+      </div>
+
+      <div class="component-card">
+        <h4>Streak Ring</h4>
+        <div style="display:flex;align-items:center;gap:20px;">
+          <div class="streak-ring"></div>
+          <div>
+            <div style="font-weight:700;font-size:18px;">12 day streak</div>
+            <div style="font-size:13px;color:var(--text-muted-light);">Keep showing up for people</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="component-card">
+        <h4>Bottom Navigation</h4>
+        <div style="background:var(--bg-light);border-radius:12px;padding:8px;display:flex;justify-content:space-around;border:1px solid var(--border-light);">
+          <div class="nav-item light"><span class="icon">♥</span>People</div>
+          <div class="nav-item light"><span class="icon">○</span>Status</div>
+          <div class="nav-item active"><span class="giro icon" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--orange));display:grid;place-items:center;margin:-4px auto 2px;font-size:16px;">◎</span>Giro</div>
+          <div class="nav-item light"><span class="icon">◆</span>Stats</div>
+          <div class="nav-item light"><span class="icon">●</span>You</div>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted-light);margin-top:12px;">Giro center tab elevated · 72dp bar height</p>
+      </div>
+
+      <div class="component-card">
+        <h4>Star Rating (Post-Call)</h4>
+        <div style="text-align:center;">
+          <p style="font-weight:600;margin-bottom:12px;">How did the call feel?</p>
+          <div style="font-size:32px;letter-spacing:8px;color:var(--orange);">★★★★☆</div>
+          <p style="font-size:13px;color:var(--text-muted-light);margin-top:8px;">Tap to rate · haptic on select</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENS -->
+  <section id="screens">
+    <div class="section-label">05 — Screens</div>
+    <h2>Key Screen Mockups</h2>
+    <p class="lead">High-fidelity references for all 9 screen groups. Light + dark mode. Mobile-first with web adaptations.</p>
+
+    <h3 style="font-size:18px;margin:32px 0 16px;">Giro Tab — Dark Mode (Hero)</h3>
+    <img class="mockup-img" src="assets/girocall-mockup-giro-dark.jpg" alt="GiroCall Giro tab dark mode mockup" />
+
+    <h3 style="font-size:18px;margin:48px 0 16px;">Auth · People · Public Card — Light Mode</h3>
+    <img class="mockup-img" src="assets/girocall-mockup-screens-light.jpg" alt="GiroCall auth, people, and public card mockups" />
+
+    <h3 style="font-size:18px;margin:48px 0 16px;">CSS Wireframes — Annotated Spacing</h3>
+    <div class="screens-row">
+      <!-- Giro dark wireframe -->
+      <div class="screen-annotated">
+        <div class="phone-frame">
+          <div class="phone-screen" style="padding:24px 16px 80px;">
+            <div class="annotation" style="top:8px;left:8px;">24px top</div>
+            <div style="color:white;font-size:18px;font-weight:700;margin-bottom:4px;">Spin the Giro</div>
+            <div style="color:#94A3B8;font-size:13px;margin-bottom:24px;">Who's it going to be today?</div>
+            <div style="position:relative;width:160px;height:160px;margin:0 auto 24px;">
+              <div class="wheel-demo" style="width:160px;height:160px;"></div>
+            </div>
+            <div class="annotation" style="top:220px;right:-20px;">40px margin</div>
+            <div class="card-premium" style="background:#1E293B;border-color:#334155;margin-bottom:16px;">
+              <div style="color:#F1F5F9;font-weight:600;">Sarah M.</div>
+              <div style="color:#94A3B8;font-size:12px;">★★★★☆ · Family</div>
+            </div>
+            <button class="btn-primary" style="width:100%;margin-bottom:8px;">Spin the Giro</button>
+            <button class="btn-secondary" style="width:100%;color:#2DD4BF;border-color:#2DD4BF;">Call Now</button>
+            <div class="bottom-nav">
+              <div class="nav-item"><span class="icon">♥</span>People</div>
+              <div class="nav-item"><span class="icon">○</span>Status</div>
+              <div class="nav-item active giro"><span class="icon">◎</span>Giro</div>
+              <div class="nav-item"><span class="icon">◆</span>Stats</div>
+              <div class="nav-item"><span class="icon">●</span>You</div>
+            </div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:13px;color:var(--text-muted-light);margin-top:12px;">1 · Giro Tab</p>
+      </div>
+
+      <!-- Stats wireframe -->
+      <div class="screen-annotated">
+        <div class="phone-frame">
+          <div class="phone-screen light" style="padding:24px 16px 80px;">
+            <div style="font-size:18px;font-weight:700;margin-bottom:4px;">Stats</div>
+            <div style="font-size:13px;color:var(--text-muted-light);margin-bottom:24px;">Look how you're showing up.</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px;">
+              <div class="stat-card"><div class="num">12</div><div class="lbl">Day streak</div></div>
+              <div class="stat-card"><div class="num" style="color:var(--orange)">47</div><div class="lbl">Total calls</div></div>
+            </div>
+            <div class="card-premium" style="height:120px;display:flex;align-items:flex-end;gap:6px;padding:16px;">
+              <div style="flex:1;background:var(--teal);border-radius:4px 4px 0 0;height:40%"></div>
+              <div style="flex:1;background:var(--teal);border-radius:4px 4px 0 0;height:70%"></div>
+              <div style="flex:1;background:var(--teal);border-radius:4px 4px 0 0;height:55%"></div>
+              <div style="flex:1;background:var(--orange);border-radius:4px 4px 0 0;height:90%"></div>
+              <div style="flex:1;background:var(--teal);border-radius:4px 4px 0 0;height:60%"></div>
+            </div>
+            <div class="bottom-nav light">
+              <div class="nav-item light"><span class="icon">♥</span>People</div>
+              <div class="nav-item light"><span class="icon">○</span>Status</div>
+              <div class="nav-item light giro"><span class="icon">◎</span>Giro</div>
+              <div class="nav-item active"><span class="icon">◆</span>Stats</div>
+              <div class="nav-item light"><span class="icon">●</span>You</div>
+            </div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:13px;color:var(--text-muted-light);margin-top:12px;">5 · Stats Tab</p>
+      </div>
+
+      <!-- Public card wireframe -->
+      <div class="screen-annotated">
+        <div class="phone-frame">
+          <div class="phone-screen light" style="padding:24px 16px;display:flex;align-items:center;">
+            <div class="card-premium" style="width:100%;text-align:center;border:2px solid var(--teal);">
+              <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--blue));margin:0 auto 16px;"></div>
+              <div style="font-weight:700;font-size:20px;">Alex Chen</div>
+              <div style="font-size:13px;color:var(--text-muted-light);margin:4px 0 16px;">Product Designer · GiroCall</div>
+              <div style="font-size:14px;color:var(--teal);margin-bottom:16px;">+1 (555) 123-4567</div>
+              <div style="display:flex;justify-content:center;gap:12px;margin-bottom:16px;">
+                <span style="width:32px;height:32px;border-radius:50%;background:var(--bg-light);display:grid;place-items:center;font-size:14px;">in</span>
+                <span style="width:32px;height:32px;border-radius:50%;background:var(--bg-light);display:grid;place-items:center;font-size:14px;">𝕏</span>
+              </div>
+              <div style="width:80px;height:80px;background:var(--bg-light);margin:0 auto;border-radius:8px;border:1px solid var(--border-light);display:grid;place-items:center;font-size:10px;color:var(--text-muted-light);">QR</div>
+            </div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:13px;color:var(--text-muted-light);margin-top:12px;">7 · Public Digital Card</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:18px;margin:32px 0 16px;">Screen Inventory</h3>
+    <table>
+      <thead><tr><th>#</th><th>Screen</th><th>Key Elements</th><th>Modes</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Onboarding / Auth</td><td>Gradient hero, logo, segmented auth, import CTA</td><td>Light hero</td></tr>
+        <tr><td>2</td><td>Giro Tab</td><td>Wheel hero, result card, spin + call CTAs</td><td>Dark hero + Light</td></tr>
+        <tr><td>3</td><td>People</td><td>Search, master-detail (web), FAB, star ratings</td><td>Both</td></tr>
+        <tr><td>4</td><td>Status</td><td>Presence selector, overdue nudges, friend feed</td><td>Both</td></tr>
+        <tr><td>5</td><td>Stats</td><td>Streak ring, fl_chart bars, encouragement copy</td><td>Both</td></tr>
+        <tr><td>6</td><td>You / Profile</td><td>Digital card preview, account pane, settings</td><td>Both</td></tr>
+        <tr><td>7</td><td>Public Card</td><td>Shareable slug page, QR, social links, no auth</td><td>Light preferred</td></tr>
+        <tr><td>8</td><td>Call Log / Modals</td><td>Star rating sheet, wheel result overlay, notes</td><td>Both</td></tr>
+        <tr><td>9</td><td>Web Dashboard</td><td>280px sidebar, wheel + stats split, 48px gutters</td><td>Light</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- WEB -->
+  <section id="web">
+    <div class="section-label">06 — Web</div>
+    <h2>Web Dashboard</h2>
+    <p class="lead">Responsive PWA with fixed sidebar at ≥900px. Wheel remains hero; stats provide context at a glance.</p>
+
+    <img class="mockup-img" src="assets/girocall-mockup-web-dashboard.jpg" alt="GiroCall web dashboard mockup" style="margin-bottom:32px;" />
+
+    <div class="dashboard-mock">
+      <div class="dash-sidebar">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px;padding:0 8px;">
+          <div class="logo-icon" style="width:32px;height:32px;font-size:12px;">G</div>
+          <strong>GiroCall</strong>
+        </div>
+        <div class="item on">◎ Giro</div>
+        <div class="item">♥ People</div>
+        <div class="item">○ Status</div>
+        <div class="item">◆ Stats</div>
+        <div class="item">● You</div>
+      </div>
+      <div class="dash-main">
+        <div>
+          <h3 style="font-size:22px;font-weight:700;margin-bottom:8px;">Who's it going to be today?</h3>
+          <p style="font-size:14px;color:var(--text-muted-light);margin-bottom:24px;">Ready to reconnect with someone special?</p>
+          <div style="position:relative;width:240px;margin:0 auto 24px;">
+            <div class="wheel-pointer"></div>
+            <div class="wheel-demo" style="width:240px;height:240px;"></div>
+          </div>
+          <div style="text-align:center;"><button class="btn-primary">Spin the Giro</button></div>
+        </div>
+        <div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+            <div class="stat-card"><div class="num">12</div><div class="lbl">🔥 Day streak</div></div>
+            <div class="stat-card"><div class="num" style="color:var(--orange)">8</div><div class="lbl">Reconnected</div></div>
+          </div>
+          <div class="card-premium">
+            <div style="font-weight:600;margin-bottom:16px;">Calls this week</div>
+            <div style="display:flex;align-items:flex-end;gap:8px;height:100px;">
+              <div style="flex:1;background:var(--teal);border-radius:4px 4px 0 0;height:50%"></div>
+              <div style="flex:1;background:var(--teal);border-radius:4px 4px 0 0;height:75%"></div>
+              <div style="flex:1;background:var(--orange);border-radius:4px 4px 0 0;height:100%"></div>
+              <div style="flex:1;background:var(--teal);border-radius:4px 4px 0 0;height:60%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <table style="margin-top:32px;">
+      <thead><tr><th>Breakpoint</th><th>Layout</th><th>Navigation</th></tr></thead>
+      <tbody>
+        <tr><td>&lt; 600px</td><td>Single column, full-width wheel</td><td>Bottom nav</td></tr>
+        <tr><td>600–899px</td><td>Stacked sections, wider cards</td><td>Bottom nav</td></tr>
+        <tr><td>≥ 900px</td><td>Sidebar 280px + 2-column content</td><td>Side nav (web) / bottom (mobile)</td></tr>
+        <tr><td>≥ 1200px</td><td>Max content 960px, 64px gutters</td><td>Side nav</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- BEFORE / AFTER -->
+  <section id="before-after">
+    <div class="section-label">07 — Spacing Fixes</div>
+    <h2>Before / After</h2>
+    <p class="lead">Polish gaps identified in v1 implementation. These are the non-negotiable spacing corrections.</p>
+
+    <div class="compare" style="margin-bottom:32px;">
+      <div class="compare-box before">
+        <h4>Before — Warning banner placement</h4>
+        <p style="font-size:14px;margin-bottom:12px;">Config warning appeared in <strong>different positions</strong> at 900px breakpoint — left column on desktop, top on mobile.</p>
+        <div class="spacing-visual">
+          <div class="block" style="width:60px;height:24px"></div>
+          <div class="gap" style="width:8px;height:24px"></div>
+          <div class="block" style="width:100px;height:24px;opacity:.3"></div>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted-light);margin-top:8px;">Inconsistent · confusing on resize</p>
+      </div>
+      <div class="compare-box after">
+        <h4>After — Unified top banner</h4>
+        <p style="font-size:14px;margin-bottom:12px;">Warning always at <strong>page top</strong>, full-width, above all layout splits. 16px gap to content.</p>
+        <div class="spacing-visual">
+          <div class="block" style="width:180px;height:24px"></div>
+        </div>
+        <div class="spacing-visual" style="margin-top:8px;">
+          <div class="gap fixed" style="width:16px;height:8px"></div>
+        </div>
+        <div class="spacing-visual">
+          <div class="block" style="width:120px;height:32px"></div>
+          <div class="gap fixed" style="width:24px;height:8px"></div>
+          <div class="block" style="width:120px;height:32px"></div>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted-light);margin-top:8px;">✓ Fixed in login_screen.dart</p>
+      </div>
+    </div>
+
+    <div class="compare" style="margin-bottom:32px;">
+      <div class="compare-box before">
+        <h4>Before — Touch targets 44dp</h4>
+        <p style="font-size:14px;margin-bottom:12px;"><code>AppTokens.minTouchTarget = 44</code> — below Material 3 / HIG 48dp minimum.</p>
+        <div style="width:44px;height:44px;background:var(--orange);border-radius:8px;opacity:.6;"></div>
+      </div>
+      <div class="compare-box after">
+        <h4>After — Touch targets 48dp</h4>
+        <p style="font-size:14px;margin-bottom:12px;"><code>AppTokens.minTouchTarget = 48</code> — all CTAs, nav items, icon buttons.</p>
+        <div style="width:48px;height:48px;background:var(--orange);border-radius:8px;"></div>
+      </div>
+    </div>
+
+    <div class="compare">
+      <div class="compare-box before">
+        <h4>Before — Wheel cramped on narrow</h4>
+        <p style="font-size:14px;">Wheel margin &lt; 16px on small screens. CTA buttons full-bleed without max-width.</p>
+      </div>
+      <div class="compare-box after">
+        <h4>After — Wheel breathing room</h4>
+        <p style="font-size:14px;">Min 40px margin around wheel. CTAs max 280px centered. Result card max 340px.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOTION -->
+  <section id="motion">
+    <div class="section-label">08 — Motion</div>
+    <h2>Interactions & Animation</h2>
+    <p class="lead">Delightful but purposeful. The wheel spin is the signature moment.</p>
+    <table>
+      <thead><tr><th>Interaction</th><th>Duration</th><th>Easing</th><th>Details</th></tr></thead>
+      <tbody>
+        <tr><td>Wheel spin</td><td><code>3s</code></td><td>easeOutCubic</td><td>5–8 rotations, lands on weighted selection. Haptic medium impact on stop.</td></tr>
+        <tr><td>Spin button press</td><td><code>200ms</code></td><td>easeInOut</td><td>Scale 0.96 → 1.0. Disabled state while spinning.</td></tr>
+        <tr><td>Result card reveal</td><td><code>400ms</code></td><td>easeOutBack</td><td>Slide up 24px + fade in. Contact avatar scales in.</td></tr>
+        <tr><td>Star rating tap</td><td><code>200ms</code></td><td>spring</td><td>Star fills coral. Light haptic per star.</td></tr>
+        <tr><td>Streak milestone</td><td><code>600ms</code></td><td>—</td><td>Confetti particles (12–20), success green flash, encouraging snackbar.</td></tr>
+        <tr><td>Tab switch</td><td><code>200ms</code></td><td>fade</td><td>Cross-fade content. Giro tab icon glows when active.</td></tr>
+        <tr><td>Card hover (web)</td><td><code>200ms</code></td><td>ease</td><td>translateY(-2px) + shadow elevation increase.</td></tr>
+        <tr><td>Page transition</td><td><code>400ms</code></td><td>slide</td><td>GoRouter slide from right (mobile). Fade (web).</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section id="a11y">
+    <div class="section-label">09 — Accessibility</div>
+    <h2>Inclusive Design</h2>
+    <p class="lead">High contrast, readable text, proper focus states. Never sacrifice clarity for aesthetics.</p>
+    <div class="component-grid">
+      <div class="card-premium">
+        <h4 style="margin-bottom:12px;">Contrast Ratios (WCAG AA)</h4>
+        <ul style="font-size:14px;color:var(--text-muted-light);padding-left:20px;line-height:2;">
+          <li>Text on light bg: <strong>12.6:1</strong> (#1E293B on #F8FAFC)</li>
+          <li>Text on dark bg: <strong>15.2:1</strong> (#F1F5F9 on #0F172A)</li>
+          <li>Teal on white: <strong>4.6:1</strong> (large text OK)</li>
+          <li>Coral button text: <strong>4.5:1</strong> (white on #F97316)</li>
+        </ul>
+      </div>
+      <div class="card-premium">
+        <h4 style="margin-bottom:12px;">Focus & Semantics</h4>
+        <ul style="font-size:14px;color:var(--text-muted-light);padding-left:20px;line-height:2;">
+          <li>2.5px teal focus ring on all interactive elements</li>
+          <li>Semantic labels on wheel ("Spin to select a contact")</li>
+          <li>Live regions for spin result + rating feedback</li>
+          <li>48dp minimum touch targets</li>
+          <li>Respects <code>prefers-reduced-motion</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="dark-panel">
+      <h3>Dark Mode First</h3>
+      <p>System default with local persistence. Hero screens (Giro, Auth) use gradient backgrounds. Content screens use calm dark surfaces (#0F172A / #1E293B). The wheel's vibrant slices provide natural color pop without overwhelming.</p>
+    </div>
+  </section>
+
+  <footer style="margin-top:80px;padding-top:32px;border-top:1px solid var(--border-light);color:var(--text-muted-light);font-size:13px;">
+    <p>GiroCall Design System v2.0 · June 2026 · Maps to <code>lib/core/design/</code></p>
+    <p style="margin-top:8px;">Open this file: <code>docs/design-system/index.html</code></p>
+  </footer>
+
+</main>
+
+<script>
+  // Highlight active nav link on scroll
+  const sections = document.querySelectorAll('section, .hero');
+  const navLinks = document.querySelectorAll('.nav-rail a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 100) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+</script>
+</body>
+</html>

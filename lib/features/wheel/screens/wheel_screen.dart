@@ -7,6 +7,7 @@ import '../../../core/design/colors.dart';
 import '../../../core/design/microcopy.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/tokens.dart';
+import '../../../core/utils/responsive_layout.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../core/utils/supabase_error_message.dart';
 import '../../../core/utils/wheel_contacts.dart';
@@ -15,7 +16,10 @@ import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/premium_card.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../shared/widgets/stats_widgets.dart';
 import '../../contacts/providers/contacts_notifier.dart';
+import '../../notifications/providers/settings_repository_provider.dart';
+import '../../stats/providers/stats_provider.dart';
 import '../../status/widgets/status_avatar.dart';
 import '../providers/wheel_provider.dart';
 import '../widgets/giro_hub.dart';
@@ -23,7 +27,7 @@ import '../widgets/wheel_painter.dart';
 
 const _kWheelActionMaxWidth = 280.0;
 const _kWheelResultMaxWidth = 340.0;
-const _kWideBreakpoint = 720.0;
+const _kTabletBreakpoint = 720.0;
 
 class WheelScreen extends ConsumerWidget {
   const WheelScreen({super.key});
@@ -39,12 +43,17 @@ class WheelScreen extends ConsumerWidget {
       title: 'Spin the Giro',
       showBackButton: false,
       actions: [
-        IconButton(
-          icon: const Icon(Icons.settings_outlined),
-          tooltip: 'Settings',
-          onPressed: () => context.push('/settings'),
-          color: Colors.white,
-        ),
+        if (!ResponsiveLayout.isDesktop(context))
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Settings',
+            onPressed: () => context.push('/settings'),
+            color: Colors.white,
+            constraints: const BoxConstraints(
+              minWidth: AppTokens.minTouchTarget,
+              minHeight: AppTokens.minTouchTarget,
+            ),
+          ),
       ],
       body: contactsAsync.when(
         data: (contacts) {
@@ -62,21 +71,38 @@ class WheelScreen extends ConsumerWidget {
             builder: (context, constraints) {
               final padding = ScreenPadding.horizontal(context).copyWith(
                 bottom: ScreenPadding.bottomNavClearance(context),
+                top: AppSpacing.xs,
               );
-              final layout = constraints.maxWidth >= _kWideBreakpoint
-                  ? _WideWheelLayout(
-                      contacts: contacts,
-                      wheelState: wheelState,
-                      wheelNotifier: wheelNotifier,
-                      maxHeight: constraints.maxHeight,
-                    )
-                  : _NarrowWheelLayout(
-                      contacts: contacts,
-                      wheelState: wheelState,
-                      wheelNotifier: wheelNotifier,
-                      maxHeight: constraints.maxHeight,
-                      maxWidth: constraints.maxWidth,
-                    );
+              final isDesktop = ResponsiveLayout.isDesktop(context);
+              final isTablet = constraints.maxWidth >= _kTabletBreakpoint;
+
+              Widget layout;
+              if (isDesktop) {
+                layout = _DashboardWheelLayout(
+                  contacts: contacts,
+                  wheelState: wheelState,
+                  wheelNotifier: wheelNotifier,
+                  maxHeight: constraints.maxHeight,
+                  stats: ref.watch(statsProvider),
+                  dailyGoal: ref.watch(userSettingsProvider).value?.dailyCallGoal ??
+                      Constants.defaultDailyCallGoal,
+                );
+              } else if (isTablet) {
+                layout = _WideWheelLayout(
+                  contacts: contacts,
+                  wheelState: wheelState,
+                  wheelNotifier: wheelNotifier,
+                  maxHeight: constraints.maxHeight,
+                );
+              } else {
+                layout = _NarrowWheelLayout(
+                  contacts: contacts,
+                  wheelState: wheelState,
+                  wheelNotifier: wheelNotifier,
+                  maxHeight: constraints.maxHeight,
+                  maxWidth: constraints.maxWidth,
+                );
+              }
 
               return Padding(padding: padding, child: layout);
             },
@@ -100,6 +126,65 @@ class WheelScreen extends ConsumerWidget {
   }
 }
 
+class _DashboardWheelLayout extends StatelessWidget {
+  final List<Contact> contacts;
+  final WheelState wheelState;
+  final WheelNotifier wheelNotifier;
+  final double maxHeight;
+  final UserStats stats;
+  final int dailyGoal;
+
+  const _DashboardWheelLayout({
+    required this.contacts,
+    required this.wheelState,
+    required this.wheelNotifier,
+    required this.maxHeight,
+    required this.stats,
+    required this.dailyGoal,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final wheelSize =
+        _computeWheelSize(maxWidth: 460, maxHeight: maxHeight - AppSpacing.xl);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 3,
+          child: _WheelColumn(
+            contacts: contacts,
+            wheelState: wheelState,
+            wheelNotifier: wheelNotifier,
+            wheelSize: wheelSize,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.lg),
+        Expanded(
+          flex: 2,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (wheelState.selectedContact != null)
+                  _WheelResult(
+                    contact: wheelState.selectedContact,
+                    onCall: () => context.push(
+                      '/call/${wheelState.selectedContact!.id}',
+                    ),
+                  )
+                else
+                  StatsDashboardPanel(stats: stats, dailyGoal: dailyGoal),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _WideWheelLayout extends StatelessWidget {
   final List<Contact> contacts;
   final WheelState wheelState;
@@ -116,7 +201,7 @@ class _WideWheelLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final wheelSize =
-        _computeWheelSize(maxWidth: 420, maxHeight: maxHeight - 48);
+        _computeWheelSize(maxWidth: 420, maxHeight: maxHeight - AppSpacing.lg);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -176,41 +261,44 @@ class _NarrowWheelLayout extends StatelessWidget {
       maxHeight: maxHeight - (wheelState.selectedContact != null ? 320 : 200),
     );
 
-    return Column(
-      children: [
-        const SizedBox(height: AppSpacing.xs),
-        _WheelHeadline(selected: wheelState.selectedContact != null),
-        const Spacer(),
-        _WheelDisc(
-          contacts: contacts,
-          wheelState: wheelState,
-          size: wheelSize,
-        ),
-        if (wheelState.isSpinning) ...[
-          const SizedBox(height: AppSpacing.sm),
-          _SpinningLabel(),
-        ],
-        const Spacer(),
-        if (wheelState.selectedContact != null)
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-            child: Center(
-              child: ConstrainedBox(
-                constraints:
-                    const BoxConstraints(maxWidth: _kWheelResultMaxWidth),
-                child: _WheelResult(
-                  contact: wheelState.selectedContact,
-                  onCall: () =>
-                      context.push('/call/${wheelState.selectedContact!.id}'),
+    return SizedBox(
+      height: maxHeight,
+      child: Column(
+        children: [
+          const SizedBox(height: AppSpacing.xs),
+          _WheelHeadline(selected: wheelState.selectedContact != null),
+          const Spacer(),
+          _WheelDisc(
+            contacts: contacts,
+            wheelState: wheelState,
+            size: wheelSize,
+          ),
+          if (wheelState.isSpinning) ...[
+            const SizedBox(height: AppSpacing.sm),
+            const _SpinningLabel(),
+          ],
+          const Spacer(),
+          if (wheelState.selectedContact != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints:
+                      const BoxConstraints(maxWidth: _kWheelResultMaxWidth),
+                  child: _WheelResult(
+                    contact: wheelState.selectedContact,
+                    onCall: () =>
+                        context.push('/call/${wheelState.selectedContact!.id}'),
+                  ),
                 ),
               ),
             ),
+          _SpinButton(
+            wheelState: wheelState,
+            onSpin: wheelNotifier.canSpin ? wheelNotifier.spin : null,
           ),
-        _SpinButton(
-          wheelState: wheelState,
-          onSpin: wheelNotifier.canSpin ? wheelNotifier.spin : null,
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -242,7 +330,7 @@ class _WheelColumn extends StatelessWidget {
         ),
         if (wheelState.isSpinning) ...[
           const SizedBox(height: AppSpacing.sm),
-          _SpinningLabel(),
+          const _SpinningLabel(),
         ],
         const SizedBox(height: AppSpacing.lg),
         _SpinButton(
@@ -267,11 +355,11 @@ class _WheelHeadline extends StatelessWidget {
         key: ValueKey(selected),
         selected ? Microcopy.wheelSelected : Microcopy.wheelReady,
         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-          fontWeight: FontWeight.w700,
-          color: Colors.white,
-          height: 1.35,
-          shadows: const [Shadow(color: Colors.black26, blurRadius: 8)],
-        ),
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              height: 1.35,
+              shadows: const [Shadow(color: Colors.black26, blurRadius: 8)],
+            ),
         textAlign: TextAlign.center,
       ),
     );
@@ -279,6 +367,8 @@ class _WheelHeadline extends StatelessWidget {
 }
 
 class _SpinningLabel extends StatelessWidget {
+  const _SpinningLabel();
+
   @override
   Widget build(BuildContext context) {
     return Text(
@@ -306,8 +396,9 @@ class _WheelDisc extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        width: size + 20,
-        height: size + 20,
+        width: size + AppSpacing.md,
+        height: size + AppSpacing.md,
+        padding: const EdgeInsets.all(AppSpacing.xxs),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           boxShadow: [
@@ -450,7 +541,7 @@ class _WheelResult extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xxs),
           Text(
             contact!.phone,
             style: Theme.of(context).textTheme.bodyMedium,
@@ -458,13 +549,13 @@ class _WheelResult extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           SizedBox(
-            width: _kWheelActionMaxWidth,
+            width: double.infinity,
             child: FilledButton.icon(
               onPressed: onCall,
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.orange,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
+                minimumSize: const Size(0, AppTokens.minTouchTarget),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppTokens.radiusLg),
                 ),

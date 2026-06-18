@@ -62,8 +62,11 @@ class PrimaryButton extends StatelessWidget {
         ),
         elevation: 4,
         shadowColor: AppColors.orange.withValues(alpha: 0.4),
-        minimumSize: Size(fullWidth ? double.infinity : 0, 48),
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        minimumSize: Size(
+          fullWidth ? double.infinity : 0,
+          AppTokens.minTouchTarget,
+        ),
+        tapTargetSize: MaterialTapTargetSize.padded,
       ),
     );
   }

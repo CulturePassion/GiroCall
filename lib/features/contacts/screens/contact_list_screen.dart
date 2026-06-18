@@ -11,6 +11,7 @@ import '../../../core/utils/screen_padding.dart';
 import '../../../shared/models/contact.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/search_field.dart';
 import '../providers/contacts_notifier.dart';
 import '../widgets/contact_detail_pane.dart';
 import '../widgets/contact_list_tile.dart';
@@ -28,6 +29,8 @@ class ContactListScreen extends ConsumerStatefulWidget {
 
 class _ContactListScreenState extends ConsumerState<ContactListScreen> {
   static const double _listPaneWidth = 360;
+  final _searchController = TextEditingController();
+  String _query = '';
 
   @override
   void initState() {
@@ -38,6 +41,24 @@ class _ContactListScreenState extends ConsumerState<ContactListScreen> {
             widget.initialContactId;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<Contact> _filterContacts(List<Contact> contacts) {
+    final q = _query.trim().toLowerCase();
+    if (q.isEmpty) return contacts;
+    return contacts
+        .where(
+          (c) =>
+              c.name.toLowerCase().contains(q) ||
+              c.phone.contains(q),
+        )
+        .toList(growable: false);
   }
 
   @override
@@ -58,6 +79,8 @@ class _ContactListScreenState extends ConsumerState<ContactListScreen> {
             ),
       body: contactsAsync.when(
         data: (contacts) {
+          final filtered = _filterContacts(contacts);
+
           if (contacts.isEmpty) {
             return EmptyState(
               icon: Icons.favorite_border,
@@ -68,18 +91,56 @@ class _ContactListScreenState extends ConsumerState<ContactListScreen> {
             );
           }
 
+          if (filtered.isEmpty) {
+            return ListView(
+              padding: ScreenPadding.all(context),
+              children: [
+                SearchField(
+                  controller: _searchController,
+                  onChanged: (v) => setState(() => _query = v),
+                  onClear: _query.isEmpty
+                      ? null
+                      : () {
+                          _searchController.clear();
+                          setState(() => _query = '');
+                        },
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                const EmptyState(
+                  icon: Icons.search_off,
+                  title: 'No matches',
+                  message: 'Try a different name or phone number.',
+                ),
+              ],
+            );
+          }
+
           if (isSplit) {
             return _SplitLayout(
-              contacts: contacts,
+              contacts: filtered,
               selectedId: selectedId,
               listWidth: _listPaneWidth,
+              searchController: _searchController,
+              query: _query,
+              onQueryChanged: (v) => setState(() => _query = v),
+              onClearSearch: () {
+                _searchController.clear();
+                setState(() => _query = '');
+              },
               onSelect: _selectContact,
               onCall: _callContact,
             );
           }
 
           return _ContactListOnly(
-            contacts: contacts,
+            contacts: filtered,
+            searchController: _searchController,
+            query: _query,
+            onQueryChanged: (v) => setState(() => _query = v),
+            onClearSearch: () {
+              _searchController.clear();
+              setState(() => _query = '');
+            },
             onSelect: (c) => context.push('/contacts/${c.id}'),
             onCall: _callContact,
           );
@@ -115,6 +176,10 @@ class _SplitLayout extends StatelessWidget {
   final List<Contact> contacts;
   final String? selectedId;
   final double listWidth;
+  final TextEditingController searchController;
+  final String query;
+  final ValueChanged<String> onQueryChanged;
+  final VoidCallback onClearSearch;
   final ValueChanged<Contact> onSelect;
   final ValueChanged<Contact> onCall;
 
@@ -122,6 +187,10 @@ class _SplitLayout extends StatelessWidget {
     required this.contacts,
     required this.selectedId,
     required this.listWidth,
+    required this.searchController,
+    required this.query,
+    required this.onQueryChanged,
+    required this.onClearSearch,
     required this.onSelect,
     required this.onCall,
   });
@@ -150,7 +219,13 @@ class _SplitLayout extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const ContactsClockHeader(),
-                const SizedBox(height: AppSpacing.xs),
+                const SizedBox(height: AppSpacing.sm),
+                SearchField(
+                  controller: searchController,
+                  onChanged: onQueryChanged,
+                  onClear: query.isEmpty ? null : onClearSearch,
+                ),
+                const SizedBox(height: AppSpacing.sm),
                 Row(
                   children: [
                     Expanded(
@@ -211,11 +286,19 @@ class _SplitLayout extends StatelessWidget {
 
 class _ContactListOnly extends ConsumerWidget {
   final List<Contact> contacts;
+  final TextEditingController searchController;
+  final String query;
+  final ValueChanged<String> onQueryChanged;
+  final VoidCallback onClearSearch;
   final ValueChanged<Contact> onSelect;
   final ValueChanged<Contact> onCall;
 
   const _ContactListOnly({
     required this.contacts,
+    required this.searchController,
+    required this.query,
+    required this.onQueryChanged,
+    required this.onClearSearch,
     required this.onSelect,
     required this.onCall,
   });
@@ -240,6 +323,12 @@ class _ContactListOnly extends ConsumerWidget {
         children: [
           const ContactsClockHeader(),
           const SizedBox(height: AppSpacing.sm),
+          SearchField(
+            controller: searchController,
+            onChanged: onQueryChanged,
+            onClear: query.isEmpty ? null : onClearSearch,
+          ),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             'Your circle',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -250,7 +339,7 @@ class _ContactListOnly extends ConsumerWidget {
           Text(
             'The people you\'re staying connected with.',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: AppColors.textMuted(context),
                 ),
           ),
           const SizedBox(height: AppSpacing.sm),

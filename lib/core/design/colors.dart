@@ -66,6 +66,10 @@ abstract class AppColors {
   static const Color heroGradientMid = Color(0xFF2DD4BF);
   static const Color heroGradientEnd = Color(0xFFF97316);
 
+  static const Color darkHeroGradientStart = Color(0xFF0F172A);
+  static const Color darkHeroGradientMid = Color(0xFF134E4A);
+  static const Color darkHeroGradientEnd = Color(0xFF1E3A5F);
+
   /// Wheel slice palette — rainbow spectrum from brand wheel art.
   static const List<Color> wheelSliceColors = [
     Color(0xFFE53935),

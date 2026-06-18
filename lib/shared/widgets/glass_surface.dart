@@ -20,17 +20,20 @@ class GlassSurface extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = AppColors.isDark(context);
+    final surface = AppColors.cardSurface(context);
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.12)
+        : Colors.white.withValues(alpha: 0.2);
+
     return Container(
       decoration: BoxDecoration(
-        color: color ?? AppColors.surface.withValues(alpha: 0.15),
+        color: color ?? surface.withValues(alpha: isDark ? 0.35 : 0.15),
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.2),
-          width: 0.8,
-        ),
+        border: Border.all(color: borderColor, width: 0.8),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.08),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -38,16 +41,7 @@ class GlassSurface extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(borderRadius),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.25),
-            borderRadius: BorderRadius.circular(borderRadius),
-          ),
-          child: Padding(
-            padding: padding,
-            child: child,
-          ),
-        ),
+        child: Padding(padding: padding, child: child),
       ),
     );
   }

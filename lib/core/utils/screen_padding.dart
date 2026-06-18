@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../design/spacing.dart';
+import '../design/tokens.dart';
 import 'responsive_layout.dart';
 
 /// Responsive padding on 8px grid.
 class ScreenPadding {
+  static bool usesBottomNav(BuildContext context) =>
+      !ResponsiveLayout.isDesktop(context);
+
   static EdgeInsets horizontal(BuildContext context) {
     return EdgeInsets.symmetric(
       horizontal: ResponsiveLayout.horizontalPadding(context),
@@ -21,6 +25,12 @@ class ScreenPadding {
     return EdgeInsets.fromLTRB(h, AppSpacing.xs, h, AppSpacing.sm);
   }
 
-  static double bottomNavClearance(BuildContext context) =>
-      88 + MediaQuery.paddingOf(context).bottom + AppSpacing.xs;
+  static double bottomNavClearance(BuildContext context) {
+    if (!usesBottomNav(context)) {
+      return MediaQuery.paddingOf(context).bottom + AppSpacing.sm;
+    }
+    return AppTokens.navBarHeight +
+        MediaQuery.paddingOf(context).bottom +
+        AppSpacing.xs;
+  }
 }

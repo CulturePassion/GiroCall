@@ -1,6 +1,8 @@
 /// Shared visual tokens — radii, durations, touch targets.
 abstract class AppTokens {
-  static const double minTouchTarget = 44;
+  static const double minTouchTarget = 48;
+  static const double sidebarWidth = 280;
+  static const double navBarHeight = 72;
 
   static const double radiusSm = 12;
   static const double radiusMd = 16;

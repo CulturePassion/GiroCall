@@ -13,7 +13,7 @@ import '../../../core/utils/responsive_layout.dart';
 import '../../../shared/widgets/auth_card.dart';
 import '../../../shared/widgets/gradient_background.dart';
 import '../../../shared/widgets/primary_button.dart';
-import '../../../shared/widgets/responsive_page.dart';
+
 import '../providers/auth_provider.dart';
 import '../utils/auth_error_message.dart';
 
@@ -164,66 +164,72 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
     });
 
+    final maxWidth = isDesktop
+        ? ResponsiveLayout.contentMaxWidth(context)
+        : ResponsiveLayout.formMaxWidth(context);
+    final horizontalPad = ResponsiveLayout.horizontalPadding(context);
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         body: GradientBackground(
           child: SafeArea(
-            child: ResponsivePage(
-              width: isDesktop
-                  ? ResponsivePageWidth.content
-                  : ResponsivePageWidth.form,
-              scrollable: true,
-              padding: EdgeInsets.symmetric(
-                horizontal: ResponsiveLayout.horizontalPadding(context),
-                vertical: AppSpacing.sm,
-              ),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: math.max(
-                    0,
-                    MediaQuery.sizeOf(context).height -
-                        MediaQuery.paddingOf(context).vertical -
-                        AppSpacing.lg,
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (!supabaseConfig.isConfigured) ...[
-                      const _ConfigWarningBanner(),
-                      const SizedBox(height: AppSpacing.md),
-                    ],
-                    Expanded(
-                      child: Center(
-                        child: isDesktop
-                            ? _DesktopAuthLayout(
-                                form: _buildAuthForm(
-                                  fieldStyle: fieldStyle,
-                                  isLoading: isLoading,
-                                  isReset: isReset,
-                                  isSignUp: isSignUp,
-                                ),
-                              )
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  const _BrandHeader(compact: false),
-                                  const SizedBox(height: AppSpacing.lg),
-                                  _buildAuthForm(
+            child: LayoutBuilder(
+              builder: (context, viewportConstraints) {
+                final minContentHeight = math.max(
+                  0.0,
+                  viewportConstraints.maxHeight - AppSpacing.sm * 2,
+                );
+
+                return SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: minContentHeight),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: horizontalPad,
+                          vertical: AppSpacing.sm,
+                        ),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: maxWidth),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (!supabaseConfig.isConfigured) ...[
+                                const _ConfigWarningBanner(),
+                                const SizedBox(height: AppSpacing.md),
+                              ],
+                              if (isDesktop)
+                                _DesktopAuthLayout(
+                                  form: _buildAuthForm(
                                     fieldStyle: fieldStyle,
                                     isLoading: isLoading,
                                     isReset: isReset,
                                     isSignUp: isSignUp,
                                   ),
-                                ],
-                              ),
+                                )
+                              else ...[
+                                const _BrandHeader(compact: false),
+                                const SizedBox(height: AppSpacing.lg),
+                                _buildAuthForm(
+                                  fieldStyle: fieldStyle,
+                                  isLoading: isLoading,
+                                  isReset: isReset,
+                                  isSignUp: isSignUp,
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
                       ),
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -571,12 +577,7 @@ class _DesktopAuthLayout extends StatelessWidget {
         const Expanded(
           child: Padding(
             padding: EdgeInsets.only(right: AppSpacing.lg),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _BrandHeader(compact: true),
-              ],
-            ),
+            child: _BrandHeader(compact: true),
           ),
         ),
         Expanded(child: form),

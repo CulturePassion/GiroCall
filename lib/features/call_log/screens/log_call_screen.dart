@@ -6,6 +6,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/microcopy.dart';
+import '../../../core/design/tokens.dart';
+import '../../../core/utils/screen_padding.dart';
+
 import '../../../shared/models/call_log.dart';
 import '../../../shared/models/contact.dart';
 import '../../../shared/widgets/app_scaffold.dart';
@@ -141,7 +144,7 @@ class _LogCallScreenState extends ConsumerState<LogCallScreen> {
     return AppScaffold(
       title: 'Log Call',
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppSpacing.sm),
+        padding: ScreenPadding.all(context),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -228,6 +231,9 @@ class _LogCallScreenState extends ConsumerState<LogCallScreen> {
             ),
             const SizedBox(height: AppSpacing.xs),
             TextButton(
+              style: TextButton.styleFrom(
+                minimumSize: const Size(0, AppTokens.minTouchTarget),
+              ),
               onPressed: () => context.pop(),
               child: const Text('Not now'),
             ),

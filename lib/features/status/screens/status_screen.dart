@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
+import '../../../core/design/tokens.dart';
 import '../../../core/design/microcopy.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../core/utils/supabase_error_message.dart';
@@ -141,6 +142,9 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
             ),
             const SizedBox(height: AppSpacing.sm),
             FilledButton.icon(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, AppTokens.minTouchTarget),
+              ),
               onPressed: _saving || _selected == null ? null : _savePresence,
               icon: _saving
                   ? const SizedBox(

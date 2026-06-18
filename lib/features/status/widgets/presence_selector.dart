@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/design/colors.dart';
+import '../../../core/design/spacing.dart';
+import '../../../core/design/tokens.dart';
 import '../../../shared/models/presence_status.dart';
 
 class PresenceSelector extends StatelessWidget {
@@ -26,7 +28,7 @@ class PresenceSelector extends StatelessWidget {
             return Expanded(
               child: Padding(
                 padding: EdgeInsets.only(
-                  right: type != PresenceType.custom ? 8 : 0,
+                  right: type != PresenceType.custom ? AppSpacing.xxs : 0,
                 ),
                 child: _PresenceChip(
                   type: type,
@@ -38,7 +40,7 @@ class PresenceSelector extends StatelessWidget {
           }).toList(),
         ),
         if (selected == PresenceType.custom) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.sm),
           TextField(
             controller: customMessageController,
             decoration: const InputDecoration(
@@ -73,29 +75,38 @@ class _PresenceChip extends StatelessWidget {
       color: selected
           ? color.withValues(alpha: 0.15)
           : Theme.of(context).colorScheme.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppTokens.radiusMd),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
-          child: Column(
-            children: [
-              Icon(
-                type.icon,
-                color: selected ? color : AppColors.textSecondary,
-                size: 26,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                type == PresenceType.meeting ? 'Meeting' : type.label,
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                      color: selected ? color : null,
-                    ),
-              ),
-            ],
+        borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minHeight: AppTokens.minTouchTarget,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSpacing.xs,
+              horizontal: AppSpacing.xxs,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  type.icon,
+                  color: selected ? color : AppColors.textMuted(context),
+                  size: 26,
+                ),
+                const SizedBox(height: AppSpacing.xxs),
+                Text(
+                  type == PresenceType.meeting ? 'Meeting' : type.label,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                        color: selected ? color : null,
+                      ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
