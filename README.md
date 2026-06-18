@@ -87,4 +87,4 @@ See `docs/DEPLOYMENT.md` for Supabase and hosting setup.
 
 ## License
 
-Copyright © 2026 GiroCall. All rights reserved.
+Copyright © 2026 GiroCall. All rights reserved.# GiroCall
