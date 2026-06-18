@@ -43,7 +43,7 @@ class _ScanContactScreenState extends ConsumerState<ScanContactScreen> {
 
     final ContactDraft? draft = VCardParser.parse(raw, userId: userId);
 
-    if (draft == null && raw.contains('/card/')) {
+    if (draft == null && (raw.contains('/card/') || raw.contains('/me/'))) {
       setState(() {
         _scanned = true;
         _scanHint =

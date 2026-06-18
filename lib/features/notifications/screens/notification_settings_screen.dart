@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/design/colors.dart';
+import '../../../core/design/spacing.dart';
 import '../../../core/constants.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../shared/models/user_settings.dart';
@@ -153,8 +154,12 @@ class _NotificationSettingsScreenState
     return AppScaffold(
       title: 'Reminders',
       responsiveWidth: ResponsivePageWidth.form,
-      body: Padding(
-        padding: ScreenPadding.all(context),
+      body: ResponsivePage(
+        width: ResponsivePageWidth.form,
+        scrollable: true,
+        padding: ScreenPadding.contactsPane(context).copyWith(
+          bottom: ScreenPadding.bottomNavClearance(context),
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -238,7 +243,7 @@ class _NotificationSettingsScreenState
                 ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(height: AppSpacing.lg),
             PrimaryButton(
               label: 'Done',
               onPressed: () => context.pop(),

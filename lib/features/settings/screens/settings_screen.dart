@@ -5,8 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants.dart';
 import '../../../core/design/microcopy.dart';
 import '../../../core/theme/theme_mode_provider.dart';
+import '../../../core/utils/responsive_layout.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../shared/widgets/app_scaffold.dart';
+import '../../../shared/widgets/responsive_page.dart';
 import '../../../shared/widgets/settings_section.dart';
 
 /// App settings — appearance, notifications, and about.
@@ -19,9 +21,15 @@ class SettingsScreen extends ConsumerWidget {
 
     return AppScaffold(
       title: 'Settings',
-      body: ListView(
-        padding: ScreenPadding.all(context),
-        children: [
+      body: ResponsivePage(
+        width: ResponsivePageWidth.content,
+        scrollable: true,
+        padding: ScreenPadding.contactsPane(context).copyWith(
+          bottom: ScreenPadding.bottomNavClearance(context),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
           SettingsSection(
             title: 'APPEARANCE',
             children: [
@@ -81,12 +89,13 @@ class SettingsScreen extends ConsumerWidget {
               SettingsTile(
                 icon: Icons.verified_outlined,
                 title: 'Version',
-                subtitle: '1.2.1',
+                subtitle: '2.0.0',
               ),
             ],
           ),
-          const SizedBox(height: 32),
-        ],
+          SizedBox(height: ResponsiveLayout.horizontalPadding(context)),
+          ],
+        ),
       ),
     );
   }
@@ -103,9 +112,10 @@ class SettingsScreen extends ConsumerWidget {
       context: context,
       showDragHandle: true,
       builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
               child: Align(
@@ -135,7 +145,8 @@ class SettingsScreen extends ConsumerWidget {
               onTap: () => Navigator.pop(context, ThemeMode.dark),
             ),
             const SizedBox(height: 8),
-          ],
+            ],
+          ),
         ),
       ),
     );

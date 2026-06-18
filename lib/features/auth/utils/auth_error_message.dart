@@ -16,6 +16,12 @@ String authErrorMessage(Object error, {required bool supabaseConfigured}) {
     return 'An account with this email already exists. Try signing in.';
   }
 
+  if (message.contains('Invalid API key')) {
+    return 'Invalid Supabase API key. Open your project dashboard → '
+        'Project Settings → API, copy the anon (publishable) key into '
+        '.env as SUPABASE_ANON_KEY, then restart with: make run';
+  }
+
   if (message.contains('Invalid login credentials')) {
     return 'Incorrect email or password.';
   }

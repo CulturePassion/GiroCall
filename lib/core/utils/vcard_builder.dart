@@ -1,15 +1,18 @@
 import '../../shared/models/contact.dart';
 import '../../shared/models/user_profile.dart';
+import 'card_url.dart';
 
 /// Builds vCard 3.0 content for saving/sharing digital business cards.
 class VCardBuilder {
   const VCardBuilder._();
 
-  static String fromProfile(UserProfile profile) {
+  static String fromProfile(UserProfile profile, {String? cardUrl}) {
+    final resolvedCardUrl = cardUrl ?? CardUrl.publicCardUrl(profile.slug);
     final buffer = StringBuffer()
       ..writeln('BEGIN:VCARD')
       ..writeln('VERSION:3.0')
-      ..writeln('FN:${_escape(profile.displayName)}');
+      ..writeln('FN:${_escape(profile.displayName)}')
+      ..writeln('UID:girocall-${profile.slug}@girocall.com');
 
     if (profile.title != null && profile.title!.isNotEmpty) {
       buffer.writeln('TITLE:${_escape(profile.title!)}');
@@ -26,6 +29,7 @@ class VCardBuilder {
     if (profile.website != null && profile.website!.isNotEmpty) {
       buffer.writeln('URL:${_escape(profile.website!)}');
     }
+    buffer.writeln('URL;TYPE=GIROCALL:${_escape(resolvedCardUrl)}');
 
     final address = profile.formattedAddress;
     if (address != null) {

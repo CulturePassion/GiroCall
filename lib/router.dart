@@ -37,7 +37,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final session = ref.read(authUserProvider).value?.session;
       final location = state.matchedLocation;
       final isAuthRoute = location == '/login';
-      final isPublicCard = location.startsWith('/card/');
+      final isPublicCard =
+          location.startsWith('/card/') || location.startsWith('/me/');
 
       if (session == null && !isAuthRoute && !isPublicCard) {
         return '/login';
@@ -60,6 +61,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/card/:slug',
+        redirect: (context, state) {
+          final slug = state.pathParameters['slug']!;
+          return '/me/$slug';
+        },
+      ),
+      GoRoute(
+        path: '/me/:slug',
         builder: (context, state) {
           final slug = state.pathParameters['slug']!;
           return PublicCardScreen(slug: slug);
@@ -92,6 +100,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: ':id',
                 builder: (context, state) {
                   final id = state.pathParameters['id']!;
+                  final width = MediaQuery.sizeOf(context).width;
+                  if (width >= 900) {
+                    return ContactListScreen(initialContactId: id);
+                  }
                   return ContactDetailScreen(contactId: id);
                 },
                 routes: [

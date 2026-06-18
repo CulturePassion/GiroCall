@@ -127,6 +127,16 @@ class Contact {
     return days >= targetFrequencyDays;
   }
 
+  /// Suggested next call date based on last call + target frequency.
+  DateTime get nextRecommendedCallAt {
+    final anchor = lastCalledAt ?? DateTime.now();
+    return DateTime(
+      anchor.year,
+      anchor.month,
+      anchor.day,
+    ).add(Duration(days: targetFrequencyDays));
+  }
+
   Contact copyWith({
     String? id,
     String? userId,

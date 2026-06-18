@@ -7,8 +7,11 @@ class CardUrl {
   static String publicCardUrl(String slug, {String? baseUrl}) {
     final base =
         (baseUrl ?? Constants.appBaseUrl).replaceAll(RegExp(r'/+$'), '');
-    return '$base/card/$slug';
+    return '$base/me/$slug';
   }
+
+  /// Short display form shown in UI chips and copy fields.
+  static String publicCardPath(String slug) => 'girocall.com/me/$slug';
 
   static String walletPassUrl({
     required String supabaseUrl,

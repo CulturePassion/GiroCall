@@ -22,6 +22,8 @@ void main() {
     expect(vcard, contains('ORG:GiroCall'));
     expect(vcard, contains('TEL;TYPE=CELL:+15551234567'));
     expect(vcard, contains('EMAIL;TYPE=INTERNET:jane@example.com'));
+    expect(vcard, contains('URL;TYPE=GIROCALL:https://girocall.com/me/jane-doe'));
+    expect(vcard, contains('UID:girocall-jane-doe@girocall.com'));
     expect(vcard, contains('BEGIN:VCARD'));
     expect(vcard, contains('END:VCARD'));
   });

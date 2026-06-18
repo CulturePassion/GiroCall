@@ -1,4 +1,4 @@
-.PHONY: install upgrade run run-ios run-android analyze test format format-check build-apk build-ios build-web clean deploy-edge deploy-edge-all deploy-supabase deploy-all deploy-hosting deploy-secrets verify-supabase supabase-link setup-db deploy-migrations clean-ios
+.PHONY: install upgrade run run-ios run-android analyze test format format-check build-apk build-ios build-web clean clean-all clean-android rebuild-all deploy-edge deploy-edge-all deploy-supabase deploy-all deploy-hosting deploy-secrets verify-supabase supabase-link setup-db deploy-migrations clean-ios
 
 SUPABASE_PROJECT_REF ?= gtvpsukmmjhszpopulfe
 
@@ -57,10 +57,35 @@ clean:
 	flutter clean
 	rm -rf build/
 
+clean-android:
+	cd android && ./gradlew clean --no-daemon 2>/dev/null || true
+	rm -rf android/.gradle android/app/build android/build
+
 clean-ios:
-	rm -rf ios/.symlinks ios/Pods ios/Podfile.lock
-	flutter pub get
+	rm -rf ios/.symlinks ios/Pods ios/Podfile.lock ios/Flutter/ephemeral
+	rm -rf ios/Runner.xcworkspace/xcuserdata ios/Runner.xcodeproj/xcuserdata
+
+clean-all: clean clean-ios clean-android
+	rm -rf .dart_tool/flutter_build
+	@echo "✓ Full clean complete."
+
+rebuild-all:
+	@if [ ! -f .env ]; then \
+		echo "Missing .env — copy .env.example to .env first."; \
+		exit 1; \
+	fi
+	$(MAKE) install
 	cd ios && pod install
+	flutter analyze
+	flutter test
+	flutter build web --release --dart-define-from-file=.env
+	flutter build apk --release --dart-define-from-file=.env
+	flutter build ios --release --dart-define-from-file=.env --no-codesign
+	@echo ""
+	@echo "✓ Rebuild complete:"
+	@echo "  Web:     build/web/"
+	@echo "  Android: build/app/outputs/flutter-apk/app-release.apk"
+	@echo "  iOS:     build/ios/iphoneos/Runner.app (unsigned)"
 
 supabase-link:
 	supabase link --project-ref $(SUPABASE_PROJECT_REF) --yes

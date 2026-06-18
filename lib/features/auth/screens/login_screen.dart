@@ -8,7 +8,6 @@ import '../../../core/constants.dart';
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/tokens.dart';
-import '../../../core/supabase_config.dart';
 import '../../../core/supabase_provider.dart';
 import '../../../core/utils/responsive_layout.dart';
 import '../../../shared/widgets/auth_card.dart';
@@ -108,6 +107,39 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
   }
 
+  Widget _buildAuthForm({
+    required TextStyle fieldStyle,
+    required bool isLoading,
+    required bool isReset,
+    required bool isSignUp,
+  }) {
+    return _AuthForm(
+      mode: _mode,
+      formKey: _formKey,
+      fieldStyle: fieldStyle,
+      isLoading: isLoading,
+      isReset: isReset,
+      isSignUp: isSignUp,
+      resetSentMessage: _resetSentMessage,
+      obscurePassword: _obscurePassword,
+      obscureConfirm: _obscureConfirm,
+      emailController: _emailController,
+      passwordController: _passwordController,
+      confirmPasswordController: _confirmPasswordController,
+      emailFocus: _emailFocus,
+      passwordFocus: _passwordFocus,
+      confirmFocus: _confirmFocus,
+      onModeChanged: _switchMode,
+      onSubmit: _submit,
+      onTogglePassword: () => setState(
+        () => _obscurePassword = !_obscurePassword,
+      ),
+      onToggleConfirm: () => setState(
+        () => _obscureConfirm = !_obscureConfirm,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authNotifierProvider);
@@ -155,74 +187,41 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         AppSpacing.lg,
                   ),
                 ),
-                child: Center(
-                  child: isDesktop
-                      ? _DesktopAuthLayout(
-                          supabaseConfig: supabaseConfig,
-                          form: _AuthForm(
-                            mode: _mode,
-                            formKey: _formKey,
-                            fieldStyle: fieldStyle,
-                            isLoading: isLoading,
-                            isReset: isReset,
-                            isSignUp: isSignUp,
-                            resetSentMessage: _resetSentMessage,
-                            obscurePassword: _obscurePassword,
-                            obscureConfirm: _obscureConfirm,
-                            emailController: _emailController,
-                            passwordController: _passwordController,
-                            confirmPasswordController:
-                                _confirmPasswordController,
-                            emailFocus: _emailFocus,
-                            passwordFocus: _passwordFocus,
-                            confirmFocus: _confirmFocus,
-                            onModeChanged: _switchMode,
-                            onSubmit: _submit,
-                            onTogglePassword: () => setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            ),
-                            onToggleConfirm: () => setState(
-                              () => _obscureConfirm = !_obscureConfirm,
-                            ),
-                          ),
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            if (!supabaseConfig.isConfigured)
-                              const _ConfigWarningBanner(),
-                            const SizedBox(height: AppSpacing.md),
-                            const _BrandHeader(compact: false),
-                            const SizedBox(height: AppSpacing.lg),
-                            _AuthForm(
-                              mode: _mode,
-                              formKey: _formKey,
-                              fieldStyle: fieldStyle,
-                              isLoading: isLoading,
-                              isReset: isReset,
-                              isSignUp: isSignUp,
-                              resetSentMessage: _resetSentMessage,
-                              obscurePassword: _obscurePassword,
-                              obscureConfirm: _obscureConfirm,
-                              emailController: _emailController,
-                              passwordController: _passwordController,
-                              confirmPasswordController:
-                                  _confirmPasswordController,
-                              emailFocus: _emailFocus,
-                              passwordFocus: _passwordFocus,
-                              confirmFocus: _confirmFocus,
-                              onModeChanged: _switchMode,
-                              onSubmit: _submit,
-                              onTogglePassword: () => setState(
-                                () => _obscurePassword = !_obscurePassword,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (!supabaseConfig.isConfigured) ...[
+                      const _ConfigWarningBanner(),
+                      const SizedBox(height: AppSpacing.md),
+                    ],
+                    Expanded(
+                      child: Center(
+                        child: isDesktop
+                            ? _DesktopAuthLayout(
+                                form: _buildAuthForm(
+                                  fieldStyle: fieldStyle,
+                                  isLoading: isLoading,
+                                  isReset: isReset,
+                                  isSignUp: isSignUp,
+                                ),
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  const _BrandHeader(compact: false),
+                                  const SizedBox(height: AppSpacing.lg),
+                                  _buildAuthForm(
+                                    fieldStyle: fieldStyle,
+                                    isLoading: isLoading,
+                                    isReset: isReset,
+                                    isSignUp: isSignUp,
+                                  ),
+                                ],
                               ),
-                              onToggleConfirm: () => setState(
-                                () => _obscureConfirm = !_obscureConfirm,
-                              ),
-                            ),
-                          ],
-                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -561,29 +560,21 @@ class _ResetSentBanner extends StatelessWidget {
 
 class _DesktopAuthLayout extends StatelessWidget {
   final Widget form;
-  final SupabaseConfig supabaseConfig;
 
-  const _DesktopAuthLayout({
-    required this.form,
-    required this.supabaseConfig,
-  });
+  const _DesktopAuthLayout({required this.form});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
+        const Expanded(
           child: Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.lg),
+            padding: EdgeInsets.only(right: AppSpacing.lg),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (!supabaseConfig.isConfigured) ...[
-                  const _ConfigWarningBanner(),
-                  const SizedBox(height: AppSpacing.md),
-                ],
-                const _BrandHeader(compact: true),
+                _BrandHeader(compact: true),
               ],
             ),
           ),

@@ -1,0 +1,3 @@
+// GiroCall application metadata — read by Xcode, Xcode Cloud, and App Store Connect.
+INFOPLIST_KEY_CFBundleDisplayName = GiroCall
+INFOPLIST_KEY_CFBundleName = GiroCall

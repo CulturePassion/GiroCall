@@ -1,33 +1,21 @@
-import 'dart:convert';
-import 'dart:typed_data';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:share_plus/share_plus.dart';
-
-import '../../../core/utils/vcard_builder.dart';
 import '../../../shared/models/user_profile.dart';
+import 'contact_save_service_mobile.dart'
+    if (dart.library.html) 'contact_save_service_web.dart' as impl;
 
-/// Shares or saves a digital business card as a vCard contact file.
+/// Saves or shares a digital business card as a vCard contact file.
 class ContactSaveService {
   const ContactSaveService();
 
   Future<void> saveProfileContact(UserProfile profile) async {
-    final vcard = VCardBuilder.fromProfile(profile);
-    final filename = '${profile.slug}.vcf';
-
-    await SharePlus.instance.share(
-      ShareParams(
-        files: [
-          XFile.fromData(
-            Uint8List.fromList(utf8.encode(vcard)),
-            name: filename,
-            mimeType: 'text/vcard',
-          ),
-        ],
-        subject: profile.displayName,
-        text: 'Save ${profile.displayName} to your contacts',
-      ),
-    );
+    final savedToDevice = await impl.saveProfileContactToDevice(profile);
+    if (!savedToDevice) {
+      await impl.shareProfileVcard(profile);
+    }
   }
 }
 
-final contactSaveServiceProvider = const ContactSaveService();
+final contactSaveServiceProvider = Provider<ContactSaveService>(
+  (ref) => const ContactSaveService(),
+);

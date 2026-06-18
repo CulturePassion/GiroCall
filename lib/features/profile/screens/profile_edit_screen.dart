@@ -256,7 +256,7 @@ class _ProfileEditScreenState extends ConsumerState<ProfileEditScreen> {
                   controller: _slug,
                   decoration: const InputDecoration(
                     labelText: 'Username (link slug)',
-                    prefixText: 'girocall.com/card/',
+                    prefixText: 'girocall.com/me/',
                     prefixIcon: Icon(Icons.link),
                   ),
                 ),
