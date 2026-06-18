@@ -59,7 +59,8 @@ class SettingsScreen extends ConsumerWidget {
                 icon: Icons.privacy_tip_outlined,
                 title: 'Privacy',
                 subtitle: 'Review privacy settings',
-                onTap: () => context.push('/profile'), // Link to profile privacy settings
+                onTap: () => context
+                    .push('/profile'), // Link to profile privacy settings
               ),
             ],
           ),

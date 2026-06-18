@@ -19,7 +19,7 @@ class ContactRepository {
 
   Future<List<Contact>> fetchContacts() async {
     _log.fine('Fetching contacts for user');
-    
+
     final userId = this.userId;
     if (userId == null) {
       _log.warning('User not authenticated');
@@ -34,7 +34,7 @@ class ContactRepository {
           .order('name');
 
       _log.fine('Fetched ${response.length} contacts');
-      
+
       return List<Map<String, dynamic>>.from(response)
           .map((json) => Contact.fromJson(json))
           .toList();
@@ -46,7 +46,7 @@ class ContactRepository {
 
   Stream<List<Contact>> watchContacts() {
     _log.fine('Watching contacts for user');
-    
+
     final userId = this.userId;
     if (userId == null) {
       _log.warning('User not authenticated');
@@ -59,7 +59,8 @@ class ContactRepository {
           .stream(primaryKey: ['id'])
           .eq('user_id', userId)
           .map((rows) {
-            final contacts = rows.map((json) => Contact.fromJson(json)).toList();
+            final contacts =
+                rows.map((json) => Contact.fromJson(json)).toList();
             contacts.sort((a, b) => a.name.compareTo(b.name));
             _log.fine('Stream updated with ${contacts.length} contacts');
             return contacts;
@@ -72,7 +73,7 @@ class ContactRepository {
 
   Future<Contact> addContact(Contact contact) async {
     _log.fine('Adding new contact: ${contact.name}');
-    
+
     final userId = this.userId;
     if (userId == null) {
       _log.severe('User not authenticated');
@@ -96,7 +97,7 @@ class ContactRepository {
 
   Future<void> updateContact(Contact contact) async {
     _log.fine('Updating contact: ${contact.id}');
-    
+
     final userId = this.userId;
     if (userId == null) {
       _log.severe('User not authenticated');
@@ -115,7 +116,7 @@ class ContactRepository {
           .update(contact.toUpdateJson())
           .eq('id', contact.id!)
           .eq('user_id', userId);
-          
+
       _log.info('Contact updated successfully: ${contact.id}');
     } catch (e, stackTrace) {
       _log.severe('Error updating contact: $e', stackTrace);
@@ -125,7 +126,7 @@ class ContactRepository {
 
   Future<void> deleteContact(String id) async {
     _log.fine('Deleting contact: $id');
-    
+
     final userId = this.userId;
     if (userId == null) {
       _log.severe('User not authenticated');
@@ -133,7 +134,11 @@ class ContactRepository {
     }
 
     try {
-      await _client.from('contacts').delete().eq('id', id).eq('user_id', userId);
+      await _client
+          .from('contacts')
+          .delete()
+          .eq('id', id)
+          .eq('user_id', userId);
       _log.info('Contact deleted successfully: $id');
     } catch (e, stackTrace) {
       _log.severe('Error deleting contact: $e', stackTrace);
@@ -143,7 +148,7 @@ class ContactRepository {
 
   Future<Contact?> getContact(String id) async {
     _log.fine('Getting contact: $id');
-    
+
     final userId = this.userId;
     if (userId == null) {
       _log.warning('User not authenticated');
@@ -162,7 +167,7 @@ class ContactRepository {
         _log.fine('Contact not found: $id');
         return null;
       }
-      
+
       _log.fine('Contact found: $id');
       return Contact.fromJson(response);
     } catch (e, stackTrace) {
@@ -173,7 +178,7 @@ class ContactRepository {
 
   Future<void> upsertContacts(List<Contact> contacts) async {
     _log.fine('Upserting ${contacts.length} contacts');
-    
+
     final userId = this.userId;
     if (userId == null) {
       _log.severe('User not authenticated');
@@ -201,18 +206,18 @@ class ContactRepository {
 
   void _validateContact(Contact contact) {
     _log.fine('Validating contact: ${contact.name}');
-    
+
     final name = contact.name.trim();
     if (name.isEmpty) {
       _log.warning('Contact name is required');
       throw ArgumentError('Contact name is required');
     }
-    
+
     if (!PhoneFormatter.looksValid(contact.phone)) {
       _log.warning('Contact phone number is invalid: ${contact.phone}');
       throw ArgumentError('Contact phone number is invalid');
     }
-    
+
     _log.fine('Contact validated successfully: ${contact.name}');
   }
 }

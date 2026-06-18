@@ -146,8 +146,7 @@ class ProfileAvatarPicker extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: Colors.black.withValues(alpha: 0.35),
-                    borderRadius:
-                        BorderRadius.circular(AppTokens.radiusLg),
+                    borderRadius: BorderRadius.circular(AppTokens.radiusLg),
                   ),
                   child: const Center(
                     child: SizedBox(
@@ -171,7 +170,8 @@ class ProfileAvatarPicker extends StatelessWidget {
                   child: const SizedBox(
                     width: AppTokens.minTouchTarget,
                     height: AppTokens.minTouchTarget,
-                    child: Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                    child:
+                        Icon(Icons.camera_alt, color: Colors.white, size: 20),
                   ),
                 ),
               ),

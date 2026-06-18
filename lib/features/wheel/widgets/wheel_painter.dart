@@ -54,9 +54,7 @@ class WheelPainter extends CustomPainter {
         center,
         radius,
         start + sliceAngle / 2,
-        contacts[i].name.isNotEmpty
-            ? contacts[i].name[0].toUpperCase()
-            : '?',
+        contacts[i].name.isNotEmpty ? contacts[i].name[0].toUpperCase() : '?',
         baseColor,
       );
     }

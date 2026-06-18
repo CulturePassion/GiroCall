@@ -69,8 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         await notifier.resetPasswordForEmail(email);
         if (mounted) {
           setState(() {
-            _resetSentMessage =
-                'Check your email for a password reset link.';
+            _resetSentMessage = 'Check your email for a password reset link.';
           });
         }
         return;
@@ -350,9 +349,8 @@ class _AuthForm extends StatelessWidget {
                     obscure: obscurePassword,
                     isSignUp: isSignUp,
                     onToggleObscure: onTogglePassword,
-                    onSubmit: isSignUp
-                        ? () => confirmFocus.requestFocus()
-                        : onSubmit,
+                    onSubmit:
+                        isSignUp ? () => confirmFocus.requestFocus() : onSubmit,
                   ),
                 ],
                 if (isSignUp) ...[
@@ -372,8 +370,7 @@ class _AuthForm extends StatelessWidget {
                   Text(
                     'At least 8 characters',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color:
-                              Theme.of(context).colorScheme.onSurfaceVariant,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                   ),
                 ],
@@ -498,7 +495,9 @@ class _PasswordField extends StatelessWidget {
           suffixIcon: IconButton(
             tooltip: obscure ? 'Show password' : 'Hide password',
             icon: Icon(
-              obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+              obscure
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
             ),
             onPressed: onToggleObscure,
           ),
@@ -661,32 +660,32 @@ class _BrandHeader extends StatelessWidget {
         Text(
           Constants.appName,
           style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                shadows: const [
-                  Shadow(
-                    color: Colors.black26,
-                    blurRadius: 8,
-                    offset: Offset(0, 2),
-                  ),
-                ],
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            shadows: const [
+              Shadow(
+                color: Colors.black26,
+                blurRadius: 8,
+                offset: Offset(0, 2),
               ),
+            ],
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: AppSpacing.xxs),
         Text(
           Constants.tagline,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: Colors.white.withValues(alpha: 0.95),
-                height: 1.4,
-                shadows: const [
-                  Shadow(
-                    color: Colors.black26,
-                    blurRadius: 6,
-                    offset: Offset(0, 1),
-                  ),
-                ],
+            color: Colors.white.withValues(alpha: 0.95),
+            height: 1.4,
+            shadows: const [
+              Shadow(
+                color: Colors.black26,
+                blurRadius: 6,
+                offset: Offset(0, 1),
               ),
+            ],
+          ),
           textAlign: TextAlign.center,
         ),
       ],

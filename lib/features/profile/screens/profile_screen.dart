@@ -184,9 +184,8 @@ class _ProfileContent extends ConsumerWidget {
                   },
                   secondary: Icon(
                     Icons.visibility,
-                    color: profile.isPublic
-                        ? AppColors.success
-                        : AppColors.error,
+                    color:
+                        profile.isPublic ? AppColors.success : AppColors.error,
                   ),
                 ),
               ],

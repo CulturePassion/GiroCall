@@ -17,7 +17,8 @@ abstract class Microcopy {
 
   // Call log
   static const callFeelPrompt = 'How did the call feel?';
-  static const callSaved = 'Great call! You\'re building something beautiful. ✨';
+  static const callSaved =
+      'Great call! You\'re building something beautiful. ✨';
   static const callTapToCall = 'Tap to call';
 
   // Stats

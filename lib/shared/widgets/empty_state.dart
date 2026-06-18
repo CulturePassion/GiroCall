@@ -79,8 +79,7 @@ class EmptyState extends StatelessWidget {
                         AppTokens.minTouchTarget,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(AppTokens.radiusLg),
+                        borderRadius: BorderRadius.circular(AppTokens.radiusLg),
                       ),
                     ),
                     child: Text(actionLabel!),

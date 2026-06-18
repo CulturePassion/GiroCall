@@ -115,7 +115,8 @@ class _WideWheelLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final wheelSize = _computeWheelSize(maxWidth: 420, maxHeight: maxHeight - 48);
+    final wheelSize =
+        _computeWheelSize(maxWidth: 420, maxHeight: maxHeight - 48);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -135,7 +136,8 @@ class _WideWheelLayout extends StatelessWidget {
           child: Align(
             alignment: Alignment.center,
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _kWheelResultMaxWidth),
+              constraints:
+                  const BoxConstraints(maxWidth: _kWheelResultMaxWidth),
               child: _WheelResult(
                 contact: wheelState.selectedContact,
                 onCall: wheelState.selectedContact == null
@@ -171,8 +173,7 @@ class _NarrowWheelLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     final wheelSize = _computeWheelSize(
       maxWidth: maxWidth - AppSpacing.xl,
-      maxHeight:
-          maxHeight - (wheelState.selectedContact != null ? 320 : 200),
+      maxHeight: maxHeight - (wheelState.selectedContact != null ? 320 : 200),
     );
 
     return Column(
@@ -266,11 +267,11 @@ class _WheelHeadline extends StatelessWidget {
         key: ValueKey(selected),
         selected ? Microcopy.wheelSelected : Microcopy.wheelReady,
         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-              height: 1.35,
-              shadows: const [Shadow(color: Colors.black26, blurRadius: 8)],
-            ),
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+          height: 1.35,
+          shadows: const [Shadow(color: Colors.black26, blurRadius: 8)],
+        ),
         textAlign: TextAlign.center,
       ),
     );

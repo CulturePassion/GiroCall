@@ -83,7 +83,8 @@ class _EditContactScreenState extends ConsumerState<EditContactScreen> {
           title: 'Edit Contact',
           responsiveWidth: ResponsivePageWidth.form,
           body: SingleChildScrollView(
-            padding: EdgeInsets.all(ResponsiveLayout.horizontalPadding(context)),
+            padding:
+                EdgeInsets.all(ResponsiveLayout.horizontalPadding(context)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

@@ -12,7 +12,8 @@ class ProfileRepository {
   String? get userId => _client.auth.currentUser?.id;
 
   Future<UserProfile?> fetchOwnProfile() async {
-    final userId = this.userId;  // Changed to use public getter instead of accessing private field
+    final userId = this
+        .userId; // Changed to use public getter instead of accessing private field
     if (userId == null) return null;
 
     final response = await _client
@@ -26,7 +27,8 @@ class ProfileRepository {
   }
 
   Future<UserProfile> ensureProfile() async {
-    final userId = this.userId;  // Changed to use public getter instead of accessing private field
+    final userId = this
+        .userId; // Changed to use public getter instead of accessing private field
     if (userId == null) throw Exception('User not authenticated');
 
     final existing = await fetchOwnProfile();
@@ -51,7 +53,8 @@ class ProfileRepository {
   }
 
   Future<UserProfile> updateProfile(UserProfile profile) async {
-    final userId = this.userId;  // Changed to use public getter instead of accessing private field
+    final userId = this
+        .userId; // Changed to use public getter instead of accessing private field
     if (userId == null) throw Exception('User not authenticated');
 
     _validateProfile(profile);

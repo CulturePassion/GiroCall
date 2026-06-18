@@ -31,8 +31,11 @@ class ContactDetailScreen extends ConsumerWidget {
           );
         }
 
-        final logs = callLogsAsync.value?.where((log) => log.contactId == contactId).toList() ?? [];
-        
+        final logs = callLogsAsync.value
+                ?.where((log) => log.contactId == contactId)
+                .toList() ??
+            [];
+
         return AppScaffold(
           title: contact.name,
           actions: [
@@ -69,10 +72,12 @@ class ContactDetailScreen extends ConsumerWidget {
                       ),
                       if (contact.firstName != null || contact.lastName != null)
                         Text(
-                          '${contact.firstName ?? ''} ${contact.lastName ?? ''}'.trim(),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
+                          '${contact.firstName ?? ''} ${contact.lastName ?? ''}'
+                              .trim(),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
                         ),
                       const SizedBox(height: AppSpacing.sm),
                       Row(
@@ -111,9 +116,9 @@ class ContactDetailScreen extends ConsumerWidget {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: AppSpacing.md),
-                
+
                 // Action buttons
                 Wrap(
                   spacing: AppSpacing.sm,
@@ -150,12 +155,12 @@ class ContactDetailScreen extends ConsumerWidget {
                       ),
                   ],
                 ),
-                
+
                 const SizedBox(height: AppSpacing.md),
-                
+
                 // Contact details section
-                if (contact.notes != null || 
-                    contact.company != null || 
+                if (contact.notes != null ||
+                    contact.company != null ||
                     contact.jobTitle != null ||
                     contact.formattedAddress != null)
                   Container(
@@ -186,7 +191,8 @@ class ContactDetailScreen extends ConsumerWidget {
                           ),
                           const Divider(height: AppSpacing.md),
                         ],
-                        if (contact.company != null || contact.jobTitle != null) ...[
+                        if (contact.company != null ||
+                            contact.jobTitle != null) ...[
                           Text(
                             'Work',
                             style: Theme.of(context).textTheme.titleMedium,
@@ -200,11 +206,15 @@ class ContactDetailScreen extends ConsumerWidget {
                           if (contact.company != null)
                             Text(
                               contact.company!,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
                                     color: AppColors.textSecondary,
                                   ),
                             ),
-                          if (contact.company != null || contact.jobTitle != null)
+                          if (contact.company != null ||
+                              contact.jobTitle != null)
                             const Divider(height: AppSpacing.md),
                         ],
                         if (contact.formattedAddress != null) ...[
@@ -221,9 +231,9 @@ class ContactDetailScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
-                
+
                 const SizedBox(height: AppSpacing.md),
-                
+
                 // Call history
                 if (logs.isNotEmpty) ...[
                   Align(

@@ -102,8 +102,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                           ? Icons.visibility_outlined
                           : Icons.visibility_off_outlined,
                     ),
-                    onPressed: () =>
-                        setState(() => _obscureNew = !_obscureNew),
+                    onPressed: () => setState(() => _obscureNew = !_obscureNew),
                   ),
                 ),
               ),

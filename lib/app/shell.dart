@@ -24,8 +24,9 @@ class MainShell extends ConsumerWidget {
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
-        backgroundColor:
-            isDark ? AppColors.darkNavBarBackground : AppColors.navBarBackground,
+        backgroundColor: isDark
+            ? AppColors.darkNavBarBackground
+            : AppColors.navBarBackground,
         indicatorColor: AppColors.softTeal,
         elevation: 8,
         shadowColor: AppColors.main.withValues(alpha: 0.12),
