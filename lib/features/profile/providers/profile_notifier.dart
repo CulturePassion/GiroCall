@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
+import '../../../core/errors/app_error_mapper.dart';
+import '../../../core/errors/error_reporter.dart';
 import '../../../shared/models/user_profile.dart';
 import 'profile_repository_provider.dart';
 
@@ -25,9 +27,14 @@ class ProfileNotifier extends StateNotifier<AsyncValue<UserProfile?>> {
   }
 
   Future<UserProfile> saveProfile(UserProfile profile) async {
-    final saved = await _repository.updateProfile(profile);
-    state = AsyncValue.data(saved);
-    return saved;
+    try {
+      final saved = await _repository.updateProfile(profile);
+      state = AsyncValue.data(saved);
+      return saved;
+    } catch (e, st) {
+      ErrorReporter.log(e, st, 'saveProfile');
+      rethrowAsAppError(e, st);
+    }
   }
 
   void clear() {

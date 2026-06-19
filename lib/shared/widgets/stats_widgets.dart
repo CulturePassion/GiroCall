@@ -119,34 +119,64 @@ class StatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return PremiumCard(
       accentColor: color,
-      padding: const EdgeInsets.all(AppSpacing.sm),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+        vertical: AppSpacing.xxs + 2,
+      ),
+      borderRadius: AppTokens.radiusMd,
+      child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(AppSpacing.xxs),
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.15),
+              color: color.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(AppTokens.radiusSm),
             ),
-            child: Icon(icon, color: color, size: 22),
+            child: Icon(icon, color: color, size: 17),
           ),
-          Text(
-            value,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: value,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.1,
+                                ),
+                      ),
+                      if (unit.isNotEmpty)
+                        TextSpan(
+                          text: ' $unit',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppColors.textMuted(context),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                        ),
+                    ],
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-          ),
-          Text(unit, style: Theme.of(context).textTheme.bodySmall),
-          const SizedBox(height: AppSpacing.xxs),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textMuted(context),
+                      ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
+              ],
+            ),
           ),
         ],
       ),
@@ -158,12 +188,14 @@ class ActivityBarChart extends StatelessWidget {
   final int today;
   final int week;
   final int month;
+  final double barWidth;
 
   const ActivityBarChart({
     super.key,
     required this.today,
     required this.week,
     required this.month,
+    this.barWidth = 28,
   });
 
   @override
@@ -221,7 +253,7 @@ class ActivityBarChart extends StatelessWidget {
             barRods: [
               BarChartRodData(
                 toY: entry.value.value,
-                width: 36,
+                width: barWidth,
                 borderRadius: const BorderRadius.vertical(
                   top: Radius.circular(10),
                 ),

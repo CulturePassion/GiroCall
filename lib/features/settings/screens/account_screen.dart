@@ -76,10 +76,16 @@ class AccountScreen extends ConsumerWidget {
               title: 'PROFILE',
               children: [
                 SettingsTile(
+                  icon: Icons.badge_outlined,
+                  title: 'My /me page',
+                  subtitle: 'Public link, username, and sharing',
+                  onTap: () => context.go('/profile/card'),
+                ),
+                SettingsTile(
                   icon: Icons.edit_outlined,
-                  title: 'Edit profile & photo',
-                  subtitle: 'Update your digital card and avatar',
-                  onTap: () => context.push('/profile/edit'),
+                  title: 'Edit profile',
+                  subtitle: 'Name, bio, contact info, and social links',
+                  onTap: () => context.go('/profile/edit'),
                 ),
               ],
             ),

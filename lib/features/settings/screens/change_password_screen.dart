@@ -9,8 +9,9 @@ import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/glass_surface.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/responsive_page.dart';
+import '../../../core/errors/app_error_extensions.dart';
+import '../../../core/errors/app_messenger.dart';
 import '../../auth/providers/auth_provider.dart';
-import '../../auth/utils/auth_error_message.dart';
 
 class ChangePasswordScreen extends ConsumerStatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -57,8 +58,13 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         context.pop();
       }
     } catch (e) {
-      final config = ref.read(supabaseConfigProvider);
-      _showSnack(authErrorMessage(e, supabaseConfigured: config.isConfigured));
+      if (mounted) {
+        final config = ref.read(supabaseConfigProvider);
+        AppMessenger.showAppError(
+          context,
+          e.toAppError(supabaseConfigured: config.isConfigured),
+        );
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }

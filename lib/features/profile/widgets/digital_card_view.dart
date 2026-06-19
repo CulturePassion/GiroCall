@@ -345,7 +345,9 @@ class _HeroHeader extends StatelessWidget {
                   ),
                   const SizedBox(width: 6),
                   Text(
-                    profile.isPublic ? cardPath : 'Private — turn on sharing to get a link',
+                    profile.isPublic
+                        ? cardPath
+                        : 'Private — turn on sharing to get a link',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
                           color: Colors.white.withValues(alpha: 0.9),
                           fontWeight: FontWeight.w600,

@@ -7,6 +7,13 @@ abstract class Constants {
   static const String supabaseUrlKey = 'SUPABASE_URL';
   static const String supabaseAnonKey = 'SUPABASE_ANON_KEY';
 
+  // Sentry (optional — leave empty to disable)
+  static const String sentryDsnKey = 'SENTRY_DSN';
+  static const String sentryDsn = String.fromEnvironment(
+    sentryDsnKey,
+    defaultValue: '',
+  );
+
   // Notification channel
   static const String reminderChannelId = 'girocall_daily_reminder';
   static const String reminderChannelName = 'Daily Call Reminders';
@@ -28,5 +35,13 @@ abstract class Constants {
   static const String appBaseUrl = String.fromEnvironment(
     appBaseUrlKey,
     defaultValue: 'https://girocall.com',
+  );
+
+  /// Optional fixed redirect for Supabase auth emails during local web dev.
+  /// Must match a URL in Supabase Auth → URL Configuration allow-list.
+  static const String webAuthRedirectUrlKey = 'WEB_AUTH_REDIRECT_URL';
+  static const String webAuthRedirectUrl = String.fromEnvironment(
+    webAuthRedirectUrlKey,
+    defaultValue: '',
   );
 }

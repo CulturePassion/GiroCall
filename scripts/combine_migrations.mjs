@@ -11,10 +11,21 @@ const files = readdirSync(migrationsDir)
   .filter((f) => f.endsWith('.sql') && f !== 'combined_migrations.sql')
   .sort();
 
+const legacyPolicyCleanup = `
+-- Drop legacy monolithic RLS policies (001) before migrations re-apply split policies (004+)
+DROP POLICY IF EXISTS "Users can only access their own contacts" ON public.contacts;
+DROP POLICY IF EXISTS "Users can only access their own call logs" ON public.call_logs;
+DROP POLICY IF EXISTS "Users can only access their own settings" ON public.user_settings;
+DROP POLICY IF EXISTS "Users can only access their own FCM tokens" ON public.fcm_tokens;
+`.trim();
+
 const parts = [
   '-- GiroCall combined migrations (safe to re-run)',
   `-- Generated: ${new Date().toISOString()}`,
   '-- Paste this entire file into Supabase SQL Editor and click Run.',
+  '',
+  '-- ── legacy_rls_cleanup (idempotent) ──',
+  legacyPolicyCleanup,
   '',
 ];
 

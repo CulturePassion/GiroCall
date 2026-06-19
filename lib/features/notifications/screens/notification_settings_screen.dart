@@ -8,8 +8,8 @@ import '../../../core/constants.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../shared/models/user_settings.dart';
 import '../../../shared/widgets/app_scaffold.dart';
-import '../../../shared/widgets/responsive_page.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../shared/widgets/responsive_page.dart' show ResponsivePageWidth;
 import '../providers/notification_provider.dart';
 import '../providers/settings_repository_provider.dart';
 
@@ -154,9 +154,8 @@ class _NotificationSettingsScreenState
     return AppScaffold(
       title: 'Reminders',
       responsiveWidth: ResponsivePageWidth.form,
-      body: ResponsivePage(
-        width: ResponsivePageWidth.form,
-        scrollable: true,
+      body: SingleChildScrollView(
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
         padding: ScreenPadding.contactsPane(context).copyWith(
           bottom: ScreenPadding.bottomNavClearance(context),
         ),

@@ -2,7 +2,7 @@
 abstract class AppTokens {
   static const double minTouchTarget = 48;
   static const double sidebarWidth = 280;
-  static const double navBarHeight = 72;
+  static const double navBarHeight = 80;
 
   static const double radiusSm = 12;
   static const double radiusMd = 16;

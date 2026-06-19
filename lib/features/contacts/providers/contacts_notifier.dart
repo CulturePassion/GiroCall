@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
+import '../../../core/errors/app_error_mapper.dart';
+import '../../../core/errors/error_reporter.dart';
 import '../../../core/utils/platform_capabilities.dart';
 
 import '../../../shared/models/contact.dart';
@@ -55,7 +57,8 @@ class ContactsNotifier extends StateNotifier<AsyncValue<List<Contact>>> {
       state = AsyncValue.data([...state.value ?? [], created]);
       await _pushToDeviceIfNeeded(created);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      ErrorReporter.log(e, st, 'addContact');
+      rethrowAsAppError(e, st);
     }
   }
 
@@ -68,7 +71,8 @@ class ContactsNotifier extends StateNotifier<AsyncValue<List<Contact>>> {
       state = AsyncValue.data(updated);
       await _pushToDeviceIfNeeded(contact);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      ErrorReporter.log(e, st, 'updateContact');
+      rethrowAsAppError(e, st);
     }
   }
 
@@ -78,7 +82,8 @@ class ContactsNotifier extends StateNotifier<AsyncValue<List<Contact>>> {
       final updated = (state.value ?? []).where((c) => c.id != id).toList();
       state = AsyncValue.data(updated);
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      ErrorReporter.log(e, st, 'deleteContact');
+      rethrowAsAppError(e, st);
     }
   }
 

@@ -78,13 +78,21 @@ class MainShell extends ConsumerWidget {
               isDark: isDark,
               onSelect: (route) => context.go(route),
             ),
-            Expanded(child: child),
+            Expanded(
+              child: ColoredBox(
+                color: AppColors.pageBackground(context),
+                child: child,
+              ),
+            ),
           ],
         ),
       );
     }
 
+    final compactLabels = ResponsiveLayout.useCompactBottomNav(context);
+
     return Scaffold(
+      backgroundColor: AppColors.pageBackground(context),
       body: child,
       bottomNavigationBar: NavigationBar(
         backgroundColor: isDark
@@ -94,7 +102,9 @@ class MainShell extends ConsumerWidget {
         elevation: 8,
         shadowColor: AppColors.main.withValues(alpha: 0.12),
         height: AppTokens.navBarHeight,
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        labelBehavior: compactLabels
+            ? NavigationDestinationLabelBehavior.onlyShowSelected
+            : NavigationDestinationLabelBehavior.alwaysShow,
         selectedIndex: currentIndex,
         onDestinationSelected: (index) {
           final dest = _destinations.firstWhere((d) => d.index == index);
@@ -129,6 +139,7 @@ class MainShell extends ConsumerWidget {
 
   int _calculateCurrentIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
+    if (location.startsWith('/settings')) return 4;
     if (location == '/') return giroTabIndex;
     if (location.startsWith('/contacts')) return 0;
     if (location.startsWith('/status')) return 1;
@@ -286,11 +297,11 @@ class _SidebarNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = selected
-        ? (AppColors.isDark(context) ? AppColors.darkDivider : AppColors.softTeal)
+        ? (AppColors.isDark(context)
+            ? AppColors.darkDivider
+            : AppColors.softTeal)
         : Colors.transparent;
-    final fg = selected
-        ? AppColors.main
-        : AppColors.textMuted(context);
+    final fg = selected ? AppColors.main : AppColors.textMuted(context);
 
     Widget icon;
     if (destination.isGiro) {

@@ -1,0 +1,33 @@
+# CodeQL path filters — focus on app source, skip generated/vendor trees.
+# Dart/Flutter is not a CodeQL language; Android (Kotlin) + TS/JS are scanned.
+
+name: GiroCall CodeQL
+
+paths:
+  - android
+  - ios
+  - lib
+  - scripts
+  - supabase/functions
+  - web
+  - .github/workflows
+
+paths-ignore:
+  - '**/*.g.dart'
+  - '**/*.freezed.dart'
+  - '**/*.mocks.dart'
+  - android/.gradle
+  - android/app/build
+  - android/build
+  - build
+  - .dart_tool
+  - node_modules
+  - ios/Pods
+  - ios/.symlinks
+  - '**/*.lock'
+
+query-filters:
+  - exclude:
+      id: js/log-injection
+  - exclude:
+      id: js/xss-through-dom

@@ -11,7 +11,9 @@ import '../../../core/design/tokens.dart';
 import '../../../core/extensions/date_time_extensions.dart';
 import '../../../shared/models/call_log.dart';
 import '../../../shared/models/contact.dart';
+import '../../../core/errors/app_messenger.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/error_state.dart';
 import '../../../shared/widgets/premium_card.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/star_rating.dart';
@@ -212,7 +214,11 @@ class _ContactDetailPaneState extends ConsumerState<ContactDetailPane> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text('Error: $e')),
+      error: (e, _) => ErrorState(
+        error: e,
+        title: Microcopy.errorLoadContacts,
+        onRetry: () => ref.invalidate(contactByIdProvider(widget.contactId)),
+      ),
     );
   }
 
@@ -241,9 +247,7 @@ class _ContactDetailPaneState extends ConsumerState<ContactDetailPane> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to save: $e')),
-        );
+        AppMessenger.showError(context, e);
       }
     } finally {
       if (mounted) setState(() => _isLogging = false);

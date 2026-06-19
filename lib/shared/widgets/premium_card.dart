@@ -23,24 +23,20 @@ class PremiumCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = AppColors.isDark(context);
     final surface = AppColors.cardSurface(context);
+    final borderColor = accentColor?.withValues(alpha: 0.25) ??
+        (isDark ? AppColors.darkDivider : AppColors.grey200);
+    final shadowColor =
+        (accentColor ?? AppColors.main).withValues(alpha: isDark ? 0.15 : 0.08);
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: surface,
+    return Material(
+      color: surface,
+      elevation: isDark ? 2 : 1,
+      shadowColor: shadowColor,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(borderRadius),
-        border: Border.all(
-          color: accentColor?.withValues(alpha: 0.25) ??
-              (isDark ? AppColors.darkDivider : AppColors.grey200),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: (accentColor ?? AppColors.main)
-                .withValues(alpha: isDark ? 0.15 : 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
+        side: BorderSide(color: borderColor),
       ),
+      clipBehavior: Clip.antiAlias,
       child: Padding(
         padding: padding,
         child: child,

@@ -21,9 +21,19 @@ abstract class ResponsiveLayout {
   static double formMaxWidth(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     if (width >= wideBreakpoint) return 440;
-    if (width >= desktopBreakpoint) return 480;
-    if (width >= tabletBreakpoint) return 520;
+    if (width >= desktopBreakpoint) return 460;
+    if (width >= tabletBreakpoint) return 480;
     return width;
+  }
+
+  /// Compact phones and narrow mobile-browser widths.
+  static bool isCompact(BuildContext context) =>
+      MediaQuery.sizeOf(context).width < 360;
+
+  /// Use icon-only bottom nav labels on tighter mobile/tablet widths.
+  static bool useCompactBottomNav(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    return width < desktopBreakpoint && width < 720;
   }
 
   /// Standard content pages (lists, settings).

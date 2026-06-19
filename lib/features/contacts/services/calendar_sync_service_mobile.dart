@@ -24,8 +24,7 @@ class MobileCalendarSyncService implements CalendarSyncService {
 
       final event = Event(
         title: 'Call ${contact.name}',
-        description:
-            'GiroCall reminder — stay connected with ${contact.name}.',
+        description: 'GiroCall reminder — stay connected with ${contact.name}.',
         location: contact.phone,
         startDate: start,
         endDate: end,

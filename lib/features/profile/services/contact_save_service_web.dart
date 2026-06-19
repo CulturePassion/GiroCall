@@ -4,6 +4,7 @@ import 'dart:html' as html;
 import '../../../core/utils/card_url.dart';
 import '../../../core/utils/vcard_builder.dart';
 import '../../../shared/models/user_profile.dart';
+
 Future<bool> saveProfileContactToDevice(UserProfile profile) async {
   return false;
 }

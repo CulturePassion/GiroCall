@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../../core/design/colors.dart';
 import '../../core/design/spacing.dart';
 
-
 /// Progress ring for call streaks — design system hero metric.
 class StreakRing extends StatelessWidget {
   final int streak;
@@ -26,9 +25,8 @@ class StreakRing extends StatelessWidget {
     final target = goal ?? math.max(streak, 1);
     final progress = (streak / target).clamp(0.0, 1.0);
     final ringColor = AppColors.orange;
-    final trackColor = AppColors.isDark(context)
-        ? AppColors.darkDivider
-        : AppColors.grey200;
+    final trackColor =
+        AppColors.isDark(context) ? AppColors.darkDivider : AppColors.grey200;
 
     return Column(
       mainAxisSize: MainAxisSize.min,

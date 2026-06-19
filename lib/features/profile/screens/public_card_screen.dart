@@ -5,8 +5,9 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/supabase_provider.dart';
 import '../../../core/utils/card_url.dart';
-import '../../../core/utils/supabase_error_message.dart';
+import '../../../core/design/microcopy.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/error_state.dart';
 import '../../../shared/widgets/gradient_background.dart';
 import '../providers/profile_notifier.dart';
 import '../services/contact_save_service.dart';
@@ -61,8 +62,7 @@ class PublicCardScreen extends ConsumerWidget {
                           .saveProfileContact(profile),
                       onShare: () => SharePlus.instance.share(
                         ShareParams(
-                          text:
-                              'Connect with ${profile.displayName}: $cardUrl',
+                          text: 'Connect with ${profile.displayName}: $cardUrl',
                         ),
                       ),
                       onAppleWallet: walletService.isMobile
@@ -77,11 +77,10 @@ class PublicCardScreen extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, _) => Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(supabaseErrorMessage(error)),
-              ),
+            error: (error, _) => ErrorState(
+              error: error,
+              title: Microcopy.errorLoadProfile,
+              onRetry: () => ref.invalidate(publicProfileProvider(slug)),
             ),
           ),
         ),

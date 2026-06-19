@@ -130,9 +130,8 @@ class _ContactsCalendarPanelState extends ConsumerState<ContactsCalendarPanel> {
           const SizedBox(height: AppSpacing.sm),
           OutlinedButton.icon(
             onPressed: () async {
-              final list = widget.contact != null
-                  ? [widget.contact!]
-                  : upcoming;
+              final list =
+                  widget.contact != null ? [widget.contact!] : upcoming;
               if (list.isEmpty) return;
               final ok = await sync.syncRecommendations(list);
               if (!context.mounted) return;
@@ -228,9 +227,7 @@ class _MonthGrid extends StatelessWidget {
             final isToday = date == todayDate;
 
             return Material(
-              color: isToday
-                  ? AppColors.softTeal
-                  : Colors.transparent,
+              color: isToday ? AppColors.softTeal : Colors.transparent,
               borderRadius: BorderRadius.circular(AppTokens.radiusSm),
               child: InkWell(
                 borderRadius: BorderRadius.circular(AppTokens.radiusSm),
@@ -257,8 +254,7 @@ class _MonthGrid extends StatelessWidget {
                               size: 10,
                               color: AppColors.main,
                             ),
-                          if (hasPast && hasFuture)
-                            const SizedBox(width: 2),
+                          if (hasPast && hasFuture) const SizedBox(width: 2),
                           if (hasFuture)
                             const Icon(
                               Icons.phone_forwarded_rounded,

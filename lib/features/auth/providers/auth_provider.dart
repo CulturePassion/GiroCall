@@ -4,6 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/supabase_provider.dart';
 import '../../../core/utils/auth_redirect.dart';
+import '../models/sign_up_result.dart';
 
 /// Encapsulates the current auth state and async operations.
 class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
@@ -30,16 +31,39 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
     }
   }
 
-  Future<void> signUpWithEmail(String email, String password) async {
+  Future<SignUpResult?> signUpWithEmail(String email, String password) async {
     state = const AsyncValue.loading();
     try {
       final response = await _client.auth.signUp(
         email: email,
         password: password,
+        emailRedirectTo: authRedirectUrl(),
       );
-      state = AsyncValue.data(response.user);
+
+      final user = response.user;
+      if (user == null) {
+        throw const AuthException(
+            'Unable to create account. Please try again.');
+      }
+
+      if (isDuplicateSignupUser(user)) {
+        throw const AuthException('User already registered');
+      }
+
+      final needsEmailConfirmation = response.session == null;
+      if (needsEmailConfirmation) {
+        state = const AsyncValue.data(null);
+      } else {
+        state = AsyncValue.data(user);
+      }
+
+      return SignUpResult(
+        user: user,
+        needsEmailConfirmation: needsEmailConfirmation,
+      );
     } catch (e, st) {
       state = AsyncValue.error(e, st);
+      return null;
     }
   }
 

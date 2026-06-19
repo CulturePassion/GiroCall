@@ -4,6 +4,11 @@
  */
 
 import { loadEnvFile } from './load_env.mjs';
+import {
+  formatManagementApiError,
+  getAccessToken,
+  validateAccessToken,
+} from './supabase_token.mjs';
 
 loadEnvFile();
 
@@ -11,10 +16,25 @@ const projectRef = process.env.SUPABASE_PROJECT_REF ?? 'gtvpsukmmjhszpopulfe';
 const supabaseUrl = (
   process.env.SUPABASE_URL ?? `https://${projectRef}.supabase.co`
 ).replace(/\/+$/, '');
-const token = process.env.SUPABASE_ACCESS_TOKEN;
 
-if (!token) {
-  console.error('Missing SUPABASE_ACCESS_TOKEN in .env');
+let token = getAccessToken();
+let tokenCheck = validateAccessToken(token);
+if (!tokenCheck.ok && process.platform === 'darwin') {
+  try {
+    const { execSync } = await import('node:child_process');
+    const keychainToken = execSync(
+      'security find-generic-password -s "Supabase CLI" -w 2>/dev/null',
+      { encoding: 'utf8' },
+    ).trim();
+    const keychainCheck = validateAccessToken(keychainToken);
+    if (keychainCheck.ok) token = keychainToken;
+  } catch {
+    // fall through
+  }
+}
+tokenCheck = validateAccessToken(token);
+if (!tokenCheck.ok) {
+  console.error(tokenCheck.message);
   process.exit(1);
 }
 
@@ -32,7 +52,7 @@ async function query(sql) {
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`${response.status}: ${body}`);
+    throw new Error(formatManagementApiError(response.status, body));
   }
 
   return response.json();

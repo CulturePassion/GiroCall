@@ -25,6 +25,15 @@ if [[ -n "${FCM_SERVER_KEY:-}" ]]; then
   ARGS+=(FCM_SERVER_KEY="$FCM_SERVER_KEY")
 fi
 
+if ! supabase projects list >/dev/null 2>&1; then
+  if [[ "$(uname -s)" == "Darwin" ]] && command -v security >/dev/null 2>&1; then
+    keychain_token="$(security find-generic-password -s "Supabase CLI" -w 2>/dev/null || true)"
+    if [[ -n "$keychain_token" ]]; then
+      export SUPABASE_ACCESS_TOKEN="$keychain_token"
+    fi
+  fi
+fi
+
 echo "→ Setting Edge Function secrets..."
 supabase secrets set "${ARGS[@]}"
 

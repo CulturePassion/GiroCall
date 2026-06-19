@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/design/colors.dart';
 import '../../../core/design/microcopy.dart';
+import '../../../shared/widgets/error_state.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/utils/responsive_layout.dart';
 import '../../../core/utils/screen_padding.dart';
@@ -16,6 +17,45 @@ import '../providers/contacts_notifier.dart';
 import '../widgets/contact_detail_pane.dart';
 import '../widgets/contact_list_tile.dart';
 import '../widgets/contacts_clock_header.dart';
+
+/// Keeps desktop master-detail selection in sync with `/contacts/:id` URLs
+/// without stacking a second [ContactListScreen] in the navigator.
+class DesktopContactRouteBridge extends ConsumerStatefulWidget {
+  final String contactId;
+
+  const DesktopContactRouteBridge({super.key, required this.contactId});
+
+  @override
+  ConsumerState<DesktopContactRouteBridge> createState() =>
+      _DesktopContactRouteBridgeState();
+}
+
+class _DesktopContactRouteBridgeState
+    extends ConsumerState<DesktopContactRouteBridge> {
+  @override
+  void initState() {
+    super.initState();
+    _syncSelection();
+  }
+
+  @override
+  void didUpdateWidget(DesktopContactRouteBridge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.contactId != widget.contactId) {
+      _syncSelection();
+    }
+  }
+
+  void _syncSelection() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(selectedContactIdProvider.notifier).state = widget.contactId;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
 
 /// People hub — master-detail on wide screens (Apple Contacts style).
 class ContactListScreen extends ConsumerStatefulWidget {
@@ -54,9 +94,7 @@ class _ContactListScreenState extends ConsumerState<ContactListScreen> {
     if (q.isEmpty) return contacts;
     return contacts
         .where(
-          (c) =>
-              c.name.toLowerCase().contains(q) ||
-              c.phone.contains(q),
+          (c) => c.name.toLowerCase().contains(q) || c.phone.contains(q),
         )
         .toList(growable: false);
   }
@@ -82,18 +120,26 @@ class _ContactListScreenState extends ConsumerState<ContactListScreen> {
           final filtered = _filterContacts(contacts);
 
           if (contacts.isEmpty) {
-            return EmptyState(
-              icon: Icons.favorite_border,
-              title: Microcopy.contactsEmptyTitle,
-              message: Microcopy.contactsEmptyMessage,
-              actionLabel: Microcopy.contactsAddCta,
-              onAction: () => context.push('/contacts/add'),
+            return Padding(
+              padding: ScreenPadding.scrollBottom(
+                context,
+                includeFab: !isSplit,
+              ),
+              child: EmptyState(
+                icon: Icons.favorite_border,
+                title: Microcopy.contactsEmptyTitle,
+                message: Microcopy.contactsEmptyMessage,
+                actionLabel: Microcopy.contactsAddCta,
+                onAction: () => context.push('/contacts/add'),
+              ),
             );
           }
 
           if (filtered.isEmpty) {
             return ListView(
-              padding: ScreenPadding.all(context),
+              padding: ScreenPadding.all(context).copyWith(
+                bottom: ScreenPadding.bottomNavClearance(context),
+              ),
               children: [
                 SearchField(
                   controller: _searchController,
@@ -146,13 +192,16 @@ class _ContactListScreenState extends ConsumerState<ContactListScreen> {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, _) => Center(
-          child: Padding(
-            padding: ScreenPadding.all(context),
-            child: Text(
-              'Something went wrong: $error',
-              style: TextStyle(color: AppColors.onSurface(context)),
-            ),
+        error: (error, _) => Padding(
+          padding: ScreenPadding.scrollBottom(
+            context,
+            includeFab: !isSplit,
+          ),
+          child: ErrorState(
+            error: error,
+            title: Microcopy.errorLoadContacts,
+            onRetry: () =>
+                ref.read(contactsNotifierProvider.notifier).loadContacts(),
           ),
         ),
       ),
@@ -199,8 +248,7 @@ class _SplitLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     final favorites =
         contacts.where((c) => c.isFavorite).toList(growable: false);
-    final others =
-        contacts.where((c) => !c.isFavorite).toList(growable: false);
+    final others = contacts.where((c) => !c.isFavorite).toList(growable: false);
     final effectiveId = selectedId ?? contacts.first.id;
 
     return Padding(
@@ -307,8 +355,7 @@ class _ContactListOnly extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final favorites =
         contacts.where((c) => c.isFavorite).toList(growable: false);
-    final others =
-        contacts.where((c) => !c.isFavorite).toList(growable: false);
+    final others = contacts.where((c) => !c.isFavorite).toList(growable: false);
 
     return RefreshIndicator(
       color: AppColors.main,
@@ -318,7 +365,7 @@ class _ContactListOnly extends ConsumerWidget {
       },
       child: ListView(
         padding: ScreenPadding.contactsPane(context).copyWith(
-          bottom: ScreenPadding.bottomNavClearance(context) + 72,
+          bottom: ScreenPadding.fabClearance(context),
         ),
         children: [
           const ContactsClockHeader(),

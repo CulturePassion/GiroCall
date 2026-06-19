@@ -46,4 +46,24 @@ abstract class Microcopy {
 
   // General
   static const madeWithLove = 'Made with love, for the people who matter.';
+
+  // Auth
+  static const authSignUpConfirm =
+      'Check your email to confirm your account, then sign in.';
+
+  // Errors
+  static const errorTitle = 'Something didn\'t work';
+  static const errorNetwork =
+      'We couldn\'t reach GiroCall right now. Check your connection and try again.';
+  static const errorGeneric =
+      'Nothing you did wrong — let\'s try that once more.';
+  static const errorSession =
+      'You\'ve been signed out for your security. Sign back in anytime.';
+  static const errorOffline =
+      'You\'re offline. Your people are still here — we\'ll sync when you\'re back.';
+  static const errorRetry = 'Retry';
+  static const errorLoadContacts = 'We couldn\'t load your contacts.';
+  static const errorLoadProfile = 'We couldn\'t load your profile.';
+  static const errorLoadWheel = 'We couldn\'t load the Giro.';
+  static const errorLoadStatus = 'We couldn\'t load status updates.';
 }

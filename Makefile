@@ -13,7 +13,7 @@ run:
 		echo "Missing .env — copy .env.example to .env and add your Supabase credentials."; \
 		exit 1; \
 	fi
-	flutter run -d chrome --dart-define-from-file=.env
+	flutter run -d chrome --web-port=62792 --dart-define-from-file=.env
 
 run-ios:
 	@if [ ! -f .env ]; then \

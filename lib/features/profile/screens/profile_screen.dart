@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:share_plus/share_plus.dart';
 
 import '../../../core/design/colors.dart';
+import '../../../core/design/microcopy.dart';
 import '../../../core/design/spacing.dart';
-import '../../../core/supabase_provider.dart';
-import '../../../core/utils/card_url.dart';
-import '../../../core/utils/responsive_layout.dart';
+import '../../../core/design/tokens.dart';
 import '../../../core/utils/screen_padding.dart';
 import '../../../shared/models/user_profile.dart';
-import '../../../shared/widgets/gradient_background.dart';
+import '../../../shared/widgets/app_scaffold.dart';
+import '../../../shared/widgets/error_state.dart';
 import '../../../shared/widgets/live_clock_header.dart';
-import '../../../shared/widgets/premium_card.dart';
-import '../../../shared/widgets/primary_button.dart';
-import '../../auth/providers/auth_provider.dart';
+import '../../../shared/widgets/settings_section.dart';
+import '../../../shared/widgets/shell_content.dart';
 import '../providers/profile_notifier.dart';
-import '../services/contact_save_service.dart';
-import '../services/wallet_service.dart';
-import '../widgets/digital_card_view.dart';
 
+/// Hub for profile, digital card, account, and settings — separate from /me/:slug.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -30,236 +26,173 @@ class ProfileScreen extends ConsumerWidget {
     return profileAsync.when(
       data: (profile) {
         if (profile == null) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          return const AppScaffold(
+            variant: AppScaffoldVariant.hero,
+            title: 'You',
+            showBackButton: false,
+            body: Center(child: CircularProgressIndicator(color: Colors.white)),
           );
         }
-        return _ProfileLayout(profile: profile);
+        return AppScaffold(
+          variant: AppScaffoldVariant.hero,
+          title: 'You',
+          showBackButton: false,
+          body: _ProfileHub(profile: profile),
+        );
       },
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      loading: () => const AppScaffold(
+        variant: AppScaffoldVariant.hero,
+        title: 'You',
+        showBackButton: false,
+        body: Center(child: CircularProgressIndicator(color: Colors.white)),
       ),
-      error: (error, _) => Scaffold(
-        body: Center(child: Text('Error: $error')),
+      error: (error, _) => AppScaffold(
+        variant: AppScaffoldVariant.hero,
+        title: 'You',
+        showBackButton: false,
+        body: ErrorState(
+          error: error,
+          title: Microcopy.errorLoadProfile,
+          onRetry: () =>
+              ref.read(profileNotifierProvider.notifier).loadProfile(),
+        ),
       ),
     );
   }
 }
 
-class _ProfileLayout extends ConsumerWidget {
+class _ProfileHub extends StatelessWidget {
   final UserProfile profile;
 
-  const _ProfileLayout({required this.profile});
-
-  static const double _cardMaxWidth = 440;
-  static const double _sidePaneWidth = 460;
+  const _ProfileHub({required this.profile});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isSplit = ResponsiveLayout.isDesktop(context);
-    final hPad = ResponsiveLayout.horizontalPadding(context);
+  Widget build(BuildContext context) {
     final bottom = ScreenPadding.bottomNavClearance(context);
-    final supabaseUrl = ref.watch(supabaseConfigProvider).url;
-    final walletService = WalletService(supabaseUrl: supabaseUrl);
-    final cardUrl = CardUrl.publicCardUrl(profile.slug);
 
-    final cardPane = _LinkInBioPane(
-      profile: profile,
-      cardUrl: cardUrl,
-      walletService: walletService,
-    );
-    final accountPane = _AccountPane(profile: profile);
-
-    if (isSplit) {
-      return GradientBackground(
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(hPad, AppSpacing.xs, hPad, bottom),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return ShellContent(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.xs,
+          AppSpacing.xs,
+          AppSpacing.xs,
+          bottom,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const LiveClockHeader(lightText: true),
+            const SizedBox(height: AppSpacing.sm),
+            _ProfileHeader(profile: profile),
+            const SizedBox(height: AppSpacing.md),
+            SettingsSection(
+              title: 'DIGITAL CARD',
               children: [
-                SizedBox(
-                  width: _sidePaneWidth,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const LiveClockHeader(lightText: true),
-                        const SizedBox(height: AppSpacing.sm),
-                        cardPane,
-                      ],
-                    ),
-                  ),
+                SettingsTile(
+                  icon: Icons.badge_outlined,
+                  title: 'My /me page',
+                  subtitle: profile.isPublic
+                      ? 'girocall.com/me/${profile.slug}'
+                      : 'Private — turn on sharing to get your link',
+                  onTap: () => context.push('/profile/card'),
                 ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: SingleChildScrollView(child: accountPane),
+                SettingsTile(
+                  icon: Icons.edit_outlined,
+                  title: 'Edit card details',
+                  subtitle: 'Name, bio, contact info, and social links',
+                  onTap: () => context.push('/profile/edit'),
                 ),
               ],
             ),
-          ),
-        ),
-      );
-    }
-
-    return GradientBackground(
-      child: SafeArea(
-        child: SingleChildScrollView(
-          padding: ScreenPadding.contactsPane(context).copyWith(bottom: bottom),
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: _cardMaxWidth),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const LiveClockHeader(lightText: true),
-                  const SizedBox(height: AppSpacing.sm),
-                  cardPane,
-                  const SizedBox(height: AppSpacing.md),
-                  accountPane,
-                ],
-              ),
+            const SizedBox(height: AppSpacing.sm),
+            SettingsSection(
+              title: 'ACCOUNT & APP',
+              children: [
+                SettingsTile(
+                  icon: Icons.account_circle_outlined,
+                  title: 'Account',
+                  subtitle: 'Email, password, sign out, delete account',
+                  onTap: () => context.push('/settings/account'),
+                ),
+                SettingsTile(
+                  icon: Icons.settings_outlined,
+                  title: 'Settings',
+                  subtitle: 'Theme, notifications, and about',
+                  onTap: () => context.push('/settings'),
+                ),
+              ],
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _LinkInBioPane extends ConsumerWidget {
+class _ProfileHeader extends StatelessWidget {
   final UserProfile profile;
-  final String cardUrl;
-  final WalletService walletService;
 
-  const _LinkInBioPane({
-    required this.profile,
-    required this.cardUrl,
-    required this.walletService,
-  });
+  const _ProfileHeader({required this.profile});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = AppColors.isDark(context);
+  Widget build(BuildContext context) {
+    final subtitle = [
+      if (profile.title != null && profile.title!.isNotEmpty) profile.title!,
+      if (profile.company != null && profile.company!.isNotEmpty)
+        profile.company!,
+    ].join(' · ');
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (!profile.isPublic)
-          Container(
-            margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-            padding: const EdgeInsets.all(AppSpacing.sm),
-            decoration: BoxDecoration(
-              color: isDark
-                  ? AppColors.accentCoral.withValues(alpha: 0.2)
-                  : Colors.black.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.25),
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.visibility_off_outlined,
-                  color: Colors.white.withValues(alpha: 0.95),
-                  size: 20,
-                ),
-                const SizedBox(width: AppSpacing.xs),
-                Expanded(
-                  child: Text(
-                    'Your card is private. Turn on public sharing below to get '
-                    'your girocall.com/me link, QR code, and share actions.',
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.95),
-                      fontSize: 13,
-                      height: 1.4,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        DigitalCardView(
-          profile: profile,
-          variant: DigitalCardVariant.owner,
-          showQr: profile.isPublic,
-          onSaveContact: () =>
-              ref.read(contactSaveServiceProvider).saveProfileContact(profile),
-          onShare: profile.isPublic
-              ? () => SharePlus.instance.share(
-                    ShareParams(
-                      text: 'Connect with ${profile.displayName}: $cardUrl',
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(AppTokens.radiusLg),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 32,
+            backgroundImage: profile.avatarUrl != null
+                ? NetworkImage(profile.avatarUrl!)
+                : null,
+            backgroundColor: AppColors.main,
+            child: profile.avatarUrl == null
+                ? Text(
+                    profile.displayName.isNotEmpty
+                        ? profile.displayName[0].toUpperCase()
+                        : '?',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 22,
                     ),
                   )
-              : null,
-          onEdit: () => context.push('/profile/edit'),
-          onAppleWallet: profile.isPublic && walletService.isMobile
-              ? () => walletService.addToAppleWallet(profile.slug)
-              : null,
-          onGoogleWallet: profile.isPublic && walletService.isMobile
-              ? () => walletService.addToGoogleWallet(profile.slug)
-              : null,
-        ),
-      ],
-    );
-  }
-}
-
-class _AccountPane extends ConsumerWidget {
-  final UserProfile profile;
-
-  const _AccountPane({required this.profile});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return PremiumCard(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Account',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
+                : null,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  profile.displayName,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
                 ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Public digital card'),
-            subtitle: Text(
-              profile.isPublic
-                  ? 'Anyone with girocall.com/me/${profile.slug} can view your card.'
-                  : 'Only you can see your card right now.',
-              style: Theme.of(context).textTheme.bodySmall,
+                if (subtitle.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.85),
+                        ),
+                  ),
+                ],
+              ],
             ),
-            value: profile.isPublic,
-            onChanged: (value) async {
-              await ref.read(profileNotifierProvider.notifier).saveProfile(
-                    profile.copyWith(isPublic: value),
-                  );
-            },
-            secondary: Icon(
-              profile.isPublic ? Icons.public : Icons.lock_outline,
-              color: profile.isPublic ? AppColors.success : AppColors.warmGray,
-            ),
-          ),
-          const Divider(),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.settings_outlined),
-            title: const Text('Settings'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push('/settings'),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          PrimaryButton(
-            label: 'Sign out',
-            icon: Icons.logout_rounded,
-            backgroundColor: AppColors.error,
-            onPressed: () => ref.read(authNotifierProvider.notifier).signOut(),
           ),
         ],
       ),

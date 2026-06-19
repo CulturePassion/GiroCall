@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
+import '../../../core/errors/app_error_mapper.dart';
+import '../../../core/errors/error_reporter.dart';
 import '../../../shared/models/call_log.dart';
 import '../../contacts/providers/contact_repository_provider.dart';
 import 'call_log_provider.dart';
@@ -51,7 +53,8 @@ class CallLogNotifier extends StateNotifier<AsyncValue<List<CallLog>>> {
         );
       }
     } catch (e, st) {
-      state = AsyncValue.error(e, st);
+      ErrorReporter.log(e, st, 'addLog');
+      rethrowAsAppError(e, st);
     }
   }
 }

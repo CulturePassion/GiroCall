@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../core/errors/error_reporter.dart';
 import '../core/sync/sync_service.dart';
 import '../features/notifications/providers/fcm_provider.dart';
 import '../features/notifications/providers/notification_provider.dart';
@@ -52,7 +53,8 @@ Future<void> _initializeFirebaseMessaging(WidgetRef ref) async {
       _firebaseInitialized = true;
     }
     await ref.read(fcmServiceProvider).initialize();
-  } catch (_) {
+  } catch (e, st) {
     // Firebase config files are optional until mobile push is set up.
+    ErrorReporter.log(e, st, 'FirebaseMessaging');
   }
 }

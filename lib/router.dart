@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'core/supabase_provider.dart';
 import 'core/utils/platform_capabilities.dart';
+import 'core/utils/responsive_layout.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/call_log/screens/log_call_screen.dart';
 import 'features/contacts/screens/add_contact_screen.dart';
@@ -73,6 +74,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           return PublicCardScreen(slug: slug);
         },
       ),
+      // Tab routes under ShellRoute must be reached with go(), not push(), when
+      // navigating from outside the shell (e.g. /settings). Otherwise two shell
+      // pages share the same navigator key and Flutter asserts.
       ShellRoute(
         builder: (context, state, child) => MainShell(child: child),
         routes: [
@@ -98,13 +102,21 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
               GoRoute(
                 path: ':id',
-                builder: (context, state) {
+                pageBuilder: (context, state) {
                   final id = state.pathParameters['id']!;
-                  final width = MediaQuery.sizeOf(context).width;
-                  if (width >= 900) {
-                    return ContactListScreen(initialContactId: id);
+                  final isDesktop = ResponsiveLayout.isDesktop(context);
+                  if (isDesktop) {
+                    // Parent /contacts already renders the split layout; only
+                    // sync the selected id into the URL without a second list page.
+                    return NoTransitionPage<void>(
+                      key: state.pageKey,
+                      child: DesktopContactRouteBridge(contactId: id),
+                    );
                   }
-                  return ContactDetailScreen(contactId: id);
+                  return MaterialPage<void>(
+                    key: state.pageKey,
+                    child: ContactDetailScreen(contactId: id),
+                  );
                 },
                 routes: [
                   GoRoute(
@@ -140,6 +152,26 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
+          GoRoute(
+            path: '/settings',
+            builder: (context, state) => const SettingsScreen(),
+            routes: [
+              GoRoute(
+                path: 'notifications',
+                builder: (context, state) => const NotificationSettingsScreen(),
+              ),
+              GoRoute(
+                path: 'account',
+                builder: (context, state) => const AccountScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'password',
+                    builder: (context, state) => const ChangePasswordScreen(),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ],
       ),
       GoRoute(
@@ -148,26 +180,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           final contactId = state.pathParameters['contactId']!;
           return LogCallScreen(contactId: contactId);
         },
-      ),
-      GoRoute(
-        path: '/settings',
-        builder: (context, state) => const SettingsScreen(),
-        routes: [
-          GoRoute(
-            path: 'notifications',
-            builder: (context, state) => const NotificationSettingsScreen(),
-          ),
-          GoRoute(
-            path: 'account',
-            builder: (context, state) => const AccountScreen(),
-            routes: [
-              GoRoute(
-                path: 'password',
-                builder: (context, state) => const ChangePasswordScreen(),
-              ),
-            ],
-          ),
-        ],
       ),
     ],
   );

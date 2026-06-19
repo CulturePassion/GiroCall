@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/design/colors.dart';
+import '../../../core/errors/app_messenger.dart';
 import '../../../core/utils/vcard_parser.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/primary_button.dart';
@@ -104,9 +105,7 @@ class _ScanContactScreenState extends ConsumerState<ScanContactScreen> {
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
+        AppMessenger.showError(context, e);
       }
     } finally {
       if (mounted) setState(() => _saving = false);

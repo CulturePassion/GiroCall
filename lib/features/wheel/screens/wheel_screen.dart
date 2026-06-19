@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,11 +11,11 @@ import '../../../core/design/spacing.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/utils/responsive_layout.dart';
 import '../../../core/utils/screen_padding.dart';
-import '../../../core/utils/supabase_error_message.dart';
 import '../../../core/utils/wheel_contacts.dart';
 import '../../../shared/models/contact.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/error_state.dart';
 import '../../../shared/widgets/premium_card.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/stats_widgets.dart';
@@ -27,7 +29,6 @@ import '../widgets/wheel_painter.dart';
 
 const _kWheelActionMaxWidth = 280.0;
 const _kWheelResultMaxWidth = 340.0;
-const _kTabletBreakpoint = 720.0;
 
 class WheelScreen extends ConsumerWidget {
   const WheelScreen({super.key});
@@ -58,12 +59,15 @@ class WheelScreen extends ConsumerWidget {
       body: contactsAsync.when(
         data: (contacts) {
           if (contacts.length < Constants.minWheelSlices) {
-            return EmptyState(
-              icon: Icons.favorite_outline,
-              title: Microcopy.wheelEmptyTitle,
-              message: Microcopy.wheelEmptyMessage(Constants.minWheelSlices),
-              actionLabel: 'Add contacts',
-              onAction: () => context.push('/contacts'),
+            return Padding(
+              padding: ScreenPadding.scrollBottom(context),
+              child: EmptyState(
+                icon: Icons.favorite_outline,
+                title: Microcopy.wheelEmptyTitle,
+                message: Microcopy.wheelEmptyMessage(Constants.minWheelSlices),
+                actionLabel: 'Add contacts',
+                onAction: () => context.go('/contacts'),
+              ),
             );
           }
 
@@ -74,7 +78,7 @@ class WheelScreen extends ConsumerWidget {
                 top: AppSpacing.xs,
               );
               final isDesktop = ResponsiveLayout.isDesktop(context);
-              final isTablet = constraints.maxWidth >= _kTabletBreakpoint;
+              final isTablet = ResponsiveLayout.isTablet(context);
 
               Widget layout;
               if (isDesktop) {
@@ -84,8 +88,9 @@ class WheelScreen extends ConsumerWidget {
                   wheelNotifier: wheelNotifier,
                   maxHeight: constraints.maxHeight,
                   stats: ref.watch(statsProvider),
-                  dailyGoal: ref.watch(userSettingsProvider).value?.dailyCallGoal ??
-                      Constants.defaultDailyCallGoal,
+                  dailyGoal:
+                      ref.watch(userSettingsProvider).value?.dailyCallGoal ??
+                          Constants.defaultDailyCallGoal,
                 );
               } else if (isTablet) {
                 layout = _WideWheelLayout(
@@ -111,15 +116,10 @@ class WheelScreen extends ConsumerWidget {
         loading: () => const Center(
           child: CircularProgressIndicator(color: Colors.white),
         ),
-        error: (error, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.sm),
-            child: Text(
-              supabaseErrorMessage(error),
-              style: const TextStyle(color: Colors.white),
-              textAlign: TextAlign.center,
-            ),
-          ),
+        error: (error, _) => ErrorState(
+          error: error,
+          title: Microcopy.errorLoadWheel,
+          onRetry: () => ref.invalidate(contactsNotifierProvider),
         ),
       ),
     );
@@ -256,49 +256,68 @@ class _NarrowWheelLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasResult = wheelState.selectedContact != null;
+    final spinningExtra = wheelState.isSpinning ? AppSpacing.lg + 24.0 : 0.0;
+    const headlineReserve = 52.0;
+    const spinButtonReserve = 56.0;
+    const resultReserve = 248.0;
+    final fixedReserve = headlineReserve +
+        spinButtonReserve +
+        AppSpacing.md +
+        (hasResult ? resultReserve : 0) +
+        spinningExtra;
     final wheelSize = _computeWheelSize(
       maxWidth: maxWidth - AppSpacing.xl,
-      maxHeight: maxHeight - (wheelState.selectedContact != null ? 320 : 200),
+      maxHeight: math.max(120.0, maxHeight - fixedReserve),
     );
 
-    return SizedBox(
-      height: maxHeight,
-      child: Column(
-        children: [
-          const SizedBox(height: AppSpacing.xs),
-          _WheelHeadline(selected: wheelState.selectedContact != null),
-          const Spacer(),
-          _WheelDisc(
-            contacts: contacts,
-            wheelState: wheelState,
-            size: wheelSize,
-          ),
-          if (wheelState.isSpinning) ...[
-            const SizedBox(height: AppSpacing.sm),
-            const _SpinningLabel(),
-          ],
-          const Spacer(),
-          if (wheelState.selectedContact != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints:
-                      const BoxConstraints(maxWidth: _kWheelResultMaxWidth),
-                  child: _WheelResult(
-                    contact: wheelState.selectedContact,
-                    onCall: () =>
-                        context.push('/call/${wheelState.selectedContact!.id}'),
-                  ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: AppSpacing.xs),
+                _WheelHeadline(selected: hasResult),
+                const SizedBox(height: AppSpacing.sm),
+                _WheelDisc(
+                  contacts: contacts,
+                  wheelState: wheelState,
+                  size: wheelSize,
                 ),
-              ),
+                if (wheelState.isSpinning) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  const _SpinningLabel(),
+                ],
+                if (hasResult) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: _kWheelResultMaxWidth,
+                      ),
+                      child: _WheelResult(
+                        contact: wheelState.selectedContact,
+                        onCall: () => context.push(
+                          '/call/${wheelState.selectedContact!.id}',
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: AppSpacing.sm),
+                _SpinButton(
+                  wheelState: wheelState,
+                  onSpin: wheelNotifier.canSpin ? wheelNotifier.spin : null,
+                ),
+                const SizedBox(height: AppSpacing.xxs),
+              ],
             ),
-          _SpinButton(
-            wheelState: wheelState,
-            onSpin: wheelNotifier.canSpin ? wheelNotifier.spin : null,
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -355,11 +374,11 @@ class _WheelHeadline extends StatelessWidget {
         key: ValueKey(selected),
         selected ? Microcopy.wheelSelected : Microcopy.wheelReady,
         style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: Colors.white,
-              height: 1.35,
-              shadows: const [Shadow(color: Colors.black26, blurRadius: 8)],
-            ),
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+          height: 1.35,
+          shadows: const [Shadow(color: Colors.black26, blurRadius: 8)],
+        ),
         textAlign: TextAlign.center,
       ),
     );
@@ -574,12 +593,12 @@ double _computeWheelSize({
   required double maxWidth,
   required double maxHeight,
 }) {
+  if (maxWidth <= 0 || maxHeight <= 0) return 120;
+
   var size = maxWidth < 400
       ? maxWidth - AppSpacing.md
       : (maxWidth * 0.85).clamp(240.0, 380.0);
 
-  if (size > maxHeight) {
-    size = maxHeight.clamp(200.0, 380.0);
-  }
-  return size;
+  size = math.min(size, maxHeight);
+  return size.clamp(120.0, 380.0);
 }

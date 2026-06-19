@@ -4,6 +4,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/bootstrap.dart';
 import 'core/constants.dart';
+import 'core/design/microcopy.dart';
+import 'core/errors/app_messenger.dart';
+import 'core/errors/error_hooks.dart';
 import 'core/design/theme.dart';
 import 'core/supabase_config.dart';
 import 'core/supabase_provider.dart';
@@ -12,6 +15,7 @@ import 'router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ErrorHooks.install();
 
   const supabaseUrl = String.fromEnvironment(Constants.supabaseUrlKey);
   const supabaseAnonKey = String.fromEnvironment(Constants.supabaseAnonKey);
@@ -55,6 +59,20 @@ class _GiroCallAppState extends ConsumerState<GiroCallApp> {
       }
       if (authState?.session != null && previous?.value?.session == null) {
         onUserSignedIn(ref);
+      }
+      if (authState?.session == null &&
+          previous?.value?.session != null &&
+          authState?.event == AuthChangeEvent.signedOut) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final context = ref
+              .read(routerProvider)
+              .routerDelegate
+              .navigatorKey
+              .currentContext;
+          if (context != null && context.mounted) {
+            AppMessenger.showInfo(context, Microcopy.errorSession);
+          }
+        });
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {

@@ -6,6 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/design/colors.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/microcopy.dart';
+import '../../../core/errors/app_messenger.dart';
+import '../../../shared/widgets/error_state.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/utils/screen_padding.dart';
 
@@ -99,7 +101,7 @@ class _LogCallScreenState extends ConsumerState<LogCallScreen> {
         context.go('/');
       }
     } catch (e) {
-      _showError('Failed to save call log: ${e.toString()}');
+      if (mounted) AppMessenger.showError(context, e);
     } finally {
       setState(() => _isSubmitting = false);
     }
@@ -135,7 +137,11 @@ class _LogCallScreenState extends ConsumerState<LogCallScreen> {
       ),
       error: (error, _) => AppScaffold(
         title: 'Log Call',
-        body: Center(child: Text('Error: $error')),
+        body: ErrorState(
+          error: error,
+          title: Microcopy.errorLoadContacts,
+          onRetry: () => ref.invalidate(contactsNotifierProvider),
+        ),
       ),
     );
   }

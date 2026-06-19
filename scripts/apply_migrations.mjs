@@ -10,6 +10,11 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadEnvFile } from './load_env.mjs';
+import {
+  formatManagementApiError,
+  getAccessToken,
+  validateAccessToken,
+} from './supabase_token.mjs';
 
 loadEnvFile();
 
@@ -17,13 +22,34 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRef = process.env.SUPABASE_PROJECT_REF ?? 'gtvpsukmmjhszpopulfe';
 const migrationsDir = resolve(__dirname, '../supabase/migrations');
 
-const token = process.env.SUPABASE_ACCESS_TOKEN;
-if (!token) {
-  console.error(
-    'Missing SUPABASE_ACCESS_TOKEN.\n' +
-      'Create one at https://supabase.com/dashboard/account/tokens\n' +
-      'Add it to .env, then run: make setup-db',
-  );
+/** Match Supabase CLI version ids (001, 20260617234610, …). */
+function migrationVersion(filename) {
+  const base = filename.replace(/\.sql$/, '');
+  const match = base.match(/^(\d+)(?:_|$)/);
+  return match ? match[1] : base;
+}
+
+let token = getAccessToken();
+let tokenCheck = validateAccessToken(token);
+if (!tokenCheck.ok && process.platform === 'darwin') {
+  try {
+    const { execSync } = await import('node:child_process');
+    const keychainToken = execSync(
+      'security find-generic-password -s "Supabase CLI" -w 2>/dev/null',
+      { encoding: 'utf8' },
+    ).trim();
+    const keychainCheck = validateAccessToken(keychainToken);
+    if (keychainCheck.ok) {
+      token = keychainToken;
+      tokenCheck = keychainCheck;
+      console.log('→ Using Supabase access token from macOS Keychain.');
+    }
+  } catch {
+    // fall through to error below
+  }
+}
+if (!tokenCheck.ok) {
+  console.error(tokenCheck.message);
   process.exit(1);
 }
 
@@ -41,7 +67,7 @@ async function query(sql) {
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`${response.status}: ${body}`);
+    throw new Error(formatManagementApiError(response.status, body));
   }
 
   return response.json();
@@ -80,7 +106,7 @@ let ran = 0;
 let skipped = 0;
 
 for (const file of files) {
-  const version = file.replace(/\.sql$/, '');
+  const version = migrationVersion(file);
 
   if (applied.has(version)) {
     console.log(`⊘ Skipping ${file} (already applied)`);

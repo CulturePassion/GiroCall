@@ -37,14 +37,28 @@ class AppScaffold extends StatelessWidget {
     final isHero = variant == AppScaffoldVariant.hero;
     final pageBg = AppColors.pageBackground(context);
 
-    Widget content = AnnotatedRegion<SystemUiOverlayStyle>(
+    Widget bodyContent = body ?? const SizedBox.shrink();
+    if (responsiveWidth != null) {
+      bodyContent = ResponsivePage(
+        width: responsiveWidth!,
+        child: bodyContent,
+      );
+    }
+
+    if (isHero) {
+      bodyContent = GradientBackground(child: bodyContent);
+    }
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
       value: isHero ? SystemUiOverlayStyle.light : _overlayFor(context),
       child: Scaffold(
         backgroundColor: isHero ? Colors.transparent : pageBg,
+        extendBodyBehindAppBar: isHero,
         appBar: AppBar(
-          backgroundColor: AppColors.main,
+          backgroundColor: isHero ? Colors.transparent : AppColors.main,
           foregroundColor: Colors.white,
           elevation: 0,
+          scrolledUnderElevation: 0,
           automaticallyImplyLeading: showBackButton,
           title: title != null
               ? Text(
@@ -60,26 +74,12 @@ class AppScaffold extends StatelessWidget {
               isHero ? SystemUiOverlayStyle.light : _overlayFor(context),
         ),
         floatingActionButton: floatingActionButton,
-        body: isHero
-            ? GradientBackground(
-                child: SafeArea(
-                  child: body ?? const SizedBox.shrink(),
-                ),
-              )
-            : SafeArea(
-                child: body ?? const SizedBox.shrink(),
-              ),
+        body: SafeArea(
+          top: !isHero,
+          child: bodyContent,
+        ),
       ),
     );
-
-    if (responsiveWidth != null) {
-      content = ResponsivePage(
-        width: responsiveWidth!,
-        child: content,
-      );
-    }
-
-    return content;
   }
 
   SystemUiOverlayStyle _overlayFor(BuildContext context) {

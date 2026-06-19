@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/errors/app_messenger.dart';
 import '../../../core/utils/responsive_layout.dart';
 import '../../../shared/widgets/app_scaffold.dart';
 import '../../../shared/widgets/responsive_page.dart';
@@ -40,7 +41,7 @@ class _AddContactScreenState extends ConsumerState<AddContactScreen> {
           .addContact(_formData.toContact(userId: userId));
       if (mounted) context.pop();
     } catch (e) {
-      if (mounted) _showError(e.toString());
+      if (mounted) AppMessenger.showError(context, e);
     } finally {
       if (mounted) setState(() => _saving = false);
     }

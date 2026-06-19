@@ -29,8 +29,7 @@ class StarRating extends StatelessWidget {
           label: 'Rate $starIndex stars',
           button: true,
           child: IconButton(
-            onPressed:
-                onChanged == null ? null : () => onChanged!(starIndex),
+            onPressed: onChanged == null ? null : () => onChanged!(starIndex),
             icon: Icon(
               isFilled ? Icons.star_rounded : Icons.star_border_rounded,
               size: size,

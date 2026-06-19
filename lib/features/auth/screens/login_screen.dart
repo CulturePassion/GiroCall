@@ -6,8 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants.dart';
 import '../../../core/design/colors.dart';
+import '../../../core/design/microcopy.dart';
 import '../../../core/design/spacing.dart';
 import '../../../core/design/tokens.dart';
+import '../../../core/errors/app_error_extensions.dart';
+import '../../../core/errors/app_messenger.dart';
 import '../../../core/supabase_provider.dart';
 import '../../../core/utils/responsive_layout.dart';
 import '../../../shared/widgets/auth_card.dart';
@@ -15,7 +18,6 @@ import '../../../shared/widgets/gradient_background.dart';
 import '../../../shared/widgets/primary_button.dart';
 
 import '../providers/auth_provider.dart';
-import '../utils/auth_error_message.dart';
 
 enum _AuthMode { signIn, signUp, resetPassword }
 
@@ -39,6 +41,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _obscureConfirm = true;
   bool _busy = false;
   String? _resetSentMessage;
+  String? _signUpSentMessage;
 
   @override
   void dispose() {
@@ -55,11 +58,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final email = _emailController.text.trim();
-    if (email.isEmpty) return;
 
     setState(() {
       _busy = true;
       _resetSentMessage = null;
+      _signUpSentMessage = null;
     });
 
     try {
@@ -75,35 +78,37 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
 
       final password = _passwordController.text.trim();
-      if (password.isEmpty) return;
 
       if (_mode == _AuthMode.signUp) {
-        await notifier.signUpWithEmail(email, password);
+        final result = await notifier.signUpWithEmail(email, password);
+        if (!mounted || result == null) return;
+        if (result.needsEmailConfirmation) {
+          setState(() {
+            _signUpSentMessage = Microcopy.authSignUpConfirm;
+            _mode = _AuthMode.signIn;
+          });
+        }
       } else {
         await notifier.signInWithEmail(email, password);
       }
     } catch (e) {
-      final config = ref.read(supabaseConfigProvider);
-      _showSnack(authErrorMessage(e, supabaseConfigured: config.isConfigured));
+      if (mounted) {
+        final config = ref.read(supabaseConfigProvider);
+        AppMessenger.showAppError(
+          context,
+          e.toAppError(supabaseConfigured: config.isConfigured),
+        );
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
-  }
-
-  void _showSnack(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.main,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 
   void _switchMode(_AuthMode mode) {
     setState(() {
       _mode = mode;
       _resetSentMessage = null;
+      _signUpSentMessage = null;
     });
   }
 
@@ -121,6 +126,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       isReset: isReset,
       isSignUp: isSignUp,
       resetSentMessage: _resetSentMessage,
+      signUpSentMessage: _signUpSentMessage,
       obscurePassword: _obscurePassword,
       obscureConfirm: _obscureConfirm,
       emailController: _emailController,
@@ -154,9 +160,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       next.whenOrNull(
         error: (error, _) {
           if (_mode == _AuthMode.resetPassword) return;
-          _showSnack(
-            authErrorMessage(
-              error,
+          AppMessenger.showAppError(
+            context,
+            error.toAppError(
               supabaseConfigured: supabaseConfig.isConfigured,
             ),
           );
@@ -164,9 +170,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       );
     });
 
-    final maxWidth = isDesktop
-        ? ResponsiveLayout.contentMaxWidth(context)
-        : ResponsiveLayout.formMaxWidth(context);
+    final maxWidth = ResponsiveLayout.formMaxWidth(context);
     final horizontalPad = ResponsiveLayout.horizontalPadding(context);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -246,6 +250,7 @@ class _AuthForm extends StatelessWidget {
   final bool isReset;
   final bool isSignUp;
   final String? resetSentMessage;
+  final String? signUpSentMessage;
   final bool obscurePassword;
   final bool obscureConfirm;
   final TextEditingController emailController;
@@ -267,6 +272,7 @@ class _AuthForm extends StatelessWidget {
     required this.isReset,
     required this.isSignUp,
     required this.resetSentMessage,
+    required this.signUpSentMessage,
     required this.obscurePassword,
     required this.obscureConfirm,
     required this.emailController,
@@ -381,7 +387,17 @@ class _AuthForm extends StatelessWidget {
                 ],
                 if (resetSentMessage != null) ...[
                   const SizedBox(height: AppSpacing.sm),
-                  _ResetSentBanner(message: resetSentMessage!),
+                  _AuthInfoBanner(
+                    message: resetSentMessage!,
+                    icon: Icons.mark_email_read_outlined,
+                  ),
+                ],
+                if (signUpSentMessage != null) ...[
+                  const SizedBox(height: AppSpacing.sm),
+                  _AuthInfoBanner(
+                    message: signUpSentMessage!,
+                    icon: Icons.mark_email_unread_outlined,
+                  ),
                 ],
                 const SizedBox(height: AppSpacing.lg),
                 PrimaryButton(
@@ -528,10 +544,14 @@ class _PasswordField extends StatelessWidget {
   }
 }
 
-class _ResetSentBanner extends StatelessWidget {
+class _AuthInfoBanner extends StatelessWidget {
   final String message;
+  final IconData icon;
 
-  const _ResetSentBanner({required this.message});
+  const _AuthInfoBanner({
+    required this.message,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -547,7 +567,7 @@ class _ResetSentBanner extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.mark_email_read_outlined, color: AppColors.main),
+            Icon(icon, color: AppColors.main),
             const SizedBox(width: AppSpacing.xs),
             Expanded(
               child: Text(

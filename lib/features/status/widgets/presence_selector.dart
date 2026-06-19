@@ -22,31 +22,64 @@ class PresenceSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: PresenceType.values.map((type) {
-            final isSelected = selected == type;
-            return Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  right: type != PresenceType.custom ? AppSpacing.xxs : 0,
-                ),
-                child: _PresenceChip(
-                  type: type,
-                  selected: isSelected,
-                  onTap: () => onSelected(type),
-                ),
+        Text(
+          'How are you feeling?',
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppColors.textMuted(context),
               ),
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth >= 420;
+            if (isWide) {
+              return Row(
+                children: PresenceType.values.map((type) {
+                  return Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        right: type != PresenceType.custom ? AppSpacing.xs : 0,
+                      ),
+                      child: _PresenceChip(
+                        type: type,
+                        selected: selected == type,
+                        onTap: () => onSelected(type),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              );
+            }
+
+            return Wrap(
+              spacing: AppSpacing.xs,
+              runSpacing: AppSpacing.xs,
+              children: PresenceType.values.map((type) {
+                return SizedBox(
+                  width: (constraints.maxWidth - AppSpacing.xs * 2) / 3,
+                  child: _PresenceChip(
+                    type: type,
+                    selected: selected == type,
+                    onTap: () => onSelected(type),
+                  ),
+                );
+              }).toList(),
             );
-          }).toList(),
+          },
         ),
         if (selected == PresenceType.custom) ...[
           const SizedBox(height: AppSpacing.sm),
           TextField(
             controller: customMessageController,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Custom status',
               hintText: 'e.g. On vacation until Friday',
-              prefixIcon: Icon(Icons.chat_bubble_outline),
+              prefixIcon: const Icon(Icons.chat_bubble_outline),
+              filled: true,
+              fillColor: AppColors.isDark(context)
+                  ? AppColors.darkDivider.withValues(alpha: 0.35)
+                  : AppColors.grey100,
             ),
             maxLength: 80,
             textCapitalization: TextCapitalization.sentences,
@@ -71,37 +104,57 @@ class _PresenceChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = type.color;
+    final isDark = AppColors.isDark(context);
+
     return Material(
       color: selected
-          ? color.withValues(alpha: 0.15)
-          : Theme.of(context).colorScheme.surfaceContainerHighest,
-      borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+          ? color.withValues(alpha: isDark ? 0.22 : 0.12)
+          : (isDark ? AppColors.darkDivider : AppColors.grey100),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppTokens.radiusMd),
+        side: BorderSide(
+          color: selected ? color : Colors.transparent,
+          width: selected ? 2 : 0,
+        ),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppTokens.radiusMd),
         child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            minHeight: AppTokens.minTouchTarget,
-          ),
+          constraints:
+              const BoxConstraints(minHeight: AppTokens.minTouchTarget),
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              vertical: AppSpacing.xs,
+              vertical: AppSpacing.sm,
               horizontal: AppSpacing.xxs,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  type.icon,
-                  color: selected ? color : AppColors.textMuted(context),
-                  size: 26,
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? color.withValues(alpha: 0.2)
+                        : Colors.transparent,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    type.icon,
+                    color: selected ? color : AppColors.textMuted(context),
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xxs),
                 Text(
                   type == PresenceType.meeting ? 'Meeting' : type.label,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        fontWeight:
+                            selected ? FontWeight.w800 : FontWeight.w600,
                         color: selected ? color : null,
                       ),
                 ),

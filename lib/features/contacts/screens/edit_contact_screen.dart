@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/design/colors.dart';
+import '../../../core/design/microcopy.dart';
+import '../../../core/errors/app_messenger.dart';
+import '../../../shared/widgets/error_state.dart';
 import '../../../core/constants.dart';
 import '../../../core/utils/responsive_layout.dart';
 import '../../../shared/models/contact.dart';
@@ -52,7 +55,7 @@ class _EditContactScreenState extends ConsumerState<EditContactScreen> {
           );
       if (mounted) context.pop();
     } catch (e) {
-      if (mounted) _showError(e.toString());
+      if (mounted) AppMessenger.showError(context, e);
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -134,7 +137,11 @@ class _EditContactScreenState extends ConsumerState<EditContactScreen> {
       ),
       error: (error, _) => AppScaffold(
         title: 'Edit Contact',
-        body: Center(child: Text('Error: $error')),
+        body: ErrorState(
+          error: error,
+          title: Microcopy.errorLoadContacts,
+          onRetry: () => ref.invalidate(contactsNotifierProvider),
+        ),
       ),
     );
   }

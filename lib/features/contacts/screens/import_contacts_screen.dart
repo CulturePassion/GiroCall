@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/design/colors.dart';
 import '../../../core/utils/platform_capabilities.dart';
-import '../../../core/utils/supabase_error_message.dart';
+import '../../../core/errors/app_messenger.dart';
 import '../providers/contacts_notifier.dart';
 
 class ImportContactsScreen extends ConsumerStatefulWidget {
@@ -37,9 +37,7 @@ class _ImportContactsScreenState extends ConsumerState<ImportContactsScreen> {
       if (count > 0) context.pop();
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(supabaseErrorMessage(e))),
-      );
+      AppMessenger.showError(context, e);
     } finally {
       if (mounted) setState(() => _importing = false);
     }

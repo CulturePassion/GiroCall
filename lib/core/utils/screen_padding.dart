@@ -31,6 +31,18 @@ class ScreenPadding {
     }
     return AppTokens.navBarHeight +
         MediaQuery.paddingOf(context).bottom +
-        AppSpacing.xs;
+        AppSpacing.sm;
+  }
+
+  /// Extra space when a FAB sits above the bottom nav.
+  static double fabClearance(BuildContext context) =>
+      bottomNavClearance(context) + AppTokens.minTouchTarget + AppSpacing.sm;
+
+  /// Bottom inset for scrollable shell tab content.
+  static EdgeInsets scrollBottom(BuildContext context,
+      {bool includeFab = false}) {
+    final bottom =
+        includeFab ? fabClearance(context) : bottomNavClearance(context);
+    return EdgeInsets.only(bottom: bottom);
   }
 }

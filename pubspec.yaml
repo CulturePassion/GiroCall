@@ -19,6 +19,10 @@ dependencies:
   # Navigation
   go_router: ^17.3.0
 
+  # Network & observability
+  connectivity_plus: ^6.1.4
+  sentry_flutter: ^8.14.2
+
   # Contacts & permissions
   flutter_contacts: ^2.2.2
   permission_handler: ^12.0.3
