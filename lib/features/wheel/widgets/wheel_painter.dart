@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 import '../../../core/design/colors.dart';
 import '../../../shared/models/contact.dart';
@@ -266,6 +267,7 @@ class WheelPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant WheelPainter oldDelegate) {
-    return oldDelegate.rotation != rotation || oldDelegate.contacts != contacts;
+    return oldDelegate.rotation != rotation ||
+        !listEquals(oldDelegate.contacts, contacts);
   }
 }

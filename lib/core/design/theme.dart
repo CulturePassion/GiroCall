@@ -11,7 +11,6 @@ class AppTheme {
         brightness: Brightness.light,
         background: AppColors.background,
         surface: AppColors.surface,
-        onBackground: AppColors.textPrimary,
         onSurface: AppColors.textPrimary,
         onSurfaceVariant: AppColors.textSecondary,
         divider: AppColors.divider,
@@ -21,7 +20,6 @@ class AppTheme {
         brightness: Brightness.dark,
         background: AppColors.darkBackground,
         surface: AppColors.darkSurface,
-        onBackground: AppColors.darkTextPrimary,
         onSurface: AppColors.darkTextPrimary,
         onSurfaceVariant: AppColors.darkTextSecondary,
         divider: AppColors.darkDivider,
@@ -31,7 +29,6 @@ class AppTheme {
     required Brightness brightness,
     required Color background,
     required Color surface,
-    required Color onBackground,
     required Color onSurface,
     required Color onSurfaceVariant,
     required Color divider,
@@ -54,7 +51,7 @@ class AppTheme {
       onSurfaceVariant: onSurfaceVariant,
     );
 
-    final textTheme = _textTheme(onBackground, onSurfaceVariant);
+    final textTheme = _textTheme(onSurface, onSurfaceVariant);
 
     return ThemeData(
       useMaterial3: true,

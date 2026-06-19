@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/utils/weighting_utils.dart';
 import '../../../core/utils/wheel_contacts.dart';
@@ -28,21 +28,24 @@ class WheelState {
     int? selectedIndex,
     double? rotation,
     Contact? selectedContact,
+    bool clearSelectedContact = false,
   }) {
     return WheelState(
       isSpinning: isSpinning ?? this.isSpinning,
       selectedIndex: selectedIndex ?? this.selectedIndex,
       rotation: rotation ?? this.rotation,
-      selectedContact: selectedContact ?? this.selectedContact,
+      selectedContact:
+          clearSelectedContact ? null : (selectedContact ?? this.selectedContact),
     );
   }
 }
 
 /// Manages wheel spin animation state and weighted selection.
-class WheelNotifier extends StateNotifier<WheelState> {
-  final Ref _ref;
+class WheelNotifier extends Notifier<WheelState> {
+  @override
+  WheelState build() => const WheelState();
 
-  WheelNotifier(this._ref) : super(const WheelState());
+  Ref get ref => ref;
 
   List<Contact> get _contacts {
     final all = _ref.read(contactsNotifierProvider).value ?? [];
@@ -56,7 +59,7 @@ class WheelNotifier extends StateNotifier<WheelState> {
     final contacts = _contacts;
     if (contacts.length < 2 || state.isSpinning) return null;
 
-    state = state.copyWith(isSpinning: true, selectedContact: null);
+    state = state.copyWith(isSpinning: true, clearSelectedContact: true);
 
     final weights = computeWheelWeights(contacts);
     final selectedIndex = selectWeightedIndex(weights);
@@ -77,7 +80,7 @@ class WheelNotifier extends StateNotifier<WheelState> {
     );
 
     // Wait for the animation duration.
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(AppTokens.wheelSpin);
 
     await HapticFeedback.heavyImpact();
 
@@ -95,6 +98,6 @@ class WheelNotifier extends StateNotifier<WheelState> {
   }
 }
 
-final wheelProvider = StateNotifierProvider<WheelNotifier, WheelState>((ref) {
-  return WheelNotifier(ref);
-});
+final wheelProvider = NotifierProvider<WheelNotifier, WheelState>(
+  WheelNotifier.new,
+);

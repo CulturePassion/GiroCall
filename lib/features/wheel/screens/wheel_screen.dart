@@ -440,7 +440,7 @@ class _WheelDisc extends StatelessWidget {
                     ? AppTokens.wheelSpin
                     : AppTokens.animationSlow,
                 curve: wheelState.isSpinning
-                    ? Curves.elasticOut
+                    ? Curves.decelerate
                     : Curves.fastOutSlowIn,
                 builder: (context, rotation, _) {
                   return CustomPaint(
@@ -572,8 +572,8 @@ class _WheelResult extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: onCall,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.brightOrange,
-                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                foregroundColor: Theme.of(context).colorScheme.onSecondary,
                 minimumSize: const Size(0, AppTokens.minTouchTarget),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppTokens.radiusLg),

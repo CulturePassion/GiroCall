@@ -76,7 +76,11 @@ class _GiroCallAppState extends ConsumerState<GiroCallApp> {
       }
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      bootstrapApp(ref);
+      // ✅ CHANGED: Guard bootstrapApp behind active session:
+      final session = ref.read(authUserProvider).value?.session;
+      if (session != null) {
+        bootstrapApp(ref);
+      }
     });
   }
 
