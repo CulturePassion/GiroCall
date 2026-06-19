@@ -12,6 +12,9 @@
 build/
 **/doc/api/
 
+# Dependencies
+node_modules/
+
 # Symbolication / obfuscation
 app.*.symbols
 app.*.map.json
