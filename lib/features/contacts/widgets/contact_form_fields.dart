@@ -423,7 +423,7 @@ class _ContactFormFieldsState extends State<ContactFormFields> {
             min: 7,
             max: 365,
             divisions: 358,
-            activeColor: AppColors.primaryTeal,
+            activeColor: AppColors.vibrantGreen,
             label: '${data.frequencyDays} days',
             onChanged: (value) {
               setState(() => data.frequencyDays = value.round());
@@ -477,7 +477,7 @@ class _SectionHeader extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: AppColors.primaryTeal),
+          Icon(icon, size: 18, color: AppColors.vibrantGreen),
           const SizedBox(width: 8),
           Text(title, style: Theme.of(context).textTheme.titleSmall),
         ],

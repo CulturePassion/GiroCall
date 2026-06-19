@@ -562,12 +562,12 @@ class _AuthInfoBanner extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.softBlue,
           borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-          border: Border.all(color: AppColors.primaryTeal),
+          border: Border.all(color: AppColors.vibrantGreen),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: AppColors.main),
+            Icon(icon, color: AppColors.vibrantGreen),
             const SizedBox(width: AppSpacing.xs),
             Expanded(
               child: Text(
@@ -616,7 +616,7 @@ class _ConfigWarningBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.softOrange,
         borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-        border: Border.all(color: AppColors.orange, width: 1.5),
+        border: Border.all(color: AppColors.brightOrange, width: 1.5),
       ),
       child: Text(
         'Supabase is not configured. Copy .env.example to .env, '

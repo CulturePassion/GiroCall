@@ -186,7 +186,7 @@ class _ThemeOption extends StatelessWidget {
       leading: Icon(icon),
       title: Text(label),
       trailing: selected
-          ? const Icon(Icons.check_circle, color: Color(0xFF0D9488))
+          ? const Icon(Icons.check_circle, color: Color(0xFF1EB05B))
           : null,
       onTap: onTap,
     );

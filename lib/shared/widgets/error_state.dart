@@ -77,7 +77,7 @@ class ErrorState extends StatelessWidget {
                     icon: const Icon(Icons.refresh_rounded),
                     label: const Text(Microcopy.errorRetry),
                     style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.main,
+                      backgroundColor: AppColors.vibrantGreen,
                       foregroundColor: Colors.white,
                       minimumSize: const Size.fromHeight(
                         AppTokens.minTouchTarget,

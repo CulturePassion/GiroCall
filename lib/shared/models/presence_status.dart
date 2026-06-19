@@ -5,8 +5,8 @@ import '../../core/design/colors.dart';
 /// Quick availability status (WhatsApp / iMessage style).
 enum PresenceType {
   available('available', 'Available', Icons.check_circle, AppColors.success),
-  meeting('meeting', 'In a meeting', Icons.event_busy, AppColors.accentCoral),
-  custom('custom', 'Custom', Icons.edit_outlined, AppColors.secondaryBlue);
+  meeting('meeting', 'In a meeting', Icons.event_busy, AppColors.brightOrange),
+  custom('custom', 'Custom', Icons.edit_outlined, AppColors.softBluePurple);
 
   const PresenceType(this.value, this.label, this.icon, this.color);
 

@@ -55,7 +55,7 @@ class AppScaffold extends StatelessWidget {
         backgroundColor: isHero ? Colors.transparent : pageBg,
         extendBodyBehindAppBar: isHero,
         appBar: AppBar(
-          backgroundColor: isHero ? Colors.transparent : AppColors.main,
+          backgroundColor: isHero ? Colors.transparent : AppColors.vibrantGreen,
           foregroundColor: Colors.white,
           elevation: 0,
           scrolledUnderElevation: 0,

@@ -82,11 +82,12 @@ class WheelPainter extends CustomPainter {
         ..strokeWidth = 2
         ..shader = const SweepGradient(
           colors: [
-            AppColors.main,
-            AppColors.orange,
-            AppColors.secondaryBlue,
-            AppColors.premiumPurple,
-            AppColors.main,
+            AppColors.vibrantGreen,
+            AppColors.brightOrange,
+            AppColors.goldenYellowOrange,
+            AppColors.pinkMagenta,
+            AppColors.softBluePurple,
+            AppColors.vibrantGreen,
           ],
         ).createShader(Rect.fromCircle(center: center, radius: radius)),
     );
@@ -245,7 +246,7 @@ class WheelPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [AppColors.orange, AppColors.cadmiumOrange],
+          colors: [AppColors.brightOrange, AppColors.goldenYellowOrange],
         ).createShader(
           Rect.fromPoints(
             Offset(center.dx - 18, pointerY - 4),

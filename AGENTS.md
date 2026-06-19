@@ -105,10 +105,13 @@ GiroCall/
 **App Name:** GiroCall  
 **Tagline:** "Spin the Giro. Make the Call. Stay Connected."
 
-**Primary Colors (use exact hex in code):**
-- Primary Teal: `#0D9488`
-- Accent Coral: `#F97316` (CTAs, highlights)
-- Secondary Blue: `#3B82F6`
+**Primary Colors (official brand — use these exact hex values everywhere):**
+- Vibrant Green: `#1EB05B` (main primary, prominent)
+- Teal/Dark Green: `#377464`
+- Bright Orange: `#F06A36` (CTAs, highlights, accents)
+- Golden Yellow-Orange: `#F8A72F`
+- Soft Blue/Purple: `#90A2D2`
+- Pink/Magenta: `#DA7CAD`
 
 **Light theme:**
 - Background: `#F8FAFC`
@@ -264,7 +267,18 @@ Example:
 This file is the single source of truth.  
 Any AI agent or developer working on GiroCall must follow the guidelines here.
 
-Last updated: 2026-06-18
+Last updated: 2026-06-19
+
+## Updates (further profile polish)
+- More glassmorphism (frosted BackdropFilter GlassSurface), entrance animations (Tween + elastic), spacing refinements, dark mode glass + contrast improvements focused on /profile + digital card.
+- Version 2.1.0+6 + CHANGELOG.md created.
+
+## Updates (color refresh + modernization)
+- Full brand palette refresh using the 6 official primary colors: Vibrant Green #1EB05B, Teal/Dark Green #377464, Bright Orange #F06A36, Golden Yellow-Orange #F8A72F, Soft Blue/Purple #90A2D2, Pink/Magenta #DA7CAD
+- Updated colors.dart, AppTheme, all widgets, features, wheel painter, gradients, charts, nav, buttons for modern vibrant consistent look and feel.
+- Modernized cards (subtle elevation + refined borders), buttons (better padding/shadow), nav indicators, glass, hub, wheel rim/pointer to new palette.
+- Cleaned legacy color references across 40+ files; updated pubspec launcher theme + AGENTS.md
+- Applied new colors to wheel slices, hero gradients, streaks, charts, accents for current premium energetic aesthetic.
 
 ## Updates
 

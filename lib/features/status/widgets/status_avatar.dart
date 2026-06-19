@@ -20,7 +20,7 @@ class StatusAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ringColor = statusType?.color ?? AppColors.primaryTeal;
+    final ringColor = statusType?.color ?? AppColors.vibrantGreen;
     final hasStatus = statusType != null;
 
     return Container(
@@ -39,7 +39,7 @@ class StatusAvatar extends StatelessWidget {
         ),
         child: CircleAvatar(
           radius: radius,
-          backgroundColor: AppColors.primaryTeal,
+          backgroundColor: AppColors.vibrantGreen,
           backgroundImage: imageUrl != null ? NetworkImage(imageUrl!) : null,
           child: imageUrl == null
               ? Text(

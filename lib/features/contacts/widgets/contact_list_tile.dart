@@ -37,12 +37,12 @@ class ContactListTile extends ConsumerWidget {
       child: Material(
         color: AppColors.cardSurface(context),
         elevation: selected ? 2 : 0,
-        shadowColor: AppColors.main.withValues(alpha: 0.1),
+        shadowColor: AppColors.vibrantGreen.withValues(alpha: 0.1),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTokens.radiusMd),
           side: BorderSide(
             color: selected
-                ? AppColors.main
+                ? AppColors.vibrantGreen
                 : (AppColors.isDark(context)
                     ? AppColors.darkDivider
                     : AppColors.grey200),
@@ -92,7 +92,7 @@ class ContactListTile extends ConsumerWidget {
                               child: Icon(
                                 Icons.favorite,
                                 size: 14,
-                                color: AppColors.orange,
+                                color: AppColors.brightOrange,
                               ),
                             ),
                           if (contact.tag != null) ...[
@@ -103,7 +103,7 @@ class ContactListTile extends ConsumerWidget {
                                 vertical: 2,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.softTeal,
+                                color: AppColors.softGreen,
                                 borderRadius: BorderRadius.circular(
                                   AppTokens.radiusSm,
                                 ),
@@ -133,7 +133,7 @@ class ContactListTile extends ConsumerWidget {
                         statusText,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: contact.isOverdue
-                                  ? AppColors.orange
+                                  ? AppColors.brightOrange
                                   : AppColors.textSecondary,
                               fontWeight:
                                   contact.isOverdue ? FontWeight.w600 : null,
@@ -149,7 +149,7 @@ class ContactListTile extends ConsumerWidget {
                   icon: Icon(
                     contact.isFavorite ? Icons.favorite : Icons.favorite_border,
                     color: contact.isFavorite
-                        ? AppColors.orange
+                        ? AppColors.brightOrange
                         : AppColors.warmGray,
                   ),
                   onPressed: () => ref
@@ -158,7 +158,7 @@ class ContactListTile extends ConsumerWidget {
                 ),
                 if (onCall != null)
                   Material(
-                    color: AppColors.softTeal,
+                    color: AppColors.softGreen,
                     borderRadius: BorderRadius.circular(AppTokens.radiusSm),
                     child: InkWell(
                       onTap: onCall,
@@ -168,7 +168,7 @@ class ContactListTile extends ConsumerWidget {
                         height: AppTokens.minTouchTarget,
                         child: Icon(
                           Icons.phone,
-                          color: AppColors.main,
+                          color: AppColors.vibrantGreen,
                           size: 22,
                         ),
                       ),

@@ -58,7 +58,8 @@ class _ContactsCalendarPanelState extends ConsumerState<ContactsCalendarPanel> {
         children: [
           Row(
             children: [
-              const Icon(Icons.calendar_month_rounded, color: AppColors.main),
+              const Icon(Icons.calendar_month_rounded,
+                  color: AppColors.vibrantGreen),
               const SizedBox(width: AppSpacing.xxs),
               Expanded(
                 child: Text(
@@ -114,7 +115,7 @@ class _ContactsCalendarPanelState extends ConsumerState<ContactsCalendarPanel> {
               'Upcoming recommendations',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w700,
-                    color: AppColors.main,
+                    color: AppColors.vibrantGreen,
                   ),
             ),
             const SizedBox(height: AppSpacing.xxs),
@@ -227,7 +228,7 @@ class _MonthGrid extends StatelessWidget {
             final isToday = date == todayDate;
 
             return Material(
-              color: isToday ? AppColors.softTeal : Colors.transparent,
+              color: isToday ? AppColors.softGreen : Colors.transparent,
               borderRadius: BorderRadius.circular(AppTokens.radiusSm),
               child: InkWell(
                 borderRadius: BorderRadius.circular(AppTokens.radiusSm),
@@ -252,14 +253,14 @@ class _MonthGrid extends StatelessWidget {
                             const Icon(
                               Icons.phone_callback_rounded,
                               size: 10,
-                              color: AppColors.main,
+                              color: AppColors.vibrantGreen,
                             ),
                           if (hasPast && hasFuture) const SizedBox(width: 2),
                           if (hasFuture)
                             const Icon(
                               Icons.phone_forwarded_rounded,
                               size: 10,
-                              color: AppColors.orange,
+                              color: AppColors.brightOrange,
                             ),
                         ],
                       ),
@@ -280,12 +281,12 @@ class _LegendRow extends StatelessWidget {
     return Row(
       children: [
         const Icon(Icons.phone_callback_rounded,
-            size: 14, color: AppColors.main),
+            size: 14, color: AppColors.vibrantGreen),
         const SizedBox(width: 4),
         Text('Past call', style: Theme.of(context).textTheme.labelSmall),
         const SizedBox(width: AppSpacing.sm),
         const Icon(Icons.phone_forwarded_rounded,
-            size: 14, color: AppColors.orange),
+            size: 14, color: AppColors.brightOrange),
         const SizedBox(width: 4),
         Text('Recommended', style: Theme.of(context).textTheme.labelSmall),
       ],
@@ -316,7 +317,7 @@ class _UpcomingRow extends StatelessWidget {
       title: Text(contact.name, maxLines: 1, overflow: TextOverflow.ellipsis),
       subtitle: Text('Suggested ${fmt.format(contact.nextRecommendedCallAt)}'),
       trailing: const Icon(Icons.phone_forwarded_rounded,
-          size: 18, color: AppColors.orange),
+          size: 18, color: AppColors.brightOrange),
       onTap: onTap,
     );
   }

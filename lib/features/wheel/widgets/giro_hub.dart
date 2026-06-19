@@ -24,11 +24,11 @@ class GiroHub extends StatelessWidget {
           shape: BoxShape.circle,
           gradient: const RadialGradient(
             colors: [
-              Color(0xFFE0F7FA),
-              Color(0xFF4FC3F7),
-              Color(0xFF0288D1),
+              Color(0xFFE8F7ED), // soft vibrant green tint
+              Color(0xFF1EB05B), // vibrant green
+              Color(0xFF377464), // teal dark green
             ],
-            stops: [0.2, 0.65, 1.0],
+            stops: [0.15, 0.55, 1.0],
           ),
           border: Border.all(color: Colors.white, width: 3),
           boxShadow: [
@@ -49,7 +49,7 @@ class GiroHub extends StatelessWidget {
             Icon(
               Icons.phone_in_talk_rounded,
               size: size * 0.34,
-              color: const Color(0xFF0A3D62),
+              color: Colors.white,
             ),
             Positioned(
               bottom: size * 0.1,

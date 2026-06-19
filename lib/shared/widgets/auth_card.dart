@@ -43,7 +43,7 @@ abstract class AuthFormTheme {
           fontWeight: FontWeight.w500,
         ),
         floatingLabelStyle: const TextStyle(
-          color: AppColors.primaryTeal,
+          color: AppColors.vibrantGreen,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
@@ -58,7 +58,7 @@ abstract class AuthFormTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppTokens.radiusMd),
           borderSide: const BorderSide(
-            color: AppColors.primaryTeal,
+            color: AppColors.vibrantGreen,
             width: 2.5,
           ),
         ),
@@ -76,9 +76,9 @@ abstract class AuthFormTheme {
         ),
       ),
       textSelectionTheme: TextSelectionThemeData(
-        cursorColor: AppColors.primaryTeal,
-        selectionColor: AppColors.primaryTeal.withValues(alpha: 0.25),
-        selectionHandleColor: AppColors.primaryTeal,
+        cursorColor: AppColors.vibrantGreen,
+        selectionColor: AppColors.vibrantGreen.withValues(alpha: 0.25),
+        selectionHandleColor: AppColors.vibrantGreen,
       ),
       segmentedButtonTheme: SegmentedButtonThemeData(
         style: ButtonStyle(
@@ -93,7 +93,9 @@ abstract class AuthFormTheme {
             return textPrimary;
           }),
           backgroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.selected)) return AppColors.main;
+            if (states.contains(WidgetState.selected)) {
+              return AppColors.vibrantGreen;
+            }
             return isDark ? const Color(0xFF374151) : AppColors.grey100;
           }),
           side: WidgetStateProperty.resolveWith((states) {

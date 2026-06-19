@@ -59,7 +59,7 @@ class _ImportContactsScreenState extends ConsumerState<ImportContactsScreen> {
                   ? Icons.contacts_outlined
                   : Icons.cloud_sync_outlined,
               size: 64,
-              color: AppColors.primaryTeal,
+              color: AppColors.vibrantGreen,
             ),
             const SizedBox(height: 16),
             Text(

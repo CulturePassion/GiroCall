@@ -98,7 +98,7 @@ class _MyCardScreenState extends ConsumerState<MyCardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My /me Page'),
-        backgroundColor: AppColors.main,
+        backgroundColor: AppColors.vibrantGreen,
         foregroundColor: Colors.white,
       ),
       body: profileAsync.when(

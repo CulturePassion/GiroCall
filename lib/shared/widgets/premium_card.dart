@@ -25,8 +25,8 @@ class PremiumCard extends StatelessWidget {
     final surface = AppColors.cardSurface(context);
     final borderColor = accentColor?.withValues(alpha: 0.25) ??
         (isDark ? AppColors.darkDivider : AppColors.grey200);
-    final shadowColor =
-        (accentColor ?? AppColors.main).withValues(alpha: isDark ? 0.15 : 0.08);
+    final shadowColor = (accentColor ?? AppColors.vibrantGreen)
+        .withValues(alpha: isDark ? 0.15 : 0.08);
 
     return Material(
       color: surface,

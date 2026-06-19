@@ -97,7 +97,7 @@ class _ContactDetailPaneState extends ConsumerState<ContactDetailPane> {
                     Text(
                       contact.phone,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColors.main,
+                            color: AppColors.vibrantGreen,
                             fontWeight: FontWeight.w600,
                           ),
                     ),
@@ -115,7 +115,7 @@ class _ContactDetailPaneState extends ConsumerState<ContactDetailPane> {
                           : 'Last called ${contact.lastCalledAt!.toRelativeDateString()}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: contact.isOverdue
-                                ? AppColors.orange
+                                ? AppColors.brightOrange
                                 : AppColors.textSecondary,
                           ),
                     ),
@@ -149,7 +149,7 @@ class _ContactDetailPaneState extends ConsumerState<ContactDetailPane> {
               ),
               const SizedBox(height: AppSpacing.sm),
               PremiumCard(
-                accentColor: AppColors.orange,
+                accentColor: AppColors.brightOrange,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -281,8 +281,9 @@ class _CallHistoryTile extends StatelessWidget {
         child: ListTile(
           dense: true,
           leading: const CircleAvatar(
-            backgroundColor: AppColors.softTeal,
-            child: Icon(Icons.phone_in_talk, color: AppColors.main, size: 18),
+            backgroundColor: AppColors.softGreen,
+            child: Icon(Icons.phone_in_talk,
+                color: AppColors.vibrantGreen, size: 18),
           ),
           title: Text(fmt.format(log.calledAt)),
           subtitle: Text(log.notes ?? 'No notes', maxLines: 1),

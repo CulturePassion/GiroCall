@@ -104,7 +104,10 @@ class ProfileAvatarPicker extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppTokens.radiusLg),
                   gradient: imageUrl == null
                       ? const LinearGradient(
-                          colors: [AppColors.main, AppColors.royalBlue],
+                          colors: [
+                            AppColors.vibrantGreen,
+                            AppColors.softBluePurple
+                          ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         )
@@ -121,7 +124,7 @@ class ProfileAvatarPicker extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.main.withValues(alpha: 0.2),
+                      color: AppColors.vibrantGreen.withValues(alpha: 0.2),
                       blurRadius: 16,
                       offset: const Offset(0, 6),
                     ),
@@ -162,7 +165,7 @@ class ProfileAvatarPicker extends StatelessWidget {
               )
             else if (canEdit)
               Material(
-                color: AppColors.orange,
+                color: AppColors.brightOrange,
                 shape: const CircleBorder(),
                 child: InkWell(
                   customBorder: const CircleBorder(),

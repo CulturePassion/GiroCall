@@ -24,7 +24,7 @@ class StreakRing extends StatelessWidget {
   Widget build(BuildContext context) {
     final target = goal ?? math.max(streak, 1);
     final progress = (streak / target).clamp(0.0, 1.0);
-    final ringColor = AppColors.orange;
+    final ringColor = AppColors.goldenYellowOrange;
     final trackColor =
         AppColors.isDark(context) ? AppColors.darkDivider : AppColors.grey200;
 

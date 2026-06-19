@@ -155,7 +155,7 @@ class _LogCallScreenState extends ConsumerState<LogCallScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             PremiumCard(
-              accentColor: AppColors.main,
+              accentColor: AppColors.vibrantGreen,
               padding: const EdgeInsets.all(AppSpacing.md),
               child: Column(
                 children: [
@@ -182,7 +182,7 @@ class _LogCallScreenState extends ConsumerState<LogCallScreen> {
                   PrimaryButton(
                     label: Microcopy.callTapToCall,
                     icon: Icons.phone,
-                    backgroundColor: AppColors.main,
+                    backgroundColor: AppColors.vibrantGreen,
                     onPressed: _call,
                   ),
                 ],

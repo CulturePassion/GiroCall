@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/design/colors.dart';
-import '../../core/design/spacing.dart';
-import '../../core/design/tokens.dart';
 
 /// Live date + time strip for hub screens.
 class LiveClockHeader extends StatefulWidget {
@@ -38,46 +36,29 @@ class _LiveClockHeaderState extends State<LiveClockHeader> {
 
   @override
   Widget build(BuildContext context) {
-    final dateFmt = DateFormat('EEE, MMM d, yyyy');
+    final dateFmt = DateFormat('EEE, MMM d');
     final timeFmt = DateFormat('h:mm a');
 
     final onLight = widget.lightText;
 
-    return Container(
+    // Small and plain style
+    return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xxs + 2,
-      ),
-      decoration: BoxDecoration(
-        color: onLight
-            ? Colors.white.withValues(alpha: 0.14)
-            : AppColors.cardSurface(context),
-        borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-        border: Border.all(
-          color: onLight
-              ? Colors.white.withValues(alpha: 0.22)
-              : AppColors.isDark(context)
-                  ? AppColors.darkDivider
-                  : AppColors.grey200,
-        ),
+        horizontal: 8,
+        vertical: 2,
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            Icons.schedule_rounded,
-            size: 18,
-            color: onLight ? Colors.white : AppColors.main,
-          ),
-          const SizedBox(width: AppSpacing.xxs),
-          Expanded(
-            child: Text(
-              '${dateFmt.format(_now)} · ${timeFmt.format(_now)}',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.2,
-                    color: onLight ? Colors.white : null,
-                  ),
-            ),
+          Text(
+            '${dateFmt.format(_now)}  ·  ${timeFmt.format(_now)}',
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w400,
+                  color: onLight
+                      ? Colors.white.withValues(alpha: 0.9)
+                      : AppColors.textSecondary,
+                  letterSpacing: 0.3,
+                ),
           ),
         ],
       ),

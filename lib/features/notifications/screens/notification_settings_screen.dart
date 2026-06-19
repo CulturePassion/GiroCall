@@ -166,9 +166,9 @@ class _NotificationSettingsScreenState
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppColors.secondaryBlue.withValues(alpha: 0.12),
+                  color: AppColors.softBluePurple.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.secondaryBlue),
+                  border: Border.all(color: AppColors.softBluePurple),
                 ),
                 child: const Text(
                   'On web, your reminder time is saved to your account. '
@@ -188,7 +188,7 @@ class _NotificationSettingsScreenState
                 subtitle: const Text(
                   'Get a gentle nudge to spin the wheel each day.',
                 ),
-                activeThumbColor: AppColors.primaryTeal,
+                activeThumbColor: AppColors.vibrantGreen,
                 value: enabled,
                 onChanged: _toggle,
               ),
@@ -225,7 +225,7 @@ class _NotificationSettingsScreenState
                       min: 1,
                       max: 5,
                       divisions: 4,
-                      activeColor: AppColors.primaryTeal,
+                      activeColor: AppColors.vibrantGreen,
                       label: '$_dailyCallGoal',
                       onChanged: (value) {
                         setState(() => _dailyCallGoal = value.round());

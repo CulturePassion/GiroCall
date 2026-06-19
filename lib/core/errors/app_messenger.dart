@@ -19,7 +19,7 @@ abstract final class AppMessenger {
     _show(
       context,
       message: message,
-      backgroundColor: AppColors.main,
+      backgroundColor: AppColors.vibrantGreen,
     );
   }
 

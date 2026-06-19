@@ -129,7 +129,7 @@ class _PhoneBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.softOrange,
+      color: AppColors.softGold,
       borderRadius: BorderRadius.circular(AppTokens.radiusMd),
       child: InkWell(
         onTap: onTap,
@@ -138,11 +138,12 @@ class _PhoneBanner extends StatelessWidget {
           padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppTokens.radiusMd),
-            border: Border.all(color: AppColors.orange.withValues(alpha: 0.5)),
+            border: Border.all(
+                color: AppColors.brightOrange.withValues(alpha: 0.5)),
           ),
           child: Row(
             children: [
-              const Icon(Icons.phone_outlined, color: AppColors.orange),
+              const Icon(Icons.phone_outlined, color: AppColors.brightOrange),
               const SizedBox(width: AppSpacing.xs),
               Expanded(
                 child: Text(

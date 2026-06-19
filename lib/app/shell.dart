@@ -98,9 +98,9 @@ class MainShell extends ConsumerWidget {
         backgroundColor: isDark
             ? AppColors.darkNavBarBackground
             : AppColors.navBarBackground,
-        indicatorColor: AppColors.softTeal,
-        elevation: 8,
-        shadowColor: AppColors.main.withValues(alpha: 0.12),
+        indicatorColor: AppColors.softGreen,
+        elevation: 10,
+        shadowColor: AppColors.vibrantGreen.withValues(alpha: 0.18),
         height: AppTokens.navBarHeight,
         labelBehavior: compactLabels
             ? NavigationDestinationLabelBehavior.onlyShowSelected
@@ -204,9 +204,11 @@ class _DesktopSidebar extends StatelessWidget {
                           shape: BoxShape.circle,
                           gradient: LinearGradient(
                             colors: [
-                              AppColors.heroGradientStart,
-                              AppColors.heroGradientEnd,
+                              AppColors.vibrantGreen,
+                              AppColors.brightOrange,
                             ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                         ),
                         child: const Center(
@@ -299,9 +301,9 @@ class _SidebarNavItem extends StatelessWidget {
     final bg = selected
         ? (AppColors.isDark(context)
             ? AppColors.darkDivider
-            : AppColors.softTeal)
+            : AppColors.softGreen)
         : Colors.transparent;
-    final fg = selected ? AppColors.main : AppColors.textMuted(context);
+    final fg = selected ? AppColors.vibrantGreen : AppColors.textMuted(context);
 
     Widget icon;
     if (destination.isGiro) {
@@ -315,7 +317,8 @@ class _SidebarNavItem extends StatelessWidget {
         backgroundImage: profile?.avatarUrl != null
             ? NetworkImage(profile!.avatarUrl!) as ImageProvider
             : null,
-        backgroundColor: selected ? AppColors.orange : AppColors.main,
+        backgroundColor:
+            selected ? AppColors.brightOrange : AppColors.vibrantGreen,
         child: profile?.avatarUrl == null
             ? const Icon(Icons.person, size: 16, color: Colors.white)
             : null,
@@ -395,9 +398,9 @@ class _GiroNavIcon extends StatelessWidget {
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.orange.withValues(alpha: 0.4),
-                  blurRadius: 10,
-                  spreadRadius: 1,
+                  color: AppColors.brightOrange.withValues(alpha: 0.45),
+                  blurRadius: 12,
+                  spreadRadius: 1.5,
                 ),
               ],
             )
@@ -423,7 +426,8 @@ class _ProfileNavIcon extends StatelessWidget {
       backgroundImage: profile?.avatarUrl != null
           ? NetworkImage(profile!.avatarUrl!) as ImageProvider
           : null,
-      backgroundColor: selected ? AppColors.orange : AppColors.main,
+      backgroundColor:
+          selected ? AppColors.brightOrange : AppColors.vibrantGreen,
       child: profile?.avatarUrl == null
           ? const Icon(
               Icons.person,

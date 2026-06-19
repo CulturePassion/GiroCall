@@ -35,33 +35,33 @@ class StatsScreen extends ConsumerWidget {
         '${stats.longestStreak}',
         'days',
         Icons.emoji_events_outlined,
-        AppColors.goldenYellow,
+        AppColors.goldenYellowOrange,
       ),
       (
         'Total calls',
         '${stats.totalCalls}',
         '',
         Icons.phone_in_talk,
-        AppColors.main,
+        AppColors.vibrantGreen,
       ),
       (
         'Reconnected',
         '${stats.uniqueContactsCalled}',
         'people',
         Icons.favorite,
-        AppColors.softPink,
+        AppColors.pinkMagenta,
       ),
       (
         'Avg rating',
         stats.averageRating.toStringAsFixed(1),
         'stars',
         Icons.star_rounded,
-        AppColors.goldenYellow,
+        AppColors.goldenYellowOrange,
       ),
     ];
 
     final heroCard = PremiumCard(
-      accentColor: AppColors.orange,
+      accentColor: AppColors.brightOrange,
       padding: const EdgeInsets.all(AppSpacing.sm),
       borderRadius: AppTokens.radiusMd,
       child: Row(
@@ -102,7 +102,7 @@ class StatsScreen extends ConsumerWidget {
                     const Icon(
                       Icons.flag_outlined,
                       size: 14,
-                      color: AppColors.secondaryBlue,
+                      color: AppColors.softBluePurple,
                     ),
                     const SizedBox(width: 4),
                     Text(
@@ -122,7 +122,7 @@ class StatsScreen extends ConsumerWidget {
                     backgroundColor: AppColors.isDark(context)
                         ? AppColors.darkDivider
                         : AppColors.grey200,
-                    color: AppColors.secondaryBlue,
+                    color: AppColors.softBluePurple,
                   ),
                 ),
               ],

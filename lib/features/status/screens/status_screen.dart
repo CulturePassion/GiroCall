@@ -130,7 +130,7 @@ class _StatusScreenState extends ConsumerState<StatusScreen> {
       showBackButton: false,
       body: ShellContent(
         child: RefreshIndicator(
-          color: AppColors.main,
+          color: AppColors.vibrantGreen,
           onRefresh: _onRefresh,
           child: isDesktop
               ? Padding(

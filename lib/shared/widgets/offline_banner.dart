@@ -20,7 +20,7 @@ class OfflineBanner extends ConsumerWidget {
     }
 
     return Material(
-      color: AppColors.orange.withValues(alpha: 0.14),
+      color: AppColors.brightOrange.withValues(alpha: 0.14),
       child: SafeArea(
         bottom: false,
         child: Padding(
@@ -32,7 +32,7 @@ class OfflineBanner extends ConsumerWidget {
             children: [
               const Icon(
                 Icons.cloud_off_rounded,
-                color: AppColors.orange,
+                color: AppColors.brightOrange,
                 size: 20,
               ),
               const SizedBox(width: AppSpacing.xs),

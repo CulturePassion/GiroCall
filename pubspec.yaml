@@ -1,7 +1,7 @@
 name: girocall
 description: "Spin the Giro. Make the Call. Stay Connected."
 publish_to: 'none'
-version: 2.0.0+5
+version: 2.1.0+6
 
 environment:
   sdk: '>=3.2.0 <4.0.0'
@@ -20,8 +20,8 @@ dependencies:
   go_router: ^17.3.0
 
   # Network & observability
-  connectivity_plus: ^6.1.4
-  sentry_flutter: ^8.14.2
+  connectivity_plus: ^7.1.1
+  sentry_flutter: ^9.22.0
 
   # Contacts & permissions
   flutter_contacts: ^2.2.2
@@ -68,7 +68,7 @@ flutter_launcher_icons:
     generate: true
     image_path: "assets/images/icon.png"
     background_color: "#FFFFFF"
-    theme_color: "#00ADEF"
+    theme_color: "#1EB05B"
   image_path: "assets/images/icon.png"
   remove_alpha_ios: true
   min_sdk_android: 21

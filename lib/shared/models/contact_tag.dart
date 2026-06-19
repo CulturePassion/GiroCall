@@ -4,9 +4,9 @@ import '../../core/design/colors.dart';
 
 /// Relationship category for organizing the address book.
 enum ContactTag {
-  friends('friends', 'Friends', Icons.favorite_outline, AppColors.accentCoral),
-  family('family', 'Family', Icons.home_outlined, AppColors.secondaryBlue),
-  work('work', 'Work', Icons.work_outline, AppColors.primaryTeal),
+  friends('friends', 'Friends', Icons.favorite_outline, AppColors.brightOrange),
+  family('family', 'Family', Icons.home_outlined, AppColors.softBluePurple),
+  work('work', 'Work', Icons.work_outline, AppColors.vibrantGreen),
   business('business', 'Business', Icons.business_center_outlined,
       AppColors.persianBlue);
 

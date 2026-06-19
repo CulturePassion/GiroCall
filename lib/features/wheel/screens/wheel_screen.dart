@@ -499,7 +499,7 @@ class _WheelResult extends StatelessWidget {
   Widget build(BuildContext context) {
     if (contact == null) {
       return PremiumCard(
-        accentColor: AppColors.main,
+        accentColor: AppColors.vibrantGreen,
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -507,7 +507,7 @@ class _WheelResult extends StatelessWidget {
             Icon(
               Icons.auto_awesome,
               size: 40,
-              color: AppColors.main.withValues(alpha: 0.8),
+              color: AppColors.vibrantGreen.withValues(alpha: 0.8),
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
@@ -531,7 +531,7 @@ class _WheelResult extends StatelessWidget {
     }
 
     return PremiumCard(
-      accentColor: AppColors.orange,
+      accentColor: AppColors.brightOrange,
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -539,7 +539,7 @@ class _WheelResult extends StatelessWidget {
           Text(
             'Your pick',
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  color: AppColors.orange,
+                  color: AppColors.brightOrange,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
                 ),
@@ -572,7 +572,7 @@ class _WheelResult extends StatelessWidget {
             child: FilledButton.icon(
               onPressed: onCall,
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.orange,
+                backgroundColor: AppColors.brightOrange,
                 foregroundColor: Colors.white,
                 minimumSize: const Size(0, AppTokens.minTouchTarget),
                 shape: RoundedRectangleBorder(

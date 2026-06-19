@@ -39,11 +39,11 @@ class AppTheme {
     final isDark = brightness == Brightness.dark;
     final colorScheme = ColorScheme(
       brightness: brightness,
-      primary: AppColors.main,
+      primary: AppColors.vibrantGreen,
       onPrimary: Colors.white,
-      secondary: AppColors.orange,
+      secondary: AppColors.brightOrange,
       onSecondary: Colors.white,
-      tertiary: AppColors.premiumPurple,
+      tertiary: AppColors.pinkMagenta,
       onTertiary: Colors.white,
       error: AppColors.error,
       onError: Colors.white,
@@ -66,61 +66,61 @@ class AppTheme {
       appBarTheme: AppBarTheme(
         elevation: 0,
         centerTitle: false,
-        backgroundColor: AppColors.main,
+        backgroundColor: AppColors.vibrantGreen,
         foregroundColor: Colors.white,
         systemOverlayStyle: SystemUiOverlayStyle.light,
         titleTextStyle: textTheme.titleLarge?.copyWith(
           color: Colors.white,
-          fontWeight: FontWeight.w600,
+          fontWeight: FontWeight.w700,
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
         elevation: 8,
         backgroundColor: surface,
-        indicatorColor: AppColors.primaryTeal,
+        indicatorColor: AppColors.vibrantGreen,
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return TextStyle(
             fontSize: 11,
-            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-            color: selected ? AppColors.primaryTeal : onSurfaceVariant,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            color: selected ? AppColors.vibrantGreen : onSurfaceVariant,
           );
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           final selected = states.contains(WidgetState.selected);
           return IconThemeData(
-            color: selected ? AppColors.primaryTeal : onSurfaceVariant,
+            color: selected ? AppColors.vibrantGreen : onSurfaceVariant,
           );
         }),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.orange,
+          backgroundColor: AppColors.brightOrange,
           foregroundColor: Colors.white,
-          elevation: 3,
-          shadowColor: AppColors.orange.withValues(alpha: 0.3),
+          elevation: 2,
+          shadowColor: AppColors.brightOrange.withValues(alpha: 0.28),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTokens.radiusLg),
           ),
           padding: const EdgeInsets.symmetric(
             vertical: AppSpacing.sm,
-            horizontal: AppSpacing.sm,
+            horizontal: AppSpacing.md,
           ),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: isDark ? Colors.white : AppColors.main,
+          foregroundColor: isDark ? Colors.white : AppColors.vibrantGreen,
           side: BorderSide(
-            color: isDark ? Colors.white : AppColors.main,
-            width: 2,
+            color: isDark ? AppColors.softBluePurple : AppColors.vibrantGreen,
+            width: 1.5,
           ),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppTokens.radiusLg),
           ),
           padding: const EdgeInsets.symmetric(
             vertical: AppSpacing.sm,
-            horizontal: AppSpacing.sm,
+            horizontal: AppSpacing.md,
           ),
         ),
       ),
@@ -133,7 +133,7 @@ class AppTheme {
           fontWeight: FontWeight.w500,
         ),
         floatingLabelStyle: const TextStyle(
-          color: AppColors.primaryTeal,
+          color: AppColors.vibrantGreen,
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
@@ -160,8 +160,8 @@ class AppTheme {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(AppTokens.radiusMd),
           borderSide: const BorderSide(
-            color: AppColors.primaryTeal,
-            width: 2.5,
+            color: AppColors.vibrantGreen,
+            width: 2,
           ),
         ),
         errorBorder: OutlineInputBorder(
@@ -174,27 +174,28 @@ class AppTheme {
         ),
       ),
       textSelectionTheme: TextSelectionThemeData(
-        cursorColor: AppColors.primaryTeal,
-        selectionColor: AppColors.primaryTeal.withValues(alpha: 0.25),
-        selectionHandleColor: AppColors.primaryTeal,
+        cursorColor: AppColors.vibrantGreen,
+        selectionColor: AppColors.vibrantGreen.withValues(alpha: 0.25),
+        selectionHandleColor: AppColors.vibrantGreen,
       ),
       cardTheme: CardThemeData(
-        elevation: 0,
+        elevation: 1,
         color: surface,
-        shadowColor: Colors.black.withValues(alpha: 0.06),
+        shadowColor: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTokens.radiusLg),
           side: BorderSide(
             color: isDark ? AppColors.darkDivider : AppColors.grey200,
+            width: 0.5,
           ),
         ),
         clipBehavior: Clip.antiAlias,
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: AppColors.main,
+        backgroundColor: AppColors.vibrantGreen,
         contentTextStyle: const TextStyle(
           color: Colors.white,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
         ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
@@ -202,9 +203,9 @@ class AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: AppColors.orange,
+        backgroundColor: AppColors.brightOrange,
         foregroundColor: Colors.white,
-        elevation: 6,
+        elevation: 5,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTokens.radiusLg),
         ),

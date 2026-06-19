@@ -358,7 +358,7 @@ class _ContactListOnly extends ConsumerWidget {
     final others = contacts.where((c) => !c.isFavorite).toList(growable: false);
 
     return RefreshIndicator(
-      color: AppColors.main,
+      color: AppColors.vibrantGreen,
       onRefresh: () async {
         ref.invalidate(contactsNotifierProvider);
         await ref.read(contactsNotifierProvider.notifier).loadContacts();
@@ -435,7 +435,7 @@ class _ContactListScroll extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return RefreshIndicator(
-      color: AppColors.main,
+      color: AppColors.vibrantGreen,
       onRefresh: () async {
         ref.invalidate(contactsNotifierProvider);
         await ref.read(contactsNotifierProvider.notifier).loadContacts();
@@ -484,7 +484,7 @@ class _SectionLabel extends StatelessWidget {
       child: Text(
         label,
         style: Theme.of(context).textTheme.titleSmall?.copyWith(
-              color: AppColors.main,
+              color: AppColors.vibrantGreen,
               fontWeight: FontWeight.w700,
               letterSpacing: 0.3,
             ),

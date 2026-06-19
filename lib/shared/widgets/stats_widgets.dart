@@ -41,21 +41,21 @@ class StatsDashboardPanel extends StatelessWidget {
                   children: [
                     _MetricLine(
                       icon: Icons.favorite,
-                      color: AppColors.softPink,
+                      color: AppColors.pinkMagenta,
                       label: 'Reconnected',
                       value: '${stats.uniqueContactsCalled}',
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     _MetricLine(
                       icon: Icons.phone_in_talk,
-                      color: AppColors.main,
+                      color: AppColors.vibrantGreen,
                       label: 'Total calls',
                       value: '${stats.totalCalls}',
                     ),
                     const SizedBox(height: AppSpacing.xs),
                     _MetricLine(
                       icon: Icons.flag_outlined,
-                      color: AppColors.secondaryBlue,
+                      color: AppColors.softBluePurple,
                       label: 'Today',
                       value: '${stats.callsToday} / $dailyGoal',
                     ),
@@ -260,7 +260,10 @@ class ActivityBarChart extends StatelessWidget {
                 gradient: const LinearGradient(
                   begin: Alignment.bottomCenter,
                   end: Alignment.topCenter,
-                  colors: [AppColors.main, AppColors.heroGradientMid],
+                  colors: [
+                    AppColors.vibrantGreen,
+                    AppColors.goldenYellowOrange
+                  ],
                 ),
               ),
             ],

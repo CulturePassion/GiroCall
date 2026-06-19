@@ -51,17 +51,17 @@ class PrimaryButton extends StatelessWidget {
             )
           : Text(label),
       style: FilledButton.styleFrom(
-        backgroundColor: backgroundColor ?? AppColors.orange,
+        backgroundColor: backgroundColor ?? AppColors.brightOrange,
         foregroundColor: foregroundColor ?? Colors.white,
         padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
+          horizontal: AppSpacing.lg,
           vertical: AppSpacing.sm,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppTokens.radiusLg),
         ),
-        elevation: 4,
-        shadowColor: AppColors.orange.withValues(alpha: 0.4),
+        elevation: 3,
+        shadowColor: AppColors.brightOrange.withValues(alpha: 0.35),
         minimumSize: Size(
           fullWidth ? double.infinity : 0,
           AppTokens.minTouchTarget,

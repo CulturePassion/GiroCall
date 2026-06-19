@@ -49,6 +49,11 @@ make run-android
 | Stats | `/stats` | Streaks and charts |
 | You | `/profile` | Account hub |
 
+## Recent Updates (v2.1)
+- Premium frosted glassmorphism, entrance animations, spacing & dark mode polish focused on Profile + Digital Card
+- Full brand palette refresh (#1EB05B vibrant green + 5 supporting colors)
+- See CHANGELOG.md for details
+
 Public digital cards: `/card/:slug` (no auth required)
 
 ## Build & Deploy

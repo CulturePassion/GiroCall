@@ -8,6 +8,7 @@ import '../../../core/design/spacing.dart';
 import '../../../core/design/tokens.dart';
 import '../../../core/utils/card_url.dart';
 import '../../../shared/models/user_profile.dart';
+import '../../../shared/widgets/glass_surface.dart';
 
 enum DigitalCardVariant { public, owner }
 
@@ -58,7 +59,7 @@ class DigitalCardView extends StatelessWidget {
           _LinkButton(
             icon: Icons.phone_outlined,
             label: profile.phone!,
-            color: AppColors.main,
+            color: AppColors.vibrantGreen,
             onTap: () => _launchUri('tel:${profile.phone}'),
           ),
         if (profile.email != null && profile.email!.isNotEmpty) ...[
@@ -66,7 +67,7 @@ class DigitalCardView extends StatelessWidget {
           _LinkButton(
             icon: Icons.email_outlined,
             label: profile.email!,
-            color: AppColors.secondaryBlue,
+            color: AppColors.softBluePurple,
             onTap: () => _launchUri('mailto:${profile.email}'),
           ),
         ],
@@ -213,21 +214,19 @@ class DigitalCardView extends StatelessWidget {
   Color _colorFor(String platform) {
     switch (platform) {
       case 'linkedin':
-        return AppColors.royalBlue;
+        return AppColors.softBluePurple;
       case 'twitter':
-        return AppColors.warmBlue;
-      case 'instagram':
-        return AppColors.softPink;
       case 'facebook':
-        return AppColors.warmBlue;
+        return AppColors.softBluePurple;
+      case 'instagram':
+        return AppColors.pinkMagenta;
       case 'tiktok':
-        return AppColors.persianBlue;
       case 'youtube':
-        return AppColors.error;
+        return AppColors.brightOrange;
       case 'website':
-        return AppColors.main;
+        return AppColors.vibrantGreen;
       default:
-        return AppColors.warmGray;
+        return AppColors.tealDarkGreen;
     }
   }
 }
@@ -247,18 +246,18 @@ class _HeroHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassSurface(
+      frosted: true,
+      blurSigma: 16,
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.md,
         AppSpacing.lg,
         AppSpacing.md,
         AppSpacing.md,
       ),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(AppTokens.radiusXl),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.22)),
-      ),
+      borderRadius: AppTokens.radiusXl,
+      // Slight tint for better readability on vibrant gradients
+      color: Colors.white.withValues(alpha: 0.08),
       child: Column(
         children: [
           Container(
@@ -274,24 +273,32 @@ class _HeroHeader extends StatelessWidget {
                 ),
               ],
             ),
-            child: CircleAvatar(
-              radius: 48,
-              backgroundColor: AppColors.primaryTeal,
-              backgroundImage: profile.avatarUrl != null
-                  ? NetworkImage(profile.avatarUrl!)
-                  : null,
-              child: profile.avatarUrl == null
-                  ? Text(
-                      profile.displayName.isNotEmpty
-                          ? profile.displayName[0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(
-                        fontSize: 36,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  : null,
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.85, end: 1.0),
+              duration: AppTokens.animationSlow,
+              curve: Curves.elasticOut,
+              builder: (context, scale, _) => Transform.scale(
+                scale: scale,
+                child: CircleAvatar(
+                  radius: 48,
+                  backgroundColor: AppColors.vibrantGreen,
+                  backgroundImage: profile.avatarUrl != null
+                      ? NetworkImage(profile.avatarUrl!)
+                      : null,
+                  child: profile.avatarUrl == null
+                      ? Text(
+                          profile.displayName.isNotEmpty
+                              ? profile.displayName[0].toUpperCase()
+                              : '?',
+                          style: const TextStyle(
+                            fontSize: 36,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      : null,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -359,7 +366,7 @@ class _HeroHeader extends StatelessWidget {
           ],
         ],
       ),
-    );
+    ); // close GlassSurface
   }
 }
 
@@ -378,49 +385,58 @@ class _LinkButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      elevation: 2,
-      shadowColor: Colors.black.withValues(alpha: 0.12),
-      borderRadius: BorderRadius.circular(999),
-      child: InkWell(
-        onTap: onTap,
+    final isDark = AppColors.isDark(context);
+
+    // Modern frosted pill glass button for more glass feel
+    return GlassSurface(
+      frosted: true,
+      blurSigma: 6,
+      padding: EdgeInsets.zero,
+      borderRadius: 999,
+      color: Colors.white.withValues(alpha: isDark ? 0.08 : 0.92),
+      child: Material(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(999),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: 14,
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 14,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.16),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: color, size: 18),
                 ),
-                child: Icon(icon, color: color, size: 18),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: Text(
-                  label,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                      ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? Colors.white : AppColors.textPrimary,
+                        ),
+                  ),
                 ),
-              ),
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 14,
-                color: AppColors.textSecondary.withValues(alpha: 0.7),
-              ),
-            ],
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 14,
+                  color: (isDark ? Colors.white : AppColors.textSecondary)
+                      .withValues(alpha: 0.7),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -460,7 +476,7 @@ class _ActionButton extends StatelessWidget {
         onPressed: onTap,
         style: FilledButton.styleFrom(
           backgroundColor: Colors.white,
-          foregroundColor: AppColors.main,
+          foregroundColor: AppColors.vibrantGreen,
           minimumSize: const Size.fromHeight(48),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(999),
@@ -474,11 +490,13 @@ class _ActionButton extends StatelessWidget {
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
         foregroundColor: Colors.white,
-        side: BorderSide(color: Colors.white.withValues(alpha: 0.65)),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.7)),
         minimumSize: const Size.fromHeight(48),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(999),
         ),
+        // Subtle glass hint on outline
+        backgroundColor: Colors.white.withValues(alpha: 0.06),
       ),
       child: child,
     );
@@ -514,7 +532,7 @@ class _QrSection extends StatelessWidget {
             size: 160,
             eyeStyle: const QrEyeStyle(
               eyeShape: QrEyeShape.square,
-              color: AppColors.primaryTeal,
+              color: AppColors.vibrantGreen,
             ),
             dataModuleStyle: const QrDataModuleStyle(
               dataModuleShape: QrDataModuleShape.square,

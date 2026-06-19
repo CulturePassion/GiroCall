@@ -29,7 +29,7 @@ class StatusNudgeCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.xs),
       child: PremiumCard(
-        accentColor: AppColors.orange,
+        accentColor: AppColors.brightOrange,
         padding: const EdgeInsets.all(AppSpacing.sm),
         child: Material(
           color: Colors.transparent,
@@ -56,7 +56,7 @@ class StatusNudgeCard extends StatelessWidget {
                       Text(
                         subtitle,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.orange,
+                              color: AppColors.brightOrange,
                               fontWeight: FontWeight.w600,
                             ),
                       ),
@@ -64,7 +64,7 @@ class StatusNudgeCard extends StatelessWidget {
                   ),
                 ),
                 Material(
-                  color: AppColors.softTeal,
+                  color: AppColors.softGreen,
                   borderRadius: BorderRadius.circular(AppTokens.radiusSm),
                   child: InkWell(
                     onTap: onCall,
@@ -74,7 +74,7 @@ class StatusNudgeCard extends StatelessWidget {
                       height: AppTokens.minTouchTarget,
                       child: Icon(
                         Icons.phone_rounded,
-                        color: AppColors.main,
+                        color: AppColors.vibrantGreen,
                       ),
                     ),
                   ),

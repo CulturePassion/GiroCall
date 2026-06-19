@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/design/tokens.dart';
+
 /// Grouped settings section with optional header.
 class SettingsSection extends StatelessWidget {
   final String? title;
@@ -18,18 +20,22 @@ class SettingsSection extends StatelessWidget {
       children: [
         if (title != null) ...[
           Padding(
-            padding: const EdgeInsets.fromLTRB(4, 8, 4, 8),
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 10),
             child: Text(
               title!,
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    letterSpacing: 0.5,
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w600,
                   ),
             ),
           ),
         ],
         Card(
           clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTokens.radiusLg),
+          ),
           child: Column(
             children: _withDividers(context, children),
           ),
@@ -47,7 +53,7 @@ class SettingsSection extends StatelessWidget {
       if (i < items.length - 1) {
         result.add(Divider(
           height: 1,
-          indent: 56,
+          indent: 60,
           color: Theme.of(context).dividerColor,
         ));
       }
@@ -92,27 +98,27 @@ class SettingsTile extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(
-                width: 40,
-                height: 40,
+                width: 42,
+                height: 42,
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: (iconColor ?? colorScheme.primary)
-                        .withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
+                        .withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(AppTokens.radiusSm),
                   ),
                   child: Icon(
                     icon,
-                    size: 22,
+                    size: 20,
                     color: iconColor ?? colorScheme.primary,
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 18),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

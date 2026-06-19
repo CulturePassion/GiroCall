@@ -33,7 +33,7 @@ class EmptyState extends StatelessWidget {
             maxWidth: ResponsiveLayout.formMaxWidth(context),
           ),
           child: PremiumCard(
-            accentColor: AppColors.orange,
+            accentColor: AppColors.brightOrange,
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -43,17 +43,20 @@ class EmptyState extends StatelessWidget {
                   height: 80,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [AppColors.softTeal, AppColors.softOrange],
+                      colors: [
+                        AppColors.softGreen,
+                        AppColors.softGold,
+                      ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.main.withValues(alpha: 0.2),
+                      color: AppColors.vibrantGreen.withValues(alpha: 0.2),
                       width: 2,
                     ),
                   ),
-                  child: Icon(icon, size: 40, color: AppColors.main),
+                  child: Icon(icon, size: 40, color: AppColors.vibrantGreen),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
@@ -78,7 +81,7 @@ class EmptyState extends StatelessWidget {
                     child: FilledButton(
                       onPressed: onAction,
                       style: FilledButton.styleFrom(
-                        backgroundColor: AppColors.orange,
+                        backgroundColor: AppColors.brightOrange,
                         foregroundColor: Colors.white,
                         minimumSize: const Size.fromHeight(
                           AppTokens.minTouchTarget,

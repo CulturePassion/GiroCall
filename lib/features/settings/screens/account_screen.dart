@@ -254,7 +254,7 @@ class _AccountAvatar extends StatelessWidget {
       height: 64,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [AppColors.main, AppColors.royalBlue],
+          colors: [AppColors.vibrantGreen, AppColors.softBluePurple],
         ),
         borderRadius: BorderRadius.circular(AppTokens.radiusMd),
       ),

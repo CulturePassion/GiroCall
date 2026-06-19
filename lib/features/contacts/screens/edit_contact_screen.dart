@@ -113,7 +113,7 @@ class _EditContactScreenState extends ConsumerState<EditContactScreen> {
                         (_formData.relationshipScore ?? 0) >= star
                             ? Icons.star
                             : Icons.star_border,
-                        color: AppColors.accentCoral,
+                        color: AppColors.brightOrange,
                       ),
                     );
                   }),

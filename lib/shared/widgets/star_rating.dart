@@ -33,7 +33,7 @@ class StarRating extends StatelessWidget {
             icon: Icon(
               isFilled ? Icons.star_rounded : Icons.star_border_rounded,
               size: size,
-              color: isFilled ? AppColors.accentCoral : inactiveColor,
+              color: isFilled ? AppColors.brightOrange : inactiveColor,
             ),
             constraints: const BoxConstraints(
               minWidth: AppTokens.minTouchTarget,
